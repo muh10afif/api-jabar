@@ -10,7 +10,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 /**
  * @OA\Swagger(
  *     basePath="/",
- *     schemes={"https://10.59.105.208/api-rabfail/api/v1/"},
+ *     schemes={"http://localhost:8080/api/v1/"},
  *     @OA\Info(
  *         version="1.0.0",
  *         title="API documentation"
@@ -20,7 +20,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
  /**
 *  @OA\Server(
-*      url="https://10.59.105.208/api-rabfail/api/v1/",
+*      url="http://localhost:8080/api/v1/",
 *      description="Host"
 *  )
 *
