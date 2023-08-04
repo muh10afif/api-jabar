@@ -9,6 +9,26 @@ use Illuminate\Support\Carbon;
 
 class RabfailController extends Controller
 {
+    public function cek_tanggal($data){
+        $ar=explode("-", $data);
+
+        if(count($ar) == 3){
+         return true;
+        }else{
+         return false;
+        }
+    }
+
+    public function cek_bulan($data){
+        $ar=explode("-", $data);
+
+        if(count($ar) == 2){
+         return true;
+        }else{
+         return false;
+        }
+    }
+
     public function index(Request $request)
     {
         $dt = $request->all();
@@ -16,6 +36,22 @@ class RabfailController extends Controller
         $mode     = $dt['mode'];
         $str      = $dt['start'];
         $stp      = $dt['stop'];
+
+        if ($mode == '') {
+            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong. 4 Pilihan: line-chart, top-10, pie-chart, based-on-rtp']);
+        }
+        if ($str == '') {
+            return Core::setResponse("error", ['start' => 'Parameter start tidak boleh kosong.']);
+        } elseif (!$this->cek_tanggal($str)) {
+            return Core::setResponse("error", ['start' => 'Format tanggal salah.']);
+        }
+
+        if ($stp == '') {
+            return Core::setResponse("error", ['stop' => 'Parameter start tidak boleh kosong.']);
+        } elseif (!$this->cek_tanggal($stp)) {
+            return Core::setResponse("error", ['stop' => 'Format tanggal salah.']);
+        }
+
 
         if (!empty($str) && !empty($stp)) {
             $tanggalstart = date('Y-m-d', strtotime($str));
@@ -77,11 +113,20 @@ class RabfailController extends Controller
 
                 }
                 break;
+
+            default:
+                return Core::setResponse('not_found', ['mode' => "Parameter mode tersebut tidak ditemukan. 4 Pilihan: line-chart, top-10, pie-chart, based-on-rtp"]);
         }
 
         $value      = array();
         $counter    = 0;
         $str        = array();
+
+        $count = count($doquery);
+
+        if ($count == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada."]);
+        }
 
         foreach ($doquery as $doquery => $key) {
 
@@ -116,7 +161,7 @@ class RabfailController extends Controller
             }
         }
 
-        return Core::setResponse("success",$mode,$output);
+        return Core::setResponse("success", $output);
     }
 
     public function triDay(Request $request)
@@ -124,7 +169,13 @@ class RabfailController extends Controller
         $rq = $request->all();
 
         $bl     = $rq['bulan'];
-        $mode   = $rq['mode'];
+        $mode   = "Interval 3 days";
+
+        if ($bl == '') {
+            return Core::setResponse("error", ['bulan' => 'Parameter bulan tidak boleh kosong.']);
+        } elseif (!$this->cek_bulan($bl)) {
+            return Core::setResponse("error", ['bulan' => 'Format bulan salah.']);
+        }
 
         $month_t    = $bl . "-01";
         $month      = $bl;
@@ -186,13 +237,23 @@ class RabfailController extends Controller
             }
         }
 
-        return Core::setResponse("success",$mode,$output);
+        if ($series['data'][0] == '') {
+            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+        }
+
+        return Core::setResponse("success",$output);
 
     }
 
     public function listRtp(Request $request)
     {
         $r_tgl = $request->tanggal;
+
+        if ($r_tgl == '') {
+            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+        } elseif (!$this->cek_tanggal($r_tgl)) {
+            return Core::setResponse("error", ['tanggal' => 'Format tanggal salah.']);
+        }
 
         $tgl = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($r_tgl));
         $tanggal = date("Y-m-d", strtotime($tgl));
@@ -220,13 +281,19 @@ class RabfailController extends Controller
             $option .= "<option value='".$d->RTPO."'>".$d->RTPO."</option>";
         }
 
-        return Core::setResponse("success","List RTPO", $option);
+        return Core::setResponse("success", $option);
 
     }
 
     public function list50(Request $request)
     {
         $r_tgl = $request->tanggal;
+
+        if ($r_tgl == '') {
+            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+        } elseif (!$this->cek_tanggal($r_tgl)) {
+            return Core::setResponse("error", ['tanggal' => 'Format tanggal salah.']);
+        }
 
         $tgl = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($r_tgl));
         $tanggal = date("Y-m-d", strtotime($tgl));
@@ -291,7 +358,7 @@ class RabfailController extends Controller
 
         $arr = array("option_tnl" => $option_tnl, "option_mme" => $option_mme);
 
-        return Core::setResponse("success","List 50", $arr);
+        return Core::setResponse("success", $arr);
 
     }
 
@@ -302,6 +369,16 @@ class RabfailController extends Controller
         $r_tgl = $request->tanggal;
         $r_rtp = $request->rtp;
 
+        if ($r_tgl == '') {
+            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+        } elseif (!$this->cek_tanggal($r_tgl)) {
+            return Core::setResponse("error", ['tanggal' => 'Format tanggal salah.']);
+        }
+
+        if ($r_rtp == '') {
+            return Core::setResponse("error", ['rtp' => 'Parameter rtp tidak boleh kosong.']);
+        }
+
         $tgl        = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($r_tgl));
         $tanggal    = date("Y-m-d", strtotime($tgl));
 
@@ -310,9 +387,11 @@ class RabfailController extends Controller
 
         $result = \DB::connection("mysql")->select("SELECT @n := @n + 1 n,a.mydate, a.siteid, a.sitename, a.cellname, a.rab_fail_est_mme, a.rab_fail_est_rnl, a.rab_fail_est_tnl, b.RTPO FROM monitoring_4g_rabfail_15mnit_$bln AS a INNER JOIN dapot_transport_new AS b ON (a.siteid = b.Site_ID), (SELECT @n := 0) m WHERE b.RTPO = ? AND a.mydate BETWEEN ? AND ?", [$rtp, "$tanggal 00:00:00", "$tanggal 23:55:00"]);
 
-        // $hsl = (object) $result;
+        if (count($result) == 0) {
+            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+        }
 
-        return Core::setResponse("success","Export Rabfail", array("result" => $result));
+        return Core::setResponse("success", array("result" => $result));
     }
 
     public function detailRTP(Request $request)
@@ -320,6 +399,16 @@ class RabfailController extends Controller
         $r_tgl = $request->tanggal;
         $r_rtp = $request->rtp;
         $r_cat = $request->category;
+
+        if ($r_tgl == '') {
+            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+        }
+        if ($r_rtp == '') {
+            return Core::setResponse("error", ['rtp' => 'Parameter rtp tidak boleh kosong.']);
+        }
+        if ($r_cat == '') {
+            return Core::setResponse("error", ['category' => 'Parameter category tidak boleh kosong.']);
+        }
 
         $tanggal    = date('Y-m-d H:i:s', strtotime($r_tgl));
 
@@ -360,6 +449,10 @@ class RabfailController extends Controller
                 $condition2
             ", $isi);
 
+        if (count($doquery1) == 0) {
+            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+        }
+
         foreach($doquery1 as $object)
         {
             $doquery[] = (array) $object;
@@ -383,7 +476,7 @@ class RabfailController extends Controller
 
         $output['new_category'] = $new_category;
 
-        return Core::setResponse("success", "Detail RTPO", $output);
+        return Core::setResponse("success", $output);
     }
 
 }
