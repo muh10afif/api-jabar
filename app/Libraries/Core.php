@@ -15,31 +15,31 @@ class Core
      * @param int $code header code of response
      * @return mixed array|json
      */
-    public function setResponse( $type = 'not_found',$message = "Not Found", $data = [], $is_array = FALSE, $code = null ){
+    public function setResponse( $type = 'not_found', $data = [], $is_array = FALSE, $code = null ){
 
         switch($type){
 
             case 'success':
                 $status = "success";
-                $message = $message;
+                // $message = $message;
                 $body = 'data' ;
                 $code = $code ?? 200;
                 break;
             case 'error':
                 $status = "error";
-                $message = $message;
-                $body = 'error_info' ;
+                // $message = $message;
+                $body = 'message' ;
                 $code = $code ?? 400;
                 break;
             default:
                 $status = $type;
-                $message = $message;
-                $body = $data ;
+                // $message = $message;
+                $body = 'message' ;
                 $code = 404;
 
         }
 
-        $response =  [ $status  => $message ,$body => $data ];
+        $response =  [ 'code' => $code, $body => $data ];
 
 
         if ($is_array) {
