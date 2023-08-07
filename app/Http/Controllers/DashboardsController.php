@@ -93,7 +93,7 @@ class DashboardsController extends Controller
                 $output['title'] = 'CCR Trend';
                 break;
             default:
-                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ditemukan.']);
+                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ditemukan. 2 Pilihan: scr, ccr']);
 
         }
 
@@ -252,6 +252,8 @@ class DashboardsController extends Controller
             } elseif ($area == 'all') {
                 $where = "";
                 $areanya = "Area 2";
+            } else {
+                return Core::setResponse("not_found", ['area' => 'Parameter area salah. 3 pilihan: jabar, jabo, all']);
             }
         } else {
             $where = " and (ggsn_name like '%DGO%' or ggsn_name like '%SOE%')";
@@ -650,6 +652,8 @@ class DashboardsController extends Controller
                 if($area =='jabar'){
                     $where = " and (ne_name like '%DGO%' or ne_name like '%SOE%')";
                     $areanya = "Jabar";
+                } else {
+                    return Core::setResponse("not_found", ['area' => 'Parameter area isi dengan jabar.']);
                 }
         }else{
             $where = " and (ne_name like '%DGO%' or ne_name like '%SOE%')";
@@ -735,7 +739,7 @@ class DashboardsController extends Controller
                 $output['yaxisVal'] = "RPM";
                 break;
             default:
-                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ada.']);
+                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ada. 4 pilihan: fantray,modul,speedfanft1,speedfanft2']);
         }
 
         $point      = array();
@@ -860,7 +864,7 @@ class DashboardsController extends Controller
             return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
-        return Core::setResponse('success', "List Name GGSN $mode", $query);
+        return Core::setResponse('success', $query);
 
     }
 }

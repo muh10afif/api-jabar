@@ -43,7 +43,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
 
-            return $this->core->setResponse('error', $validator->messages()->first(), NULL, false , 400  );
+            return $this->core->setResponse('error', $validator->messages()->first());
         }
 
         $input = $request->all();
@@ -52,7 +52,7 @@ class AuthController extends Controller
 
         $user = User::create($input);
 
-        return $this->core->setResponse('success', 'Account created successfully!', $user );
+        return $this->core->setResponse('success', $user );
     }
 
     /**
@@ -67,14 +67,14 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
 
-            return $this->core->setResponse('error', $validator->messages()->first(), NULL, false , 400  );
+            return $this->core->setResponse('error', $validator->messages()->first());
         }
 
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
 
-            return $this->core->setResponse('error', 'Please check your email or password !', NULL, false , 400  );
+            return $this->core->setResponse('error', ['username/password' => 'Please check your email or password !']);
         }
 
         return $this->respondWithToken($token, 'login');
@@ -89,7 +89,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return $this->core->setResponse('success', 'Successfully logged out' );
+        return $this->core->setResponse('success', ['result' => 'Successfully logged out'] );
     }
 
     /**
@@ -109,7 +109,7 @@ class AuthController extends Controller
      */
     public function profile() {
 
-        return $this->core->setResponse('success', 'User Profile',  auth()->user());
+        return $this->core->setResponse('success', auth()->user());
     }
 
 
@@ -167,7 +167,7 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * config('auth.jwt.expires_in', 60),
         ];
 
-        return $this->core->setResponse('success', "Successfully $action", $data );
+        return $this->core->setResponse('success', $data);
     }
 
 }

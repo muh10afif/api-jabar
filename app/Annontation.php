@@ -342,14 +342,6 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 *                 type="string"
 *           )
 *       ),
-*       @OA\Parameter(
-*           name="mode",
-*           in="query",
-*           required=true,
-*           @OA\Schema(
-*                 type="string"
-*           )
-*       ),
 *    @OA\Response(
 *      response=200,
 *       description="Success",
@@ -768,7 +760,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 *       @OA\Parameter(
 *           name="apn",
 *           in="query",
-*           required=true,
+*           required=false,
 *           @OA\Schema(
 *                 type="string"
 *           )

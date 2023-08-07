@@ -308,14 +308,6 @@
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    {
-                        "name": "mode",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
                     }
                 ],
                 "responses": {
@@ -717,7 +709,7 @@
                     {
                         "name": "apn",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }
