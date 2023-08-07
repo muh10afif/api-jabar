@@ -48,5 +48,14 @@ return [
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
         ],
+        'mysql144' => [
+            'driver' => 'mysql',
+            'host' => env('DB6_HOST'),
+            'database' => env('DB6_DATABASE'),
+            'username' => env('DB6_USERNAME'),
+            'password' => env('DB6_PASSWORD'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+        ],
     ]
 ];
