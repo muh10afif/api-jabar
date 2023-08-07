@@ -38,6 +38,7 @@ class Authenticate
         if ($this->auth->guard($guard)->guest()) {
 
             return response()->json([
+                'code'  => 401,
                 'error' => 'Unauthorized',
             ])->setStatusCode(401);
 

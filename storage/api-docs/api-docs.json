@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "https://10.59.105.208/api-rabfail/api/v1/",
+            "url": "http://localhost:8080/api/v1/",
             "description": "Host"
         }
     ],
@@ -303,14 +303,6 @@
                 "parameters": [
                     {
                         "name": "bulan",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "mode",
                         "in": "query",
                         "required": true,
                         "schema": {
@@ -717,7 +709,7 @@
                     {
                         "name": "apn",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }

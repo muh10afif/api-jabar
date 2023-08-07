@@ -10,7 +10,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 /**
  * @OA\Swagger(
  *     basePath="/",
- *     schemes={"https://10.59.105.208/api-rabfail/api/v1/"},
+ *     schemes={"http://localhost:8080/api/v1/"},
  *     @OA\Info(
  *         version="1.0.0",
  *         title="API documentation"
@@ -20,7 +20,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
  /**
 *  @OA\Server(
-*      url="https://10.59.105.208/api-rabfail/api/v1/",
+*      url="http://localhost:8080/api/v1/",
 *      description="Host"
 *  )
 *
@@ -336,14 +336,6 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 *     tags={"Rabfail"},
 *       @OA\Parameter(
 *           name="bulan",
-*           in="query",
-*           required=true,
-*           @OA\Schema(
-*                 type="string"
-*           )
-*       ),
-*       @OA\Parameter(
-*           name="mode",
 *           in="query",
 *           required=true,
 *           @OA\Schema(
@@ -768,7 +760,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 *       @OA\Parameter(
 *           name="apn",
 *           in="query",
-*           required=true,
+*           required=false,
 *           @OA\Schema(
 *                 type="string"
 *           )
