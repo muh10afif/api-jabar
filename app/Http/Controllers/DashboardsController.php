@@ -867,4 +867,15 @@ class DashboardsController extends Controller
         return Core::setResponse('success', $query);
 
     }
+
+    public function neName_dropdown()
+    {
+        $query = DB::connection("mysql139")->select("SELECT distinct(ne_name) from ggsn_fantray_temp_mon where date_id >= date_add(curdate(),interval -3 day)");
+
+        if (count($query) == 0) {
+            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+        }
+
+        return Core::setResponse('success', $query);
+    }
 }

@@ -916,6 +916,38 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 * )
 */
 
+/**
+* @OA\Get(
+*     path="/neName_dropdown",
+*     summary="Get list data ne_Name",
+*     tags={"Dashboards Performance"},
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
 class Annotation extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
