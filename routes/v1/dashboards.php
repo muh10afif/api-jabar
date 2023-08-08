@@ -7,3 +7,4 @@ $router->get('/pdp_sr_graph', [ 'as' => 'pdp_sr_graph', 'uses' => 'DashboardsCon
 $router->get('/ggsn', [ 'as' => 'ggsn', 'uses' => 'DashboardsController@ggsn']);
 $router->get('/ggsn_fan_temp', [ 'as' => 'ggsn_fan_temperature', 'uses' => 'DashboardsController@ggsn_fan_temperature']);
 $router->post('/ggsn_dropdown', [ 'as' => 'ggsn_dropdown', 'uses' => 'DashboardsController@ggsn_dropdown']);
+$router->get('/neName_dropdown', [ 'as' => 'neName_dropdown', 'uses' => 'DashboardsController@neName_dropdown']);

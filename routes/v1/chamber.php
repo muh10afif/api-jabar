@@ -8,3 +8,8 @@ $router->get('/hitungRetrieve', [ 'as' => 'hitungRetrieve', 'uses' => 'ChamberCo
 $router->get('/ajaxMsisdn', [ 'as' => 'ajaxMsisdn', 'uses' => 'ChamberController@ajaxMsisdn']);
 $router->post('/saveListMsisdn', [ 'as' => 'saveListMsisdn', 'uses' => 'ChamberController@saveListMsisdn']);
 $router->post('/updateListMsisdn', [ 'as' => 'updateListMsisdn', 'uses' => 'ChamberController@updateListMsisdn']);
+$router->post('/export_mapping_msisdn', [ 'as' => 'export_mapping_msisdn', 'uses' => 'ChamberController@export_mapping_msisdn']);
+$router->get('/list_cluster', [ 'as' => 'list_cluster', 'uses' => 'ChamberController@list_cluster']);
+$router->get('/list_wlupload', [ 'as' => 'list_wlupload', 'uses' => 'ChamberController@list_wlupload']);
+$router->get('/list_achive_top10', [ 'as' => 'list_achive_top10', 'uses' => 'ChamberController@list_achive_top10']);
+$router->post('/insert_upload_wl', [ 'as' => 'insert_upload_wl', 'uses' => 'ChamberController@insert_upload_wl']);

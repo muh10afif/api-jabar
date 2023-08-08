@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8080/api/v1/",
+            "url": "https://10.59.105.208/api-rabfail/api/v1/",
             "description": "Host"
         }
     ],
@@ -836,6 +836,34 @@
                         }
                     }
                 },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/neName_dropdown": {
+            "get": {
+                "tags": [
+                    "Dashboards Performance"
+                ],
+                "summary": "Get list data ne_Name",
                 "responses": {
                     "200": {
                         "description": "Success"

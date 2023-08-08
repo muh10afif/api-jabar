@@ -468,7 +468,7 @@ class ChamberController extends Controller
                 break;
 
             default:
-                return Core::setResponse("not_found", ['message' => "Type tidak ditemukan"]);
+                return Core::setResponse("not_found", ['type' => "Type tidak ditemukan"]);
 
         }
 
@@ -530,5 +530,220 @@ class ChamberController extends Controller
 
         return Core::setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
 
+    }
+
+    public function export_mapping_msisdn(Request $request)
+    {
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit','2048M');
+
+        $ftype      = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->ftype));
+        $flag       = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->flag));
+        $table      = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->table));
+        $id_user    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->id_user));
+        $id_branch  = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->id_branch));
+
+        $flag_list          = array('combomax', 'isakobc', 'obc_giganet', 'wacluster', 'isakwacluster', 'hotpromo', 'imax', 'btl_comsak', 'btl_giganet', 'btl_insak', 'btl_inlife', 'btl_promsak', 'btl_winback', 'coreall', 'voucher', 'p2pnon', 'p2pperso', 'ads_hotpromo', 'ads_imax', 'ads_comsak', 'ads_giganet', 'ads_insak', 'ads_inlife', 'ads_promsak', 'ads_winback', 'ads_coreall', 'ads_voucher', 'ads_p2pnon','ads_p2pperso', 'tiktok_hotpromo', 'tiktok_imax', 'tiktok_btl_comsak', 'tiktok_btl_giganet', 'tiktok_btl_insak', 'tiktok_btl_inlife', 'tiktok_btl_promsak', 'tiktok_btl_winback', 'tiktok_coreall', 'tiktok_voucher', 'tiktok_p2pnon','tiktok_p2pperso', 'takers_hotpromo', 'takers_imax', 'takers_btl_comsak', 'takers_btl_giganet', 'takers_btl_insak', 'takers_btl_inlife', 'takers_btl_promsak', 'takers_btl_winback', 'takers_coreall', 'takers_voucher', 'takers_p2pnon', 'takers_p2pperso', 'omni_outlet', 'omni_tokopedia', 'omni_shopee', 'omni_alfamart', 'omni_indomaret', 'omni_alfamidi', 'omni_lini', 'omni_gojek');
+
+        $flag_obc_call      = array('combomax', 'isakobc');
+
+        $flag_wacluster     = array('wacluster', 'isakwacluster', 'hotpromo', 'imax', 'btl_comsak', 'btl_giganet', 'btl_insak', 'btl_inlife', 'btl_promsak', 'btl_winback', 'coreall', 'voucher', 'p2pnon', 'p2pperso', 'ads_hotpromo', 'ads_imax', 'ads_comsak', 'ads_giganet', 'ads_insak', 'ads_inlife', 'ads_promsak', 'ads_winback', 'ads_coreall', 'ads_voucher', 'ads_p2pnon','ads_p2pperso', 'tiktok_hotpromo', 'tiktok_imax', 'tiktok_btl_comsak', 'tiktok_btl_giganet', 'tiktok_btl_insak', 'tiktok_btl_inlife', 'tiktok_btl_promsak', 'tiktok_btl_winback', 'tiktok_coreall', 'tiktok_voucher', 'tiktok_p2pnon','tiktok_p2pperso', 'takers_hotpromo', 'takers_imax', 'takers_btl_comsak', 'takers_btl_giganet', 'takers_btl_insak', 'takers_btl_inlife', 'takers_btl_promsak', 'takers_btl_winback', 'takers_coreall', 'takers_voucher', 'takers_p2pnon', 'takers_p2pperso', 'omni_outlet', 'omni_tokopedia', 'omni_shopee', 'omni_alfamart', 'omni_indomaret', 'omni_alfamidi', 'omni_lini', 'omni_gojek');
+
+        if(!empty($ftype) && $ftype == 'export'){
+            $query = '';
+
+            if(in_array($flag, $flag_obc_call)){ // obc call
+                $query = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+            }elseif(in_array($flag, $flag_wacluster)){ // wacluster
+                $query = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+            }
+            elseif($flag == 'obc_giganet'){ // obc giganet
+                $query = DB::connection("mysql")->select("SELECT DISTINCT(`wl_for`), username FROM $table
+                    JOIN users
+                    WHERE temp_user = '$id_user'
+                    AND id_users = wl_for
+                    AND remark_claim IS NULL");
+            }
+            else{
+                $query = '';
+            }
+
+            if(in_array($flag, $flag_list)){ // jika flag ada dalam list
+                $mapping        = array();
+                $mapping_for    = array();
+                $result         = $query;
+
+                foreach($result as $key => $val){
+                    if(in_array($flag, $flag_obc_call)){ // obc call
+                        $mapping[]      = $val->id_cluster;
+                        $mapping_for[]  = $val->cluster_name;
+                    }elseif(in_array($flag, $flag_wacluster)){ // wacluster
+                        $mapping[]      = $val->id_cluster;
+                        $mapping_for[]  = $val->cluster_name;
+                    }
+                    elseif($flag == 'obc_giganet'){ // obc giganet
+                        $mapping[] = $val->wl_for;
+                        $mapping_for[]  = $val->username;
+                    }
+                    else{
+                        $mapping        = [];
+                        $mapping_for    = [];
+                    }
+                }
+            }
+
+            if(in_array($flag, $flag_list)){ // jika flag ada dalam list
+
+                $ar = array('mapping' => $mapping, 'mapping_for' => $mapping_for, 'ftype' => $ftype, 'flag' => strtoupper($flag), 'time' => date('YmdHis'), 'success' => true);
+
+                return Core::setResponse("success", $ar);
+            }
+            else{
+
+                return Core::setResponse("error", array("message" => 'Failed to export, flag not in list', 'success' => false));
+
+                // echo json_encode(
+                //     array("message" => 'Failed to export, flag not in list', 'success' => false)
+                // );
+            }
+        }
+        else if(!empty($ftype) && $ftype == 'export-mapping'){
+            $part               = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->part,ENT_QUOTES));
+
+            if(in_array($flag, $flag_obc_call)){ // obc call
+                $l_kec    = array();
+                $q_kec = DB::connection("mysql")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
+                $r_kec = $q_kec;
+
+                foreach($r_kec as $key => $v_kec){
+                    $l_kec[] = "'$v_kec->cluster_name'";
+                }
+
+                $kec = implode(',', $l_kec);
+
+                $field  = "@i:=@i+1 AS `no`, region_lacci AS `region`, cluster_lacci AS `cluster`, kecamatan, msisdn, segment_id, rank_msisdn, campaign_channel, keterangan";
+                $query      = DB::connection("mysql")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE cluster_lacci IN ($kec) AND temp_user = '$id_user' AND remark_claim IS NULL");
+            }
+            elseif(in_array($flag, $flag_wacluster)){ // wacluster
+                $l_kec = array();
+                $q_kec = DB::connection("mysql")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
+                $r_kec = $q_kec;
+
+                foreach($r_kec as $key => $v_kec){
+                    $l_kec[] = "'$v_kec->cluster_name'";
+                }
+
+                $kec = implode(',', $l_kec);
+
+                $field  = "@i:=@i+1 AS `no`, region_lacci AS `region`, cluster_lacci AS `cluster`, kecamatan, msisdn, segment_id, rank_msisdn, campaign_channel, keterangan";
+                $query      = DB::connection("mysql")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE cluster_lacci IN ($kec) AND temp_user = '$id_user' AND remark_claim IS NULL");
+            }
+            else{ // obc giganet
+                $field  = "@i:=@i+1 AS `no`, cluster_lacci AS `cluster`, segment_id, msisdn";
+                $query      = DB::connection("mysql")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE wl_for = '$part' AND temp_user = '$id_user' AND remark_claim IS NULL");
+            }
+
+            $result = $query;
+
+            return Core::setResponse("success", array('result' => $result, 'ftype' => $ftype));
+
+            // echo json_encode(
+            //     array('result' => $result, 'ftype' => $ftype)
+            // );
+        }
+        else{
+
+            return Core::setResponse("error", array("message" => 'Failed to export', 'success' => false));
+
+            // echo json_encode(
+            //     array("message" => 'Failed to export', 'success' => false)
+            // );
+        }
+
+    }
+
+    public function list_cluster(Request $request)
+    {
+        $id_branch = $request->id_branch;
+
+        if ($id_branch == ''){
+            return Core::setResponse('error', ['id_branch' => "id_branch tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT u.id_users, u.username, c.id_cluster, c.cluster_name, c.id_branch
+            FROM users u
+            JOIN cluster c ON c.id_cluster = u.id_cluster
+            WHERE c.id_branch = '$id_branch' AND u.roles = 'branch_cluster'
+            ORDER BY c.id_branch ASC");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function list_wlupload(Request $request)
+    {
+        $username   = $request->username;
+        $flag       = $request->flag;
+
+        if ($username == ''){
+            return Core::setResponse('error', ['username' => "username tidak boleh kosong"]);
+        }
+        if ($flag == ''){
+            return Core::setResponse('error', ['flag' => "flag tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT * from boopati_file_import a
+                    JOIN region b ON (a.id_region = b.id_region)
+                    JOIN boopati_file_import_summary c on (a.id_file_import=c.id_file_import)
+                    WHERE created_by = '$username'
+                    AND flag = '$flag'
+                    AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN DATE_FORMAT(NOW()  - INTERVAL 1 MONTH, '%Y-%m') AND DATE_FORMAT(NOW(), '%Y-%m') ORDER BY date_upload DESC");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function list_achive_top10(Request $request)
+    {
+        $keyword_page = $request->keyword_page;
+
+        if ($keyword_page == ''){
+            return Core::setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT id_users, username,
+        sum(tot_call) as tot_call,
+        sum(call_sukses) as call_sukses,
+        sum(call_already_activated) as call_sudah
+        from boopati_achievement
+        where id_users is not null and flag = '" . $keyword_page . "'
+        group by id_users, username
+        order by tot_call desc,call_sukses desc
+        limit 0,10");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+
+    }
+
+    public function insert_upload_wl(Request $request)
+    {
+        $file = $request->file('file_csv');
+        $file_oriname = $request->file('file_csv')->getClientOriginalName();
+        $file_size = $request->file('file_csv')->getSize();
+
+        $filename = pathinfo($file_oriname, PATHINFO_FILENAME);
+        $extension = pathinfo($file_oriname, PATHINFO_EXTENSION);
+
+        print_r($file_size);
     }
 }
