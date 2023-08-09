@@ -13,3 +13,4 @@ $router->get('/list_cluster', [ 'as' => 'list_cluster', 'uses' => 'ChamberContro
 $router->get('/list_wlupload', [ 'as' => 'list_wlupload', 'uses' => 'ChamberController@list_wlupload']);
 $router->get('/list_achive_top10', [ 'as' => 'list_achive_top10', 'uses' => 'ChamberController@list_achive_top10']);
 $router->post('/insert_upload_wl', [ 'as' => 'insert_upload_wl', 'uses' => 'ChamberController@insert_upload_wl']);
+$router->post('/export_achiev_wl', [ 'as' => 'export_achiev_wl', 'uses' => 'ChamberController@export_achiev_wl']);
