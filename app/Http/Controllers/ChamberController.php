@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use app\Libraries\Core;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ChamberController extends Controller
 {
@@ -735,15 +736,392 @@ class ChamberController extends Controller
 
     }
 
+    public function detectDelimiter($csvFile)
+    {
+        $delimiters = array(
+            ';' => 0,
+            ',' => 0,
+            "\t" => 0,
+            "|" => 0
+        );
+
+        $handle = fopen($csvFile, "r");
+        $firstLine = fgets($handle);
+        fclose($handle);
+        foreach ($delimiters as $delimiter => &$count) {
+            $count = count(str_getcsv($firstLine, $delimiter));
+        }
+
+        return array_search(max($delimiters), $delimiters);
+    }
+
     public function insert_upload_wl(Request $request)
     {
-        $file = $request->file('file_csv');
-        $file_oriname = $request->file('file_csv')->getClientOriginalName();
-        $file_size = $request->file('file_csv')->getSize();
+        $file           = $request->file('file_csv');
+        $flag           = $request->flag;
+        $id_region      = $request->id_region;
+        $tap_user       = $request->tap_user;
+        $table_name     = $request->table_name;
+        $username       = $request->username;
 
-        $filename = pathinfo($file_oriname, PATHINFO_FILENAME);
-        $extension = pathinfo($file_oriname, PATHINFO_EXTENSION);
+        if ($file != '') {
 
-        print_r($file_size);
+            $file_oriname   = $file->getClientOriginalName();
+            $file_size      = $file->getSize();
+            $fileMimeType   = $file->getClientMimeType();
+            $filename       = pathinfo($file_oriname, PATHINFO_FILENAME);
+            $extension      = pathinfo($file_oriname, PATHINFO_EXTENSION);
+
+            $tanggal        = date('Y-m-d');
+            $waktu          = strtotime(date('H:i:s'));
+            $file_import 	= str_replace('/','', preg_replace('/[\/<>]/', '', htmlspecialchars($file_oriname)));
+            $flag 			= str_replace('/','', htmlspecialchars($flag));
+            $id_region 		= str_replace('/','', htmlspecialchars($id_region));
+            $tap_user 		= str_replace('/','', htmlspecialchars($tap_user));
+
+            $eror		    = false;
+            $max_upload     = false;
+            $pesan          = '';
+            $folder		    = 'file_upload/';
+
+            $allowed_file = array('application/vnd.ms-excel','text/plain','text/csv');
+            $max_size	= 10 * 1024 * 1024; // 10MB
+
+			$file_size	    = $file_size;
+			$extensi	    = $extension;
+
+			$tanggal        = date('Ymd');
+			$waktu          = date('His');
+			$types          = $fileMimeType;
+
+			$file_name	= str_replace('/','',$table_name."_".$tanggal."_".$waktu.".".$extensi);
+			// $file_loc   = $folder.$file_name;
+
+            $ext = $extension;
+            if($ext == "csv" && in_array($types, array('text/csv', 'application/vnd.ms-excel'))){
+                if($file_size <= $max_size){
+                    if($file->move(storage_path('file_csv'), $file_oriname)){
+
+                        $query_file_import = DB::connection("mysql")->select("INSERT into boopati_file_import (file_import,flag,id_region,table_name,created_by,created_date,read_status) values(
+                            '".$file_name."',
+                            '".$flag."',
+                            '".$id_region."',
+                            '".$table_name."',
+                            '".$username."',
+                        now(), '1')");
+
+                        $id_file_import = DB::getPdo()->lastInsertId();
+                        $doquery        = $query_file_import;
+
+                        $msg = "Data telah ditambahkan";
+
+                        $file_loc   = storage_path("/file_csv/$file_oriname");
+                        $file       = fopen($file_loc, "r");
+
+                        $count_insert_uploaded  = 0;
+                        $count_not_uploaded     = 0;
+                        $count_insert_claimed   = 0;
+
+                        $delimiter = $this->detectDelimiter($file_loc);
+
+                        while(!feof($file)){
+
+                            $val = fgetcsv($file,2000,$delimiter);
+
+                            $date_string = explode('-', $val[1]);
+                            $date_length = count($date_string);
+
+                            $msisdn         = str_replace(['\r', '\n', '"'], '', htmlspecialchars($val[0]));
+                            $date_remark    = htmlspecialchars(date("Y-m-d", strtotime($val[1])));
+                            $status_telepon = str_replace(['\r', '\n', '"'], '', htmlspecialchars($val[2]));
+
+                            $date_remark_bulan = date('Y-m', strtotime($date_remark));
+                            $bulan_ini = date('Y-m');
+
+                            $tgl_awal_bulan = $bulan_ini . "-01";
+                            $tgl_akhir_bulan = date("Y-m-t", strtotime($tgl_awal_bulan));
+
+                            $v = strtotime(date("Y-m-d", strtotime($tgl_akhir_bulan)) . " +1 weeks");
+                            $x = strtotime(date("Y-m-d", strtotime($tgl_awal_bulan)) . " -1 weeks");
+
+                            $seminggu_setelah = date("Y-m-d", $v);
+                            $seminggu_sebelum = date("Y-m-d", $x);
+
+                            $cari_myads = strpos("$flag", 'myads_');
+
+                            if ($cari_myads !== FALSE) {
+                                $condition = '$date_length == "3" and count($val) == 3 and $msisdn != "" and strlen($msisdn) >= 11  and strpos($msisdn, "E+") == false and $date_remark != "1970-01-01" and $date_remark >= $seminggu_sebelum AND $date_remark <= $seminggu_setelah';
+                            } else {
+                                $condition = '$date_length == "3" and count($val) == 3 and $msisdn != "" and strlen($msisdn) >= 11  and strpos($msisdn, "E+") == false and $date_remark != "1970-01-01" and $date_remark >= date("Y-m-d", strtotime("-3 weeks")) and $date_remark <= date("Y-m-d",strtotime("+1 weeks"))';
+                            }
+
+                            $result = eval('return (' . $condition . ');');
+
+                            print_r($cari_myads);
+                            exit;
+
+                            if($result){
+
+                                $query_insert = DB::connection("mysql")->select("INSERT INTO boopati_whitelist_claim (msisdn, status_claim, tanggal_claim, datetime_claim, flag, table_name, id_users, id_file_import, status_telepon, remark_claim, date_upload)
+                                    VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$tap_user', '$id_file_import','$status_telepon', '$tap_user', NOW())");
+
+                                $insert_wl_upload = $query_insert;
+
+                                if(count($insert_wl_upload) == 0){
+                                    $count_insert_uploaded++;
+                                } else {
+                                    $count_insert_claimed++;
+                                }
+
+                            } else {
+                                $count_not_uploaded = (count($data_import) - $count_insert_uploaded);
+                            }
+                        }
+
+                        $import_summary = DB::connection("mysql")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, not_uploaded, date_upload) VALUES ('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', '$count_not_uploaded', NOW())");
+
+                        $insert_import_summary = $import_summary;
+                        fclose($file);
+
+                        if(count($insert_import_summary) == 0){
+
+                            return Core::setResponse("success", ['info' => 'Data telah ditambahkan.', 'alert' => 'success']);
+
+                        } else {
+                            unlink($file_loc);
+
+                            return Core::setResponse("error", ['info' => 'Data gagal ditambahkan.', 'alert' => 'danger']);
+                        }
+
+                    } else {
+                        return Core::setResponse("error", ['file_upload' => 'File gagal diupload', 'alert' => 'danger']);
+                    }
+
+                } else {
+                    return Core::setResponse("error", ['file_size' => 'Maksimal Upload 10 MB', 'alert' => 'danger']);
+                }
+
+            } else {
+                return Core::setResponse("error", ['format_file' => 'Format file harus .CSV', 'alert' => 'danger']);
+            }
+
+        } else {
+            return Core::setResponse("error", ['file' => 'File Import harus diisi!', 'alert' => 'danger']);
+        }
+
+    }
+
+    public function export_achiev_wl(Request $request)
+    {
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit', '2048M');
+
+        $ftype = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->ftype);
+
+        if (!empty($ftype) && $ftype == 'export') {
+            $array_mode = array('all', 'sukses', 'sudahaktivasi', 'tidakdiangkat', 'menolakaktivasi', 'menolakregistrasi');
+            $id_branch	= $request->id_branch;
+            $roles 		= $request->roles;
+            $username 	= $request->username;
+
+            // mendapatkan list id branch cluster
+            $id_branch_cluster	= '';
+            if ($roles == 'branch') {
+                $l_cluster  = array();
+                $q_cluster	= DB::connection("mysql")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
+                $r_cluster = $q_cluster;
+
+                foreach ($r_cluster as $key => $v_cluster) {
+                    $id_u = $v_cluster['id_users'];
+                    $l_cluster[] = "'$id_u'";
+                }
+
+                $id_branch_cluster = implode(',', $l_cluster);
+
+                $filter = " AND id_users IN ($id_branch_cluster)";
+            } else {
+                $filter = '';
+            }
+
+            $mode 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->mode);
+            $flag 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->flag);
+            $start_date = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->start_date);
+            $end_date 	= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->end_date);
+
+            $option_date = "";
+            if (!empty($start_date)) {
+                $option_date = " AND (tanggal_claim BETWEEN '$start_date' AND '$end_date')";
+            }
+
+            switch ($mode) {
+                case 'all':
+                    $option = "where flag = '" . $flag . "'";
+                    break;
+                case 'sukses':
+                    $option = " where status_claim='sukses' and flag = '" . $flag . "'";
+                    break;
+                case 'sudahaktivasi':
+                    $option = " where status_claim='sudahaktivasi' and flag = '" . $flag . "'";
+                    break;
+                case 'tidakdiangkat':
+                    $option = " where status_claim='tidakdiangkat' and flag = '" . $flag . "'";
+                    break;
+                case 'menolakaktivasi':
+                    $option = " where status_claim='menolakaktivasi' and flag = '" . $flag . "'";
+                    break;
+                case 'menolakregistrasi':
+                    $option = " where status_claim='menolakaktivasi' and flag = '" . $flag . "'";
+                    break;
+            }
+
+            if ($roles == 'branch') {
+                $query = DB::connection("mysql")->select("SELECT COUNT(*) AS total FROM boopati_whitelist_claim a $option $option_date $filter");
+            } else {
+                $query = DB::connection("mysql")->select("SELECT COUNT(*) AS total FROM boopati_whitelist_claim a LEFT JOIN users_tdc u ON u.id_users = a.id_users $option $option_date $filter");
+            }
+
+            $result = (object)$query[0];
+            $part 	= ($result->total / 100000); // dibagi per seratus ribu
+
+            echo json_encode(
+                array("total" => (int)$result->total, 'total_part' => ceil($part), 'ftype' => $ftype, 'time' => date('YmdHis'))
+            );
+
+        } else if (!empty($ftype) && $ftype == 'export-partial') {
+
+            $array_mode = array('all', 'sukses', 'sudahaktivasi', 'tidakdiangkat', 'menolakaktivasi', 'menolakregistrasi');
+            $id_branch	= $request->id_branch;
+            $roles 		= $request->roles;
+            $username 	= $request->username;
+
+            // mendapatkan list id branch cluster
+            $id_branch_cluster	= '';
+            if ($roles == 'branch') {
+                $l_cluster  = array();
+                $q_cluster	= DB::connection("mysql")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
+                $r_cluster = $q_cluster;
+
+                foreach ($r_cluster as $key => $v_cluster) {
+                    $id_u = $v_cluster['id_users'];
+                    $l_cluster[] = "'$id_u'";
+                }
+
+                $id_branch_cluster = implode(',', $l_cluster);
+
+                $filter = " AND a.id_users IN ($id_branch_cluster)";
+            } else {
+                $filter = '';
+            }
+
+            $part 				= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['part']);
+            $mode 				= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['mode']);
+            $flag 				= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['flag']);
+            $start_date 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['start_date']);
+            $end_date 			= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['end_date']);
+
+            $q_table = db_query("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$flag'");
+            $explode_table_name = explode("(id_region)", $q_table->table_name);
+            $table_name = $explode_table_name[0];
+
+            $table1				= $table_name . '1';
+            $table2				= $table_name . '2';
+            $table3				= $table_name . '3';
+            $table4				= $table_name . '4';
+
+            $limit_start 		= ($part * 100000);
+            $limit_end 			= 100000;
+
+            $option_date = "";
+            if (!empty($start_date)) {
+                $option_date = " AND (a.tanggal_claim BETWEEN '$start_date' AND '$end_date')";
+            }
+
+            switch ($mode) {
+                case 'all':
+                    $option = "where a.flag = '" . $flag . "'";
+                    break;
+                case 'sukses':
+                    $option = " where a.status_claim='sukses' and a.flag = '" . $flag . "'";
+                    break;
+                case 'sudahaktivasi':
+                    $option = " where a.status_claim='sudahaktivasi' and a.flag = '" . $flag . "'";
+                    break;
+                case 'tidakdiangkat':
+                    $option = " where a.status_claim='tidakdiangkat' and a.flag = '" . $flag . "'";
+                    break;
+                case 'menolakaktivasi':
+                    $option = " where a.status_claim='menolakaktivasi' and a.flag = '" . $flag . "'";
+                    break;
+                case 'menolakregistrasi':
+                    $option = " where a.status_claim='menolakaktivasi' and a.flag = '" . $flag . "'";
+                    break;
+            }
+
+            if ($roles == 'branch') {
+                $id_region	= $request->id_region;
+                $table 		= $table_name . $id_region;
+
+                $query = DB::connection("mysql")->select("SELECT @i:=@i+1 AS `no`, NOW() AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim, f.created_date as date_upload,
+                    a.datetime_claim, a.datetime_open_form, '$flag' AS `campaign`, a.keterangan, w.flag_combo_sakti AS Flag, w.last_date_activation AS `Last Date Activation`
+                FROM boopati_whitelist_claim a
+                LEFT JOIN $table w ON w.msisdn = a.msisdn
+                LEFT JOIN boopati_file_import f ON f.id_file_import = a.id_file_import
+                LEFT JOIN users_branch_cluster u ON u.id_users = a.id_users,
+                (SELECT @i:=$limit_start) AS foo
+                $option $option_date $filter
+                LIMIT $limit_start, $limit_end");
+            } else {
+                $query = DB::connection("mysql")->select("SELECT @i:=@i+1 AS `no`, CAST(NOW() as DATE) AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim, CAST(f.created_date as DATE) as date_upload,
+                CAST(a.datetime_claim as DATE) as datetime_claim, CAST(a.datetime_open_form as DATE) as datetime_open_form, '$flag' AS `campaign`, a.keterangan,
+                IF(
+                    (a.`table_name` = '$table1'),
+                    (SELECT c.flag_combo_sakti FROM $table1 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                    IF(
+                        (a.`table_name` = '$table2'),
+                        (SELECT c.flag_combo_sakti FROM $table2 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                        IF(
+                            (a.`table_name` = '$table3'),
+                            (SELECT c.flag_combo_sakti FROM $table3 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                            IF(
+                                (a.`table_name` = '$table4'),
+                                (SELECT c.flag_combo_sakti FROM $table4 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                                NULL
+                            )
+                        )
+                    )
+                ) AS `Flag`,
+                IF(
+                    (a.`table_name` = '$table1'),
+                    (SELECT c.last_date_activation FROM $table1 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                    IF(
+                        (a.`table_name` = '$table2'),
+                        (SELECT c.last_date_activation FROM $table2 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                        IF(
+                            (a.`table_name` = '$table3'),
+                            (SELECT c.last_date_activation FROM $table3 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                            IF(
+                                (a.`table_name` = '$table4'),
+                                (SELECT c.last_date_activation FROM $table4 c WHERE (c.msisdn = c.msisdn) LIMIT 1),
+                                NULL
+                            )
+                        )
+                    )
+                ) AS `Last Date Activation`
+                FROM boopati_whitelist_claim a
+                LEFT JOIN boopati_file_import f ON f.id_file_import = a.id_file_import
+                LEFT JOIN users_tdc u ON u.id_users = a.id_users,
+                        (SELECT @i:=$limit_start) AS foo
+                $option $option_date $filter
+                LIMIT $limit_start, $limit_end");
+            }
+
+            $result = $query;
+
+            return Core::setResponse("success", array("result" => $result, 'ftype' => $ftype, 'time' => date('YmdHis')));
+
+        } else {
+
+            return Core::setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
+        }
     }
 }
