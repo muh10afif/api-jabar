@@ -6,6 +6,10 @@ use app\Libraries\Core;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ChamberController extends Controller
 {
@@ -983,9 +987,7 @@ class ChamberController extends Controller
             $result = (object)$query[0];
             $part 	= ($result->total / 100000); // dibagi per seratus ribu
 
-            echo json_encode(
-                array("total" => (int)$result->total, 'total_part' => ceil($part), 'ftype' => $ftype, 'time' => date('YmdHis'))
-            );
+            return Core::setResponse("success", array("total" => (int)$result->total, 'total_part' => ceil($part), 'ftype' => $ftype, 'time' => date('YmdHis')));
 
         } else if (!empty($ftype) && $ftype == 'export-partial') {
 
@@ -1019,7 +1021,9 @@ class ChamberController extends Controller
             $start_date 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['start_date']);
             $end_date 			= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['end_date']);
 
-            $q_table = db_query("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$flag'");
+            $q_tablee = DB::connection("mysql")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$flag'");
+            $q_table = (object)$q_tablee['data'][0];
+
             $explode_table_name = explode("(id_region)", $q_table->table_name);
             $table_name = $explode_table_name[0];
 
@@ -1124,4 +1128,439 @@ class ChamberController extends Controller
             return Core::setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
         }
     }
+
+    public function tot_info_achiev(Request $request)
+    {
+        $keyword_page = $request->keyword_page;
+
+        if ($keyword_page == ''){
+            return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT sum(tot_call) as tot_call,
+                  sum(call_sukses) as call_sukses,
+                  sum(call_notanswer) as call_notanswer,
+                  sum(call_already_activated) as call_sudah,
+                  sum(call_reject) as call_reject
+                  from boopati_achievement
+                  where flag = '" . $keyword_page . "'");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function users_branch_cluster()
+    {
+        $query = DB::connection("mysql")->select("SELECT id_users, username FROM users_branch_cluster");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function list_achive_top10_wabranch(Request $request)
+    {
+        $keyword_page = $request->keyword_page;
+
+        if ($keyword_page == ''){
+            return Core::setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT id_users, username,
+        sum(tot_call) as tot_call,
+        sum(call_sukses) as call_sukses,
+        sum(call_already_activated) as call_sudah
+        from boopati_achievement
+        where id_users is not null and flag = '".$keyword_page."'
+        AND MONTH(tanggal_claim) = MONTH(NOW())
+        AND YEAR(tanggal_claim) = YEAR(NOW())
+        group by id_users, username
+        order by tot_call desc,call_sukses desc
+        limit 0,10");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function export_achiev_wabranch(Request $request)
+    {
+        $ftype = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->ftype);
+
+        if(!empty($ftype) && $ftype == 'export'){
+            $array_mode = array('all','sukses','gagal');
+
+            $mode 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->mode);
+            $flag 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->flag);
+            $start_date = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->start_date);
+            $end_date 	= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->end_date);
+
+            $option_date = "";
+            if(!empty($start_date)){
+                $option_date = " AND (tanggal_claim BETWEEN '$start_date' AND '$end_date')";
+            }
+
+            switch($mode){
+                case 'all':
+                    $option = "WHERE flag = '".$flag."'";
+                    break;
+                case 'sukses':
+                    $option = "WHERE (status_claim LIKE '%sent%' OR status_claim LIKE '%terkirim%' OR status_claim LIKE '%success%') AND flag = '".$flag."'";
+                    break;
+                case 'gagal':
+                    $option = "WHERE (status_claim LIKE '%gagal%' OR status_claim LIKE '%failed%' OR status_claim LIKE '%not%') AND flag = '".$flag."'";
+                    break;
+            }
+
+            $query = DB::connection("mysql")->select("SELECT @i:=@i+1 AS `no`, NOW() AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim,
+                a.datetime_claim, '$flag' AS `campaign`,
+                IF(
+                    (a.`table_name` = 'wl_wabranch1'),
+                    (SELECT c.flag FROM wl_wabranch1 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                    IF(
+                        (a.`table_name` = 'wl_wabranch2'),
+                        (SELECT c.flag FROM wl_wabranch2 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                        IF(
+                            (a.`table_name` = 'wl_wabranch3'),
+                            (SELECT c.flag FROM wl_wabranch3 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                            IF(
+                                (a.`table_name` = 'wl_wabranch4'),
+                                (SELECT c.flag FROM wl_wabranch4 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                                NULL
+                            )
+                        )
+                    )
+                ) AS `service`,
+                IF(
+                    (a.`table_name` = 'wl_wabranch1'),
+                    (SELECT c.period FROM wl_wabranch1 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                    IF(
+                        (a.`table_name` = 'wl_wabranch2'),
+                        (SELECT c.period FROM wl_wabranch2 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                        IF(
+                            (a.`table_name` = 'wl_wabranch3'),
+                            (SELECT c.period FROM wl_wabranch3 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                            IF(
+                                (a.`table_name` = 'wl_wabranch4'),
+                                (SELECT c.period FROM wl_wabranch4 c WHERE (a.msisdn = c.msisdn) LIMIT 1),
+                                NULL
+                            )
+                        )
+                    )
+                ) AS `period`
+                FROM boopati_whitelist_claim a
+                LEFT JOIN users_tdc u ON u.id_users = a.id_users,
+                (SELECT @i:= 0) AS foo $option $option_date $filter");
+
+            $result = $query;
+
+            return Core::setResponse("success", array("result" => $result, 'ftype' => $ftype, 'time' => date('YmdHis')));
+
+        }
+        else{
+
+            return Core::setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
+        }
+    }
+
+    public function tot_info_achiev_wabranch(Request $request)
+    {
+        $keyword_page = $request->keyword_page;
+
+        if ($keyword_page == ''){
+            return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT sum(tot_call) as tot_call,
+                        sum(call_sukses) as call_sukses,
+                        sum(call_notanswer) as call_notanswer,
+                        sum(call_already_activated) as call_sudah,
+                        sum(call_reject) as call_reject
+                        from boopati_achievement
+                        where flag = '".$keyword_page."'
+                        AND MONTH(tanggal_claim) = MONTH(NOW())
+                        AND YEAR(tanggal_claim) = YEAR(NOW())");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function export_achiev(Request $request)
+    {
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit','2048M');
+
+        $array_mode = array('all','sukses','sudahaktivasi','tidakdiangkat','menolakaktivasi', 'menolakregistrasi');
+        $roles = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->roles));
+
+        $username = $request->username;
+        if(!empty(htmlspecialchars($request->mode)) && in_array(htmlspecialchars($request->mode),$array_mode)){
+
+            if($roles == 'branch'){
+                $branch_tmp = str_replace('branch_', '', $username);
+                $filter = " and branch_name like '%".$branch_tmp."%'";
+                $query = DB::connection("mysql")->select("select * from user_mapping_branch where user = '$username' limit 1");
+                $row = (object)$query[0];
+                $filter = " and branch_name like '%".$row->branch."%'";
+            }
+            else{
+                $filter ='';
+            }
+
+            $week = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->week));
+            $year = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->year));
+            $flag = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->flag));
+            $flag = preg_replace('/[^a-z-]/i', '', $flag);
+            $start_date = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->start_date));
+            $end_date = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->end_date));
+
+            $option_date = "";
+            if(!empty($request->start_date)){
+                $option_date = " AND tanggal_claim BETWEEN '".$start_date."' AND '".$end_date."'";
+            }
+
+            $date = date('YmdHi');
+            $filename = 'Output_boopati_' . $date . '.csv';
+            $content  = (string) preg_replace('/[\/<>]/', '', 'Content-Disposition: attachment; filename="'.$filename.'"');
+
+            header('Content-type: text/csv');
+            header($content);
+
+            // Get Records from the table
+            switch($request->mode){
+            case 'all':
+                $option = "where flag = '".$flag."'";
+                break;
+            case 'sukses':
+                $option = " where status_claim='sukses' and flag = '".$flag."'";
+                break;
+            case 'sudahaktivasi':
+                $option = " where status_claim='sudahaktivasi' and flag = '".$flag."'";
+                break;
+            case 'tidakdiangkat':
+                $option = " where status_claim='tidakdiangkat' and flag = '".$flag."'";
+                break;
+            case 'menolakaktivasi':
+                $option = " where status_claim='menolakaktivasi' and flag = '".$flag."'";
+                break;
+            case 'menolakregistrasi':
+                $option = " where status_claim='menolakaktivasi' and flag = '".$flag."'";
+                break;
+            }
+
+            $query = DB::connection("mysql")->select("SELECT now() as date_update,a.username, a.msisdn, a.status_claim, a.tanggal_claim, a.datetime_claim, a.datetime_open_form from list_call_old a $option $option_date $filter
+            union select now() as date_update,a.username, a.msisdn, a.status_claim, a.tanggal_claim, a.datetime_claim, a.datetime_open_form from list_call a $option $option_date $filter");
+
+            $sql = $query;
+            $no = 0;
+
+            // create a file pointer connected to the output stream
+            $file = fopen('php://output', 'w');
+
+            // send the column headers
+            fputcsv($file, array('No', 'Date Update', 'Username', 'msisdn', 'Status Claim', 'tanggal_claim', 'Datetime Submit Claim', 'Datetime Open Form'));
+
+            // output each row of the data
+            foreach ($sql as $key => $result) {
+                $no++;
+                $data = array($no, $result['date_update'], $result['username'], $result['msisdn'], $result['status_claim'], $result['tanggal_claim'], $result['datetime_claim'], $result['datetime_open_form']);
+                fputcsv($file, $data);
+            }
+
+            fclose($file);
+
+            exit();
+        }
+    }
+
+    public function obc_per_cluster_achiev(Request $request)
+    {
+        $keyword_page   = $request->keyword_page;
+        $regional       = $request->regional;
+
+        if ($keyword_page == ''){
+            return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
+        }
+        if ($regional == ''){
+            return Core::setResponse('error', ['regional' => "Regional tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysql")->select("SELECT cluster_name,branch_name, regional,
+            count(id_tdc) as total_tdc,
+            sum(remark_obc) as total_tdc_obc,
+            ROUND(sum(remark_obc)/count(id_tdc)*100,2) as percentage,sum(jml_obc) as total_call
+            from (
+            select a.id_tdc, a.tdc, a.cluster_name, a.branch_name, a.regional,
+            case when SUM(b.total_call) is null then 0 else SUM(b.total_call) end as jml_obc,
+            case when SUM(b.total_call) is not null then 1 else 0 end as remark_obc
+            from users_tdc a left join
+            (
+                select a.id_users, sum(a.tot_call)as total_call
+                from boopati_achievement a
+                where a.flag = '$keyword_page'
+                group by a.id_users
+            ) b
+            on a.id_users=b.id_users
+            group by a.id_tdc, a.cluster_name, a.branch_name, a.regional
+            ) aaa
+            where regional = '$regional'
+            group by cluster_name, branch_name, regional
+            order by total_call desc
+        ");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function upload_file_wabranch(Request $request)
+    {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '-1');
+
+        $file       = $request->file('upload_file');
+        $kondisi    = preg_replace('/[\/<>]/', '', htmlspecialchars($request->optradio));
+
+        if ($kondisi == 'wl') {
+            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch1");
+            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch2");
+            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch3");
+            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch4");
+
+        } elseif ($kondisi == 'flag') {
+            $isi_list = $request->multi_opt;
+
+            DB::connection("mysql")->select("DELETE FROM wl_wabranch1 where flag IN ($isi_list)");
+            DB::connection("mysql")->select("DELETE FROM wl_wabranch2 where flag IN ($isi_list)");
+            DB::connection("mysql")->select("DELETE FROM wl_wabranch3 where flag IN ($isi_list)");
+            DB::connection("mysql")->select("DELETE FROM wl_wabranch4 where flag IN ($isi_list)");
+
+        } elseif ($kondisi == 'no') {
+            if (empty($file))
+            {
+                return Core::setResponse("error", ['file' => "File kosong, harap diinput"]);
+            }
+
+        } else {
+            return Core::setResponse("error", ['optradio' => "optradio salah input. Pilihan: wl, flag, no"]);
+        }
+
+        if (!empty($file))
+        {
+            $file_oriname   = $file->getClientOriginalName();
+            $extension      = pathinfo($file_oriname,PATHINFO_EXTENSION);
+            $extension      = strtolower($extension);
+
+            $allowed_extensions = array("xlsx");
+
+            if(!in_array(strtolower($extension), $allowed_extensions)) {
+                return Core::setResponse("success", ['type' => "Format file harus .xlxs"]);
+            }
+
+            $file->move(storage_path('file_xlxs'), $file_oriname);
+
+            $spreadsheet = new Spreadsheet();
+            $writer = new Xlsx($spreadsheet);
+
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $spreadsheet = $reader->load(storage_path("/file_xlxs/$file_oriname"));
+
+            $reader = IOFactory::createReader('Xlsx');
+            $worksheetNames = $reader->listWorksheetNames(storage_path("/file_xlxs/$file_oriname"));
+
+            if (count($worksheetNames) > '11') {
+                unlink(storage_path("/file_xlxs/$file_oriname"));
+                return Core::setResponse("error", ['cluster' => "Cluster kurang dari 11"]);
+            }
+
+            $spreadSheetAry = [];
+            $i = 0;
+            foreach ($worksheetNames as $worksheetName) {
+                $excelSheet = $spreadsheet->getSheetByName($worksheetName);
+                $spreadSheetAry[] = $excelSheet->toArray();
+                unset($spreadSheetAry[$i][0]);
+
+                $i++;
+            }
+
+            $sql1 = [];
+            $sql2 = [];
+            $sql3 = [];
+            $sql4 = [];
+            for ($i=0; $i < count($spreadSheetAry); $i++) {
+                for ($j=1; $j <= count($spreadSheetAry[$i]); $j++) {
+                    $region1 = ['NORTHERN JAKARTA', 'SOUTHERN JAKARTA'];
+                    $region2 = ['BEKASI', 'BOGOR', 'KARAWANG'];
+                    $region3 = ['BANDUNG', 'SOREANG', 'CIREBON', 'TASIKMALAYA'];
+                    $region4 = ['SERANG', 'TANGERANG'];
+
+                    $msisdn         = $spreadSheetAry[$i][$j][0];
+                    $branch_lacci   = $spreadSheetAry[$i][$j][1];
+                    $cluster_lacci  = $spreadSheetAry[$i][$j][2];
+                    $flag           = $spreadSheetAry[$i][$j][3];
+                    $service        = $spreadSheetAry[$i][$j][4];
+
+                    $date_upload    = date("Y-m-d");
+                    if (in_array($branch_lacci, $region1)) {
+                        $table  = 'wl_wabranch1';
+                        $region = 'CENTRAL JABOTABEK';
+                        $sql1[] = "('$msisdn', '$region', '$branch_lacci', '$cluster_lacci', '$service', '$flag', '$date_upload')";
+                    } elseif (in_array($branch_lacci, $region2)) {
+                        $table  = 'wl_wabranch2';
+                        $region = 'EASTERN JABOTABEK';
+                        $sql2[] = "('$msisdn', '$region', '$branch_lacci', '$cluster_lacci', '$service', '$flag','$date_upload')";
+                    } elseif (in_array($branch_lacci, $region3)) {
+                        $table  = 'wl_wabranch3';
+                        $region = 'JABAR';
+                        $sql3[] = "('$msisdn', '$region', '$branch_lacci', '$cluster_lacci', '$service', '$flag','$date_upload')";
+                    } elseif (in_array($branch_lacci, $region4)) {
+                        $table  = 'wl_wabranch4';
+                        $region = 'WESTERN JABOTABEK';
+                        $sql4[] = "('$msisdn', '$region', '$branch_lacci', '$cluster_lacci', '$service', '$flag','$date_upload')";
+                    }
+
+                }
+            }
+
+            DB::connection("mysql")->select("INSERT into wl_wabranch1 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql1));
+            DB::connection("mysql")->select("INSERT into wl_wabranch2 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql2));
+            DB::connection("mysql")->select("INSERT into wl_wabranch3 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql3));
+            DB::connection("mysql")->select("INSERT into wl_wabranch4 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql4));
+
+            unlink(storage_path("/file_xlxs/$file_oriname"));
+
+            if ($kondisi == 'wl') {
+                $ar = ['info' => "Semua region WL WABRANCH berhasil dihapus dan data file upload berhasil disimpan"];
+            } elseif ($kondisi == 'flag') {
+                $ar = ['info' => "Flag $isi_list berhasil dihapus dan data file upload berhasil disimpan"];
+            } else {
+                $ar = ['info' => "Data berhasil disimpan"];
+            }
+
+            return Core::setResponse("success", $ar);
+
+        } else {
+            if ($kondisi == 'wl') {
+                $ar = ['info' => "Semua region WL WABRANCH berhasil dihapus"];
+            } elseif ($kondisi == 'flag') {
+                $ar = ['info' => "Flag $isi_list berhasil dihapus"];
+            }
+
+            return Core::setResponse("success", $ar);
+        }
+
+    }
+
 }
