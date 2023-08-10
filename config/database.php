@@ -57,5 +57,14 @@ return [
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
         ],
+        'mysql222' => [
+            'driver' => 'mysql',
+            'host' => env('DB7_HOST'),
+            'database' => env('DB7_DATABASE'),
+            'username' => env('DB7_USERNAME'),
+            'password' => env('DB7_PASSWORD'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+        ],
     ]
 ];

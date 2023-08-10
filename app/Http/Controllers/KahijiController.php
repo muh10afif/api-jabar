@@ -248,4 +248,411 @@ class KahijiController extends Controller
             break;
         }
     }
+
+    public function packetlossperhubmetro(Request $request)
+    {
+        $dt = $request->all();
+
+        //$tanggal     = $dt['tanggal'];
+        //$jam      = $dt['jam'];
+
+        $output = array();
+        // ambil hub nya saja
+        if(isset($dt['tanggal']) && isset($dt['jam'])){
+            /*
+            $tanggal    = $_GET['tanggal'];
+            $jam        = $_GET['jam'];
+            */
+            $tanggal    = $dt['tanggal'];
+            $jam        = $dt['jam'];
+            $doquery = \DB::connection("mysql170")->select("SELECT concat(tanggal,' ',jam) AS tanggal,hub AS metro_hub,count(*) AS jml_packetloss
+            FROM hourly_monitoring_packetloss4g
+            WHERE packetloss_r = 'CONSEC'
+            AND CONCAT(tanggal,' ',jam) = '".$tanggal." ".$jam."'
+            GROUP BY hub,tanggal,jam
+            order by jml_packetloss desc
+            ");
+        }else{
+            $doquery = \DB::connection("mysql170")->select("SELECT concat(tanggal,' ',jam) AS tanggal,hub AS metro_hub,count(*) AS jml_packetloss
+            FROM hourly_monitoring_packetloss4g
+            WHERE packetloss_r = 'CONSEC'
+                and concat(tanggal,' ',jam) = 
+                (select concat(tanggal,' ',jam) AS tanggal FROM 
+                hourly_monitoring_packetloss4g GROUP BY tanggal,jam ORDER BY tanggal desc LIMIT 1)
+            GROUP BY hub,tanggal,jam
+            order by jml_packetloss desc 
+            ");
+        }
+        //$doquery = mysqli_query($link, $query) or die(mysqli_error($link));
+        $count = 0;
+        $counter = 0;
+        //while($data = mysqli_fetch_object($doquery)){
+        foreach ($doquery as $doquery => $data) {
+            $counter++;
+            if($count <=20){
+                $metros[] = $data->metro_hub;
+            }
+            $out['counter'] = $counter;
+            $out['hub'] = $data->metro_hub;
+            $out['packetloss'] = $data->jml_packetloss;
+            $data_out[] = $out;
+            $count++;
+        }
+        $output['category'] = $metros;
+        $output['table'] = $data_out;
+        // ambil data rnc dan value nya
+        if(isset($dt['tanggal']) && isset($dt['jam'])){
+            /*
+            $tanggal    = $_GET['tanggal'];
+            $jam        = $_GET['jam'];
+            */
+            $tanggal    = $dt['tanggal'];
+            $jam        = $dt['jam'];
+            $doquery = \DB::connection("mysql170")->select("SELECT concat(tanggal,' ',jam) AS tanggal,hub AS metro_hub, backhaul_4g AS rnc,count(*) AS jml_packetloss
+            FROM hourly_monitoring_packetloss4g
+            WHERE packetloss > 0.1 
+                AND tanggal = '".$tanggal."' AND jam = '".$jam."'
+            GROUP BY tanggal,jam,hub,backhaul_4g
+            order by jml_packetloss desc
+            ");
+        }else{
+            $doquery = \DB::connection("mysql170")->select("SELECT concat(tanggal,' ',jam) AS tanggal,hub AS metro_hub, backhaul_4g AS rnc,count(*) AS jml_packetloss
+            FROM hourly_monitoring_packetloss4g
+            WHERE packetloss > 0.1 
+                and concat(tanggal,' ',jam) = (
+                select concat(tanggal,' ',jam) AS tanggal FROM hourly_monitoring_packetloss4g order by tanggal desc  LIMIT 1)
+            GROUP BY tanggal,jam,hub,backhaul_4g
+            order by jml_packetloss desc
+            ");
+        }
+        //$doquery = mysqli_query($link ,$query) or die(mysqli_error($link));
+
+        //while($data = mysqli_fetch_object($doquery)){
+        foreach ($doquery as $doquery => $data) {
+            $packetloss[$data->metro_hub][$data->rnc] = $data->jml_packetloss;
+            $rncs[] = $data->rnc;
+            $tanggal = $data->tanggal;
+        }
+        $rncs = array_unique($rncs);
+        foreach($rncs as $key => $val){
+            $rncz[] = $val;
+        }
+        foreach($rncz as $rnc){
+            $str = array();
+            $str['name'] = $rnc;
+            foreach($metros as $metro){
+                if(empty($packetloss[$metro][$rnc])){
+                    $iub = 0;
+                }else{
+                    $iub = $packetloss[$metro][$rnc];
+                }
+                $str['data'][] = $iub;
+            }
+            $series[] = $str;
+        }
+
+        $output['series'] = $series;
+        $output['tanggal'] = $tanggal;
+        //header("Content-type: application/json");
+        //echo json_encode($output, JSON_NUMERIC_CHECK);
+        return Core::setResponse("success",$output);
+        //break;
+    }
+
+    public function hourlymonitoringpacketloss(Request $request)
+    {
+        $dt = $request->all();
+        date_default_timezone_set("Asia/Jakarta");
+          
+        if(isset($dt['start'])){
+            $tanggalstart = $dt['start'];
+            $tanggalstop = $dt['stop'];
+            $condition = " where  nsa is not null and date(DATETIME) BETWEEN '".$tanggalstart."' AND '".$tanggalstop."'				
+                            ORDER BY DATETIME ASC,nsa ASC,rtp ASC";
+        }else{
+            $condition = " WHERE nsa is not null and date(DATETIME) between DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) AND CURDATE()  
+                            ORDER BY DATETIME ASC,nsa ASC,rtp ASC";	
+        }
+      
+        $doquery = \DB::connection("mysql170")->select( "
+            SELECT *
+            FROM hourly_monitoring_packetloss4g_rtp
+            ".$condition);
+    //    $query = "
+    //		select tanggal,nsa,rtp,consec 
+    //		from hourly_monitoring_packetloss_rtp".$condition;
+    //		where DATE(tanggal) between DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) AND CURDATE()
+    //	";
+        
+        //$doquery = mysqli_query($link, $query) or die(mysqli_error($link));
+        $value = array();
+        $counter = 0;
+        //while($data = mysqli_fetch_object($doquery)){
+        foreach ($doquery as $doquery => $data) {
+            if(!empty($data->rtp)){
+                $value[$counter]['consec'] = $data->consec;
+                $value[$counter]['nsa'] = $data->nsa;
+                $value[$counter]['rtp'] = $data->rtp;
+                $value[$counter]['datetime'] = $data->datetime;
+                $rtp[] = $data->rtp;
+                $tanggal[] = $data->datetime;
+                $counter++;
+            }        
+        }
+        
+        $tanggal = array_unique($tanggal);
+        $lastseries = count($tanggal) -1;
+        sort($tanggal);
+        $rtpo = array_unique($rtp);
+        $index = 0;
+        foreach($rtpo as $key => $rtp){
+            $output2[$index]['name'] = $rtp;
+            $index2 = 0;
+            foreach($value as $key => $values){
+                if($rtp == $values['rtp']){
+                    $output2[$index]['data'][$index2] = $values['consec'];
+                    $index2++;
+                }
+            }
+            $index++;
+        }
+        $tot = 0;
+        $i = 0;
+    //    echo "<pre>";
+    //    print_r($output2);
+    //    echo "</pre>";
+        foreach($rtpo as $key => $rtp){
+            if(!empty($output2[$i]['data'][$lastseries])){
+                $tot = $tot + $output2[$i]['data'][$lastseries];
+            }
+            $i++;
+        }
+    //    $output3['temp'] = $output2;
+        $output3['category'] = $tanggal;
+        $output3['series'] = $output2;
+        $output3['total_last'] = $tot;
+        
+        //$output3['query'] = $query;
+        //mysqli_close($link);
+        return Core::setResponse("success",$output3);
+    }
+
+    public function alarmdown(Request $request)
+    {
+        $dt = $request->all();
+
+        $mode     = $dt['mode'];
+        $str      = $dt['tanggal_start'];
+        $stp      = $dt['tanggal_stop'];
+        $sid      = $dt['siteid'];
+
+        switch ($mode) {
+        case 'query_weeks_years':
+            $output = \DB::connection("mysql222")->select("SELECT MAX(weeks_data) AS weeks, MAX(years_data) AS years
+            FROM 16010754_dapot_sites.dapot_site
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'text_class':
+            $output = \DB::connection("mysql222")->select("SELECT tab.*,
+            100 * ( 1 - (tab.down / tab.total_all)) AS total_avail,
+            100 * ( 1 - (tab.down_2g / tab.total_2g)) AS total_avail_2g,
+            100 * ( 1 - (tab.down_3g / tab.total_3g)) AS total_avail_3g,
+            100 * ( 1 - (tab.down_4g / tab.total_4g)) AS total_avail_4g,
+            100 * ( 1 - ((tab.down_platinum_2g + tab.down_platinum_3g + tab.down_platinum_4g) / tab.total_platinum)) AS total_avail_platinum,
+            100 * ( 1 - ((tab.down_gold_2g + tab.down_gold_3g + tab.down_gold_4g) / tab.total_gold)) AS total_avail_gold,
+            100 * ( 1 - ((tab.down_silver_2g + tab.down_silver_3g + tab.down_silver_4g) / tab.total_silver)) AS total_avail_silver,
+            100 * ( 1 - ((tab.down_bronze_2g + tab.down_bronze_3g + tab.down_bronze_4g) / tab.total_bronze)) AS total_avail_bronze
+    
+        FROM(	
+            SELECT a.*,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '2G'
+                AND LOWER(a1.class_revenue) = 'platinum'
+            ) AS down_platinum_2g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '3G'
+                AND LOWER(a1.class_revenue) = 'platinum'
+            ) AS down_platinum_3g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '4G'
+                AND LOWER(a1.class_revenue) = 'platinum'
+            ) AS down_platinum_4g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND LOWER(a1.class_revenue) = 'platinum'
+            ) AS down_platinum,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '2G'
+                AND LOWER(a1.class_revenue) = 'gold'
+            ) AS down_gold_2g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '3G'
+                AND LOWER(a1.class_revenue) = 'gold'
+            ) AS down_gold_3g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '4G'
+                AND LOWER(a1.class_revenue) = 'gold'
+            ) AS down_gold_4g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND LOWER(a1.class_revenue) = 'gold'
+            ) AS down_gold,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '2G'
+                AND LOWER(a1.class_revenue) = 'silver'
+            ) AS down_silver_2g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '3G'
+                AND LOWER(a1.class_revenue) = 'silver'
+            ) AS down_silver_3g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '4G'
+                AND LOWER(a1.class_revenue) = 'silver'
+            ) AS down_silver_4g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND LOWER(a1.class_revenue) = 'silver'
+            ) AS down_silver,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '2G'
+                AND LOWER(a1.class_revenue) = 'bronze'
+            ) AS down_bronze_2g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '3G'
+                AND LOWER(a1.class_revenue) = 'bronze'
+            ) AS down_bronze_3g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '4G'
+                AND LOWER(a1.class_revenue) = 'bronze'
+            ) AS down_bronze_4g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND LOWER(a1.class_revenue) = 'bronze'
+            ) AS down_bronze,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band != 'EAS'
+            ) AS down,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '2G'
+            ) AS down_2g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '3G'
+            ) AS down_3g,
+            (
+                SELECT COUNT(*) 
+                FROM 85152_trafficability.ran_alarm a1
+                WHERE a1.rtp = a.rtp
+                AND a1.band = '4G'
+            ) AS down_4g
+            FROM 16010754_dapot_site.resume_dapotcell a
+        ) AS tab
+        ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'count_2g':
+            $output = \DB::connection("mysql222")->select("SELECT *
+            FROM ran_alarm a
+            WHERE a.band = '2G'
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'count_3g':
+            $output = \DB::connection("mysql222")->select("SELECT *
+            FROM ran_alarm a
+            WHERE a.band = '3G'
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'count_4g':
+            $output = \DB::connection("mysql222")->select("SELECT *
+            FROM ran_alarm a
+            WHERE a.band = '4G'
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        }
+    }
+
+    public function alarmeas(Request $request)
+    {
+        $dt = $request->all();
+
+        $mode     = $dt['mode'];
+        //$str      = $dt['tanggal_start'];
+        //$stp      = $dt['tanggal_stop'];
+        //$sid      = $dt['siteid'];
+
+        switch ($mode) {
+        case 'text_class':
+            $output = \DB::connection("mysql222")->select("select nsa,rtp,string_alarm,code,count(code) as jml_alarm from (
+                select concat('alarm',substr(string_alarm,2,5)) as code,string_alarm,siteid,neid,sitename,mydatetime,band,nsa,rtp from ran_alarm 
+                where band='EAS' or band='EAS_BOARD' order by string_alarm
+                ) aa
+                where nsa is not null
+                group by rtp,code
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        }
+    }
 }
