@@ -10,6 +10,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class ChamberController extends Controller
 {
@@ -1561,6 +1563,447 @@ class ChamberController extends Controller
             return Core::setResponse("success", $ar);
         }
 
+    }
+
+    public function stock_wl_recap(Request $request)
+    {
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit','2048M');
+
+        date_default_timezone_set("Asia/Jakarta");
+
+        $ftype = htmlentities($request->ftype);
+
+        if ($ftype == '') {
+            return Core::setResponse("error", ['ftype' => "Parameter ftype harus terisi"]);
+        }
+
+        $tmp = explode('_',$ftype);
+        $flag = $tmp[1];
+        $loc = $tmp[0];
+        $flag_type = 'cluster';
+
+        switch($loc){
+            case "central":
+                $region = '1';
+            break;
+            case "eastern":
+                $region = '2';
+            break;
+            case "jabar":
+                $region = '3';
+            break;
+            case "western":
+                $region = '4';
+            break;
+            default:
+                return Core::setResponse("not_found", ["region" => "Region tidak ada"]);
+        }
+
+        switch($flag)
+        {
+            case "isakobc" :
+                $tabel = 'wl_internet_sakti_obc_region'.$region;
+            break;
+            case "isakwacluster" :
+                $tabel = 'wl_isak_wacluster_region'.$region;
+            break;
+            case "combomax" :
+                $tabel = 'wl_combomax_region'.$region;
+            break;
+            case "hvc" :
+                $tabel = 'wl_75k_region'.$region;
+            break;
+            case "mbjj" :
+                $tabel = 'wl_mbjj_region'.$region;
+            break;
+            case "comboul" :
+                $tabel = 'wl_combo_ul_region'.$region;
+            break;
+            case "diamond" :
+                $tabel = 'wl_hvc_priority_diamond_region'.$region;
+            break;
+            case "wacluster" :
+                $tabel = 'wl_wacluster'.$region;
+            break;
+            case "wapoi" :
+                $tabel = 'wl_wapoi'.$region;
+            break;
+            case "wabranch" :
+                $tabel = 'wl_wabranch'.$region;
+                $flag_type = 'branch';
+            break;
+            case "giganet" :
+                $tabel = 'wl_giganet_region'.$region;
+                $flag_type = 'giganet';
+            break;
+            case "wambjj" :
+                $tabel = 'wl_wambjj_branch'.$region;
+                $flag_type = 'branch';
+            break;
+            default:
+                return Core::setResponse("not_found", ["flag" => "Flag tidak ada"]);
+
+        }
+
+        switch($flag_type){
+            case "cluster":
+                $q = DB::connection("mysql")->select("SELECT cluster_name, tdc, count(msisdn) as total_msisdn,
+                    count(case when temp_user is null then 1 else null end) as total_notyet_call,
+                    count(case when temp_user is not null then 1 else null end) as already_call
+                    from (
+                    select f.*,cluster_name, tdc from $tabel f, (
+                    select a.*,b.kecamatan,c.kabupaten,d.cluster_name from tdc a, kecamatan b, kabupaten c, cluster d
+                    where a.id_tdc=b.id_tdc and b.id_kabupaten=c.id_kabupaten and a.id_cluster= d.id_cluster) g
+                    where f.kecamatan =g.kecamatan and f.kabupaten=g.kabupaten and f.cluster_lacci=g.cluster_name ) h
+                    GROUP BY cluster_name, tdc");
+
+                    $sql = $q;
+                    $output = array();
+                    //$output["sql"] = $q;
+                    $index = 0;
+                    foreach ($sql as $key => $row)
+                    {
+                        $output["data"][$index] = htmlentities($row);
+                        $output["datanya"][$index]= htmlentities($row);
+                        $output["datanya"][$index]->cluster_name = htmlentities($row->cluster_name);
+                        $output["datanya"][$index]->tdc = htmlentities($row->tdc);
+                        $output["datanya"][$index]->total_msisdn = htmlentities($row->total_msisdn);
+                        $output["datanya"][$index]->total_notyet_call = htmlentities($row->total_notyet_call);
+                        $output["datanya"][$index]->already_call = htmlentities($row->already_call);
+                        $index++;
+                    }
+                    if(!empty($output["datanya"]))
+                    {
+                        $no =0;
+                        foreach($output["datanya"] as $key => $value)
+                        {
+                            $no++;
+                            $output["table"] .= "<tr>";
+                            $output["table"] .= "<td class=''>".htmlentities($no)."</td>";
+                            $output["table"] .= "<td class=''>".htmlentities($value->cluster_name)."</td>";
+                            $output["table"] .= "<td class=''>".htmlentities($value->tdc)."</td>";
+                            $output["table"] .= "<td class=''>".htmlentities($value->total_msisdn)."</td>";
+                            if($value->total_notyet_call==0){
+                                $output["table"] .= "<td class='' style='background:red;'>".htmlentities($value->total_notyet_call)."</td>";
+                            }else{
+                                $output["table"] .= "<td class='' style='background:white;'>".htmlentities($value->total_notyet_call)."</td>";
+                            }
+                            $output["table"] .= "<td class=''>".htmlentities($value->already_call)."</td>";
+                            $output["table"] .= "</tr>";
+                        }
+                    }
+                    else{
+                        $output["table"] .= "<tr>";
+                        $output["table"] .= "<td class='align-center' colspan='5'>Data Kosong 1</td>";
+                        $output["table"] .= "</tr>";
+                    }
+                break;
+
+            case "branch":
+                $q = DB::connection("mysql")->select("SELECT branch_name as cluster_name, count(msisdn) as total_msisdn,
+                count(case when status_telepon IS null then 1 else null end) as total_notyet_call,
+                count(case when temp_user is not null AND status_telepon IS NOT null then 1 else null end) as already_call
+                from (
+                select f.*,branch_name from $tabel f, (
+                select d.branch_name from branch d) g
+                where f.branch_lacci=g.branch_name ) h
+                GROUP BY branch_name");
+
+                $sql = $q;
+                $output = array();
+                //$output["sql"] = $q;
+                $index = 0;
+                // while($row =mysqli_fetch_object($sql))
+                foreach ($sql as $key => $row)
+                {
+                    $output["data"][$index] = htmlentities($row);
+                    $output["datanya"][$index]=htmlentities($row);
+                    $output["datanya"][$index]->cluster_name = htmlentities($row->cluster_name);
+                    $output["datanya"][$index]->total_msisdn = htmlentities($row->total_msisdn);
+                    $output["datanya"][$index]->total_notyet_call = htmlentities($row->total_notyet_call);
+                    $output["datanya"][$index]->already_call = htmlentities($row->already_call);
+                    $index++;
+                }
+                if(!empty($output["datanya"])){
+                    $no =0;
+                    foreach($output["datanya"] as $key => $value){
+                        $no++;
+                        $output["table"] .= "<tr>";
+                        $output["table"] .= "<td class=''>".htmlentities($no)."</td>";
+                        $output["table"] .= "<td class=''>".htmlentities($value->cluster_name)."</td>";
+                        $output["table"] .= "<td class=''>".htmlentities($value->total_msisdn)."</td>";
+                        if($value->total_notyet_call==0){
+                            $output["table"] .= "<td class='' style='background:red;'>".htmlentities($value->total_notyet_call)."</td>";
+                        }else{
+                            $output["table"] .= "<td class='' style='background:white;'>".htmlentities($value->total_notyet_call)."</td>";
+                        }
+                        $output["table"] .= "<td class=''>".htmlentities($value->already_call)."</td>";
+                        $output["table"] .= "</tr>";
+                        }
+                    }
+                    else{
+                    $output["table"] .= "<tr>";
+                    $output["table"] .= "<td class='align-center' colspan='5'>Data Kosong</td>";
+                    $output["table"] .= "</tr>";
+                    }
+                break;
+
+            case "giganet":
+                $q = DB::connection("mysql")->select("SELECT cluster_name, count(msisdn) as total_msisdn,
+                count(case when status_telepon IS null then 1 else null end) as total_notyet_call,
+                count(case when temp_user is not null AND status_telepon IS NOT null then 1 else null end) as already_call
+                from (
+                select f.*,cluster_name from $tabel f, (
+                select d.cluster_name from cluster d) g
+                where f.cluster_lacci=g.cluster_name ) h
+                GROUP BY cluster_name");
+
+                $sql = $q;
+                $output = array();
+                //$output["sql"] = $q;
+                $index = 0;
+                // while($row =mysqli_fetch_object($sql))
+                foreach ($sql as $key => $row)
+                {
+                    $output["data"][$index] = htmlentities($row);
+                    $output["datanya"][$index]=htmlentities($row);
+                    $output["datanya"][$index]->cluster_name = htmlentities($row->cluster_name);
+                    $output["datanya"][$index]->total_msisdn = htmlentities($row->total_msisdn);
+                    $output["datanya"][$index]->total_notyet_call = htmlentities($row->total_notyet_call);
+                    $output["datanya"][$index]->already_call = htmlentities($row->already_call);
+                    $index++;
+                }
+                if(!empty($output["datanya"])){
+                    $no =0;
+                    foreach($output["datanya"] as $key => $value){
+                        $no++;
+                        $output["table"] .= "<tr>";
+                        $output["table"] .= "<td class=''>".htmlentities($no)."</td>";
+                        $output["table"] .= "<td class=''>".htmlentities($value->cluster_name)."</td>";
+                        $output["table"] .= "<td class=''>".htmlentities($value->total_msisdn)."</td>";
+                        if($value->total_notyet_call==0){
+                            $output["table"] .= "<td class='' style='background:red;'>".htmlentities($value->total_notyet_call)."</td>";
+                        }else{
+                            $output["table"] .= "<td class='' style='background:white;'>".htmlentities($value->total_notyet_call)."</td>";
+                        }
+                        $output["table"] .= "<td class=''>".htmlentities($value->already_call)."</td>";
+                        $output["table"] .= "</tr>";
+                        }
+                    }
+                    else{
+                    $output["table"] .= "<tr>";
+                    $output["table"] .= "<td class='align-center' colspan='5'>Data Kosong</td>";
+                    $output["table"] .= "</tr>";
+                    }
+                break;
+
+            default:
+                return Core::setResponse("not_found", ["Flag type tidak ada"]);
+
+        }
+
+        $output["type"] =  preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlentities(htmlspecialchars($request->ftype)));
+
+        return Core::setResponse("success", $output);
+    }
+
+    public function save_adm_menu(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'namaMenu'  => 'required',
+            'iconMenu'  => 'required',
+            'urlMenu'   => 'required',
+            'levelMenu' => 'required',
+            'parentMenu'=> 'required',
+            'typeMenu'  => 'required',
+            'orderMenu' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'nama_menu'     => $request->input('namaMenu'),
+                'icon_menu'     => $request->input('iconMenu'),
+                'url_menu'      => $request->input('urlMenu'),
+                'level_menu'    => $request->input('levelMenu'),
+                'parent_menu'   => $request->input('parentMenu'),
+                'type_menu'     => $request->input('typeMenu'),
+                'target_menu'   => $request->input('targetMenu'),
+                'order_menu'    => $request->input('orderMenu'),
+                'color_menu'    => $request->input('colorMenu'),
+                'authorized_roles'  => $request->input('authorized'),
+                'status_menu'       => 'active'
+            ];
+
+            $query = DB::connection("mysql")->table('boopati_menu')->insert($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data Menu telah ditambahkan"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+            }
+
+        }
+    }
+
+    public function update_adm_menu(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'namaMenu'  => 'required',
+            'iconMenu'  => 'required',
+            'urlMenu'   => 'required',
+            'levelMenu' => 'required',
+            'parentMenu'=> 'required',
+            'typeMenu'  => 'required',
+            'orderMenu' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'nama_menu'     => $request->input('namaMenu'),
+                'icon_menu'     => $request->input('iconMenu'),
+                'url_menu'      => $request->input('urlMenu'),
+                'level_menu'    => $request->input('levelMenu'),
+                'parent_menu'   => $request->input('parentMenu'),
+                'type_menu'     => $request->input('typeMenu'),
+                'color_menu'    => $request->input('colorMenu'),
+                'order_menu'    => $request->input('orderMenu'),
+                'target_menu'   => $request->input('targetMenu'),
+                'status_menu'   => $request->input('status_menu'),
+                'authorized_roles' => $request->input('authorized')
+            ];
+
+            $query = DB::connection("mysql")->table("boopati_menu")
+                        ->where("id_menu", $id)
+                        ->update($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data Menu telah diupdate"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+            }
+
+        }
+
+    }
+
+    public function delete_adm_menu($id)
+    {
+        $query =  DB::connection("mysql")->table('boopati_menu')->where('id_menu','=',$id)->delete();
+
+        if ($query) {
+            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+        } else {
+            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+        }
+    }
+
+    public function save_adm_loader(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'namaLoader'    => 'required',
+            'sessionLoader' => 'required',
+            'permission'    => 'required',
+            'pathLoader'    => 'required',
+            'titleLoader'   => 'required',
+            'username'      => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'nama_loader'   => $request->input('namaLoader'),
+                'session_loader'=> $request->input('sessionLoader'),
+                'permission'    => $request->input('permission'),
+                'filepage'      => $request->input('pathLoader'),
+                'title'         => $request->input('titleLoader'),
+                'created_by'    => $request->input('username'),
+                'created_date'  => Carbon::now()->timezone('Asia/Jakarta')
+            ];
+
+            $query = DB::connection("mysql")->table('boopati_loader')->insert($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data Loader telah ditambahkan"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+            }
+
+        }
+    }
+
+    public function update_adm_loader(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'namaLoader'    => 'required',
+            'sessionLoader' => 'required',
+            'permission'    => 'required',
+            'pathLoader'    => 'required',
+            'titleLoader'   => 'required'
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'nama_loader'   => $request->input('namaLoader'),
+                'session_loader'=> $request->input('sessionLoader'),
+                'permission'    => $request->input('permission'),
+                'filepage'      => $request->input('pathLoader'),
+                'title'         => $request->input('titleLoader')
+            ];
+
+            $query = DB::connection("mysql")->table("boopati_loader")
+                        ->where("id_loader", $id)
+                        ->update($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data Loader telah diupdate"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+            }
+
+        }
+
+    }
+
+    public function delete_adm_loader($id)
+    {
+        $query =  DB::connection("mysql")->table('boopati_loader')->where('id_loader','=',$id)->delete();
+
+        if ($query) {
+            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+        } else {
+            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+        }
+    }
+
+    public function boopati_loader()
+    {
+        $query = DB::connection("mysql")->table('boopati_loader')->get();
+
+        if (count($query) == 0) {
+            return Core::setResponse("not_found", ['info' => "Table Empty"]);
+        } else {
+            return Core::setResponse("success", $query);
+        }
     }
 
 }
