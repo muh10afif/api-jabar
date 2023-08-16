@@ -118,40 +118,151 @@ class ChamberController extends Controller
 
     public function menu(Request $request)
     {
-        $roles       = $request->roles;
-        $menu_status = $request->menu_status;
-        $level_menu  = $request->level_menu;
-        $parent_menu = $request->parent_menu;
+        $roles  = $request->roles;
+        $link   = $request->link;
 
         if ($roles == ''){
             return Core::setResponse('error', ['roles' => "roles tidak boleh kosong"]);
         }
-        if ($menu_status == ''){
-            return Core::setResponse('error', ['menu_status' => "Parameter tidak boleh kosong. Pilihan: judul_menu, sub_menu"]);
-        }
 
         $optionroles = "and status_menu = 'active' and (authorized_roles is null or authorized_roles ='' or authorized_roles LIKE '%".$roles."%')";
 
-        if ($menu_status == 'judul_menu') {
-            $query = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=0 $optionroles order by order_menu");
+        $query = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=0 $optionroles order by order_menu");
 
-            if (count($query) == 0) {
-                return Core::setResponse('not_found', ['result' => "Level menu 0 kosong"]);
-            }
+        $data0 = $query;
 
-        } else {
-            if ($level_menu == ''){
-                return Core::setResponse('error', ['level_menu' => "Parameter level menu tidak boleh kosong. Pilihan 1 s/d 5"]);
-            }
-            if ($parent_menu == ''){
-                return Core::setResponse('error', ['parent_menu' => "Parameter parent menu tidak boleh kosong."]);
-            }
+        $txt = "";
+        foreach($data0 as $val0){
 
-            $query = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=$level_menu and parent_menu=$parent_menu $optionroles order by order_menu");
+            if($val0->type_menu == "header"){
+                $txt .= '<li class="header">'.$val0->nama_menu.'</li>';
+
+                $query1 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=1 and parent_menu=$val0->id_menu $optionroles order by order_menu");
+                $data1 = $query1;
+
+                foreach($data1 as $val1){
+                    if($val1->type_menu =="link"){
+                        if($val1->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val1->target_menu.'"';}
+                        $txt .= '<li><a href="'.$link.'/'.$val1->url_menu.'" '.$target.'><i class="fa '.$val1->icon_menu.' '.$val1->color_menu.'"></i> <span>'.$val1->nama_menu.'</span></a></li>';
+                    }
+                    elseif($val1->type_menu == "treeview"){
+
+                        $txt .= '<li class="treeview">';
+                        $txt .= '  <a href="#"><i class="fa '.$val1->icon_menu.' '.$val1->color_menu.'"></i> <span>'.$val1->nama_menu.'</span>';
+                        $txt .= '    <span class="pull-right-container">';
+                        $txt .= '       <i class="fa fa-angle-left pull-right"></i>';
+                        $txt .= '    </span>';
+                        $txt .= '  </a>';
+                        $txt .= '  <ul class="treeview-menu">';
+
+                        $query2 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=2 and parent_menu=$val1->id_menu $optionroles order by order_menu");
+                        $data2 = $query2;
+
+                        foreach($data2 as $val2){
+                            if($val2->type_menu =="link"){
+                                if($val2->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val2->target_menu .'"';}
+                                 $txt .= '<li><a href="'.$link.'/'.$val2->url_menu.'" '.$target.'><i class="fa '.$val2->icon_menu .' '.$val2->color_menu .'"></i> <span>'.$val2->nama_menu .'</span></a></li>';
+                            }
+                            elseif($val2->type_menu=="url"){
+                                if($val2->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val2->target_menu .'"';}
+                                 $txt .= '<li><a href="'.$val2->url_menu .'" '.$target.'><i class="fa '.$val2->icon_menu .' '.$val2->color_menu .'"></i> <span>'.$val2->nama_menu .'</span></a></li>';
+                            }
+                            elseif($val2->type_menu =="treeview"){
+                                $txt .= '<li class="treeview">';
+                                $txt .= '  <a href="#"><i class="fa '.$val2->icon_menu .' '.$val2->color_menu .'"></i> <span>'.$val2->nama_menu .'</span>';
+                                $txt .= '    <span class="pull-right-container">';
+                                $txt .= '       <i class="fa fa-angle-left pull-right"></i>';
+                                $txt .= '    </span>';
+                                $txt .= '  </a>';
+                                $txt .= '  <ul class="treeview-menu">';
+
+                                $query3 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=3 and parent_menu=$val2->id_menu $optionroles order by order_menu");
+                                $data3 = $query3;
+
+                                foreach($data3 as $val3){
+                                    if($val3->type_menu =="link"){
+                                        if($val3->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val3->target_menu .'"';}
+                                        $txt .= '<li><a href="'.$link.'/'.$val3->url_menu.'" '.$target.'><i class="fa '.$val3->icon_menu .' '.$val3->color_menu .'"></i> <span>'.$val3->nama_menu .'</span></a></li>';
+                                    }
+                                    elseif($val3->type_menu=="url"){
+                                        if($val3->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val3->target_menu .'"';}
+                                        $txt .= '<li><a href="'.$val3->url_menu .'" '.$target.'><i class="fa '.$val3->icon_menu .' '.$val3->color_menu .'"></i> <span>'.$val3->nama_menu .'</span></a></li>';
+                                    }
+                                    elseif($val3->type_menu =="treeview"){
+                                        $txt .= '<li class="treeview">';
+                                        $txt .= '  <a href="#"><i class="fa '.$val3->icon_menu .' '.$val3->color_menu .'"></i> <span>'.$val3->nama_menu .'</span>';
+                                        $txt .= '    <span class="pull-right-container">';
+                                        $txt .= '       <i class="fa fa-angle-left pull-right"></i>';
+                                        $txt .= '    </span>';
+                                        $txt .= '  </a>';
+                                        $txt .= '  <ul class="treeview-menu">';
+
+                                        $query4 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=4 and parent_menu=$val3->id_menu $optionroles order by order_menu");
+                                        $data4 = $query4;
+
+                                        foreach($data4 as $val4){
+                                            if($val4->type_menu =="link"){
+                                                if($val4->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val4->target_menu .'"';}
+                                                $txt .= '<li><a href="'.$link.'/'.$val4->url_menu.'" '.$target.'><i class="fa '.$val4->icon_menu .' '.$val4->color_menu .'"></i> <span>'.$val4->nama_menu .'</span></a></li>';
+                                            }
+                                            elseif($val4->type_menu=="url"){
+                                                if($val4->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val4->target_menu .'"';}
+                                                $txt .= '<li><a href="'.$val4->url_menu .'" '.$target.'><i class="fa '.$val4->icon_menu .' '.$val4->color_menu .'"></i> <span>'.$val4->nama_menu .'</span></a></li>';
+                                            }
+                                            elseif($val4->type_menu =="treeview"){
+                                                $txt .= '<li class="treeview">';
+                                                $txt .= '  <a href="#"><i class="fa '.$val4->icon_menu .' '.$val4->color_menu .'"></i> <span>'.$val4->nama_menu .'</span>';
+                                                $txt .= '    <span class="pull-right-container">';
+                                                $txt .= '       <i class="fa fa-angle-left pull-right"></i>';
+                                                $txt .= '    </span>';
+                                                $txt .= '  </a>';
+                                                $txt .= '  <ul class="treeview-menu">';
+
+                                                $query5 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=5 and parent_menu=$val4->id_menu $optionroles order by order_menu");
+                                                $data5 = $query5;
+
+                                                foreach($data5 as $val5){
+                                                    if($val5->type_menu =="link"){
+                                                        if($val5->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val5->target_menu .'"';}
+                                                        $txt .= '<li><a href="'.$link.'/'.$val5->url_menu.'" '.$target.'><i class="fa '.$val5->icon_menu .' '.$val5->color_menu .'"></i> <span>'.$val5->nama_menu .'</span></a></li>';
+                                                    }
+                                                    elseif($val5->type_menu=="url"){
+                                                        if($val5->target_menu ==''){ $target = 'target="_SELF"';}{$target='target="'.$val5->target_menu .'"';}
+                                                        $txt .= '<li><a href="'.$val5->url_menu .'" '.$target.'><i class="fa '.$val5->icon_menu .' '.$val5->color_menu .'"></i> <span>'.$val5->nama_menu .'</span></a></li>';
+                                                    }
+                                                    elseif($val5->type_menu =="treeview"){
+                                                        $txt .= '<li class="treeview">';
+                                                        $txt .= '  <a href="#"><i class="fa '.$val5->icon_menu .' '.$val5->color_menu .'"></i> <span>'.$val5->nama_menu .'</span>';
+                                                        $txt .= '    <span class="pull-right-container">';
+                                                        $txt .= '       <i class="fa fa-angle-left pull-right"></i>';
+                                                        $txt .= '    </span>';
+                                                        $txt .= '  </a>';
+                                                        $txt .= '  <ul class="treeview-menu">';
+                                                        // untuk level selanjut nya
+                                                        $txt .= '  </ul>';
+                                                        $txt .= '</li>';
+                                                    }
+                                                }
+                                                $txt .= '  </ul>';
+                                                $txt .= '</li>';
+                                            }
+                                        }
+                                        $txt .= '  </ul>';
+                                        $txt .= '</li>';
+                                    }
+                                }
+                                $txt .= '  </ul>';
+                                $txt .= '</li>';
+                            }
+                        }
+                        $txt .= '  </ul>';
+                        $txt .= '</li>';
+                    }
+                }
+            }
         }
 
-        return Core::setResponse("success", $query);
-
+        return Core::setResponse("success", $txt);
     }
 
     public function tableRegion(Request $request)
@@ -2006,4 +2117,784 @@ class ChamberController extends Controller
         }
     }
 
+    public function chamber_menu()
+    {
+        $query0 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=0 order by order_menu");
+        $data0 = $query0;
+
+        $txt = '';
+
+        foreach($data0 as $val0){
+            // $dt[] = showrowmenutable(0,'#8a959b');
+            $kun = '';
+            for($i=0;$i<0;$i++){
+                $kun = $kun.'>';
+            }
+
+            $txt .= "<tr bgcolor=''#8a959b''>";
+            $txt .= "  <td>".$val0->id_menu."</td>";
+            $txt .= "  <td>".$val0->order_menu."</td>";
+            $txt .= "  <td>$kun ".$val0->nama_menu."</td>";
+            $txt .= "  <td>".$val0->icon_menu."</td>";
+            $txt .= "  <td>".$val0->color_menu."</td>";
+            $txt .= "  <td>".$val0->url_menu."</td>";
+            $txt .= "  <td>".$val0->level_menu."</td>";
+            $txt .= "  <td>".$val0->parent_menu."</td>";
+            $txt .= "  <td>".$val0->type_menu."</td>";
+            $txt .= "  <td>".$val0->target_menu."</td>";
+            $txt .= "  <td>".$val0->status_menu."</td>";
+            $nextlevel = $val0->level_menu + 1;
+            $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val0->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val0->id_menu."','".$val0->nama_menu."','".$val0->icon_menu."','".$val0->url_menu."','".$val0->level_menu."','".$val0->parent_menu."','".$val0->type_menu."','".$val0->target_menu."','".$val0->color_menu."','".$val0->order_menu."','".$val0->authorized_roles."', '".$val0->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val0->id_menu."','".$val0->nama_menu."','".$val0->icon_menu."','".$val0->url_menu."','".$val0->level_menu."','".$val0->parent_menu."','".$val0->type_menu."','".$val0->target_menu."','".$val0->color_menu."','".$val0->order_menu."','".$val0->authorized_roles."', '".$val0->status_menu."')\">delete</a></td>";
+            $txt .= "</tr>";
+            $query1 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=1 and parent_menu=$val0->id_menu order by order_menu");
+            $data1 = $query1;
+            foreach($data1 as $val1){
+
+                $kun = '';
+                for($i=0;$i<1;$i++){
+                    $kun = $kun.'>';
+                }
+
+                $txt .= "<tr bgcolor='#a5b2ba'>";
+                $txt .= "  <td>".$val1->id_menu."</td>";
+                $txt .= "  <td>".$val1->order_menu."</td>";
+                $txt .= "  <td>$kun ".$val1->nama_menu."</td>";
+                $txt .= "  <td>".$val1->icon_menu."</td>";
+                $txt .= "  <td>".$val1->color_menu."</td>";
+                $txt .= "  <td>".$val1->url_menu."</td>";
+                $txt .= "  <td>".$val1->level_menu."</td>";
+                $txt .= "  <td>".$val1->parent_menu."</td>";
+                $txt .= "  <td>".$val1->type_menu."</td>";
+                $txt .= "  <td>".$val1->target_menu."</td>";
+                $txt .= "  <td>".$val1->status_menu."</td>";
+                $nextlevel = $val1->level_menu + 1;
+                $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val1->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val1->id_menu."','".$val1->nama_menu."','".$val1->icon_menu."','".$val1->url_menu."','".$val1->level_menu."','".$val1->parent_menu."','".$val1->type_menu."','".$val1->target_menu."','".$val1->color_menu."','".$val1->order_menu."','".$val1->authorized_roles."', '".$val1->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val1->id_menu."','".$val1->nama_menu."','".$val1->icon_menu."','".$val1->url_menu."','".$val1->level_menu."','".$val1->parent_menu."','".$val1->type_menu."','".$val1->target_menu."','".$val1->color_menu."','".$val1->order_menu."','".$val1->authorized_roles."', '".$val1->status_menu."')\">delete</a></td>";
+                $txt .= "</tr>";
+
+                $query2 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=2 and parent_menu=$val1->id_menu order by order_menu");
+                $data2 = $query2;
+                foreach($data2 as $val2){
+
+                    $kun = '';
+                    for($i=0;$i<2;$i++){
+                        $kun = $kun.'>';
+                    }
+
+                    $txt .= "<tr bgcolor='#b3c1c9'>";
+                    $txt .= "  <td>".$val2->id_menu."</td>";
+                    $txt .= "  <td>".$val2->order_menu."</td>";
+                    $txt .= "  <td>$kun ".$val2->nama_menu."</td>";
+                    $txt .= "  <td>".$val2->icon_menu."</td>";
+                    $txt .= "  <td>".$val2->color_menu."</td>";
+                    $txt .= "  <td>".$val2->url_menu."</td>";
+                    $txt .= "  <td>".$val2->level_menu."</td>";
+                    $txt .= "  <td>".$val2->parent_menu."</td>";
+                    $txt .= "  <td>".$val2->type_menu."</td>";
+                    $txt .= "  <td>".$val2->target_menu."</td>";
+                    $txt .= "  <td>".$val2->status_menu."</td>";
+                    $nextlevel = $val2->level_menu + 1;
+                    $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val2->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val2->id_menu."','".$val2->nama_menu."','".$val2->icon_menu."','".$val2->url_menu."','".$val2->level_menu."','".$val2->parent_menu."','".$val2->type_menu."','".$val2->target_menu."','".$val2->color_menu."','".$val2->order_menu."','".$val2->authorized_roles."', '".$val2->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val2->id_menu."','".$val2->nama_menu."','".$val2->icon_menu."','".$val2->url_menu."','".$val2->level_menu."','".$val2->parent_menu."','".$val2->type_menu."','".$val2->target_menu."','".$val2->color_menu."','".$val2->order_menu."','".$val2->authorized_roles."', '".$val2->status_menu."')\">delete</a></td>";
+                    $txt .= "</tr>";
+                    $query3 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=3 and parent_menu=$val2->id_menu order by order_menu");
+                    $data3 = $query3;
+                    foreach($data3 as $val3){
+
+                        $kun = '';
+                        for($i=0;$i<3;$i++){
+                            $kun = $kun.'>';
+                        }
+
+                        $txt .= "<tr bgcolor='#cad6df'>";
+                        $txt .= "  <td>".$val3->id_menu."</td>";
+                        $txt .= "  <td>".$val3->order_menu."</td>";
+                        $txt .= "  <td>$kun ".$val3->nama_menu."</td>";
+                        $txt .= "  <td>".$val3->icon_menu."</td>";
+                        $txt .= "  <td>".$val3->color_menu."</td>";
+                        $txt .= "  <td>".$val3->url_menu."</td>";
+                        $txt .= "  <td>".$val3->level_menu."</td>";
+                        $txt .= "  <td>".$val3->parent_menu."</td>";
+                        $txt .= "  <td>".$val3->type_menu."</td>";
+                        $txt .= "  <td>".$val3->target_menu."</td>";
+                        $txt .= "  <td>".$val3->status_menu."</td>";
+                        $nextlevel = $val3->level_menu + 1;
+                        $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val3->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val3->id_menu."','".$val3->nama_menu."','".$val3->icon_menu."','".$val3->url_menu."','".$val3->level_menu."','".$val3->parent_menu."','".$val3->type_menu."','".$val3->target_menu."','".$val3->color_menu."','".$val3->order_menu."','".$val3->authorized_roles."', '".$val3->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val3->id_menu."','".$val3->nama_menu."','".$val3->icon_menu."','".$val3->url_menu."','".$val3->level_menu."','".$val3->parent_menu."','".$val3->type_menu."','".$val3->target_menu."','".$val3->color_menu."','".$val3->order_menu."','".$val3->authorized_roles."', '".$val3->status_menu."')\">delete</a></td>";
+                        $txt .= "</tr>";
+
+                        $query4 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=4 and parent_menu=$val3->id_menu order by order_menu");
+                        $data4 = $query4;
+                        foreach($data4 as $val4){
+
+                            $kun = '';
+                            for($i=0;$i<4;$i++){
+                                $kun = $kun.'>';
+                            }
+
+                            $txt .= "<tr bgcolor='#dbe4ee'>";
+                            $txt .= "  <td>".$val4->id_menu."</td>";
+                            $txt .= "  <td>".$val4->order_menu."</td>";
+                            $txt .= "  <td>$kun ".$val4->nama_menu."</td>";
+                            $txt .= "  <td>".$val4->icon_menu."</td>";
+                            $txt .= "  <td>".$val4->color_menu."</td>";
+                            $txt .= "  <td>".$val4->url_menu."</td>";
+                            $txt .= "  <td>".$val4->level_menu."</td>";
+                            $txt .= "  <td>".$val4->parent_menu."</td>";
+                            $txt .= "  <td>".$val4->type_menu."</td>";
+                            $txt .= "  <td>".$val4->target_menu."</td>";
+                            $txt .= "  <td>".$val4->status_menu."</td>";
+                            $nextlevel = $val4->level_menu + 1;
+                            $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val4->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val4->id_menu."','".$val4->nama_menu."','".$val4->icon_menu."','".$val4->url_menu."','".$val4->level_menu."','".$val4->parent_menu."','".$val4->type_menu."','".$val4->target_menu."','".$val4->color_menu."','".$val4->order_menu."','".$val4->authorized_roles."', '".$val4->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val4->id_menu."','".$val4->nama_menu."','".$val4->icon_menu."','".$val4->url_menu."','".$val4->level_menu."','".$val4->parent_menu."','".$val4->type_menu."','".$val4->target_menu."','".$val4->color_menu."','".$val4->order_menu."','".$val4->authorized_roles."', '".$val4->status_menu."')\">delete</a></td>";
+                            $txt .= "</tr>";
+
+                            $query5 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=5 and parent_menu=$val4->id_menu order by order_menu");
+                            $data5 = $query5;
+                            foreach($data5 as $val5){
+                                $kun = '';
+                                for($i=0;$i<5;$i++){
+                                    $kun = $kun.'>';
+                                }
+
+                                $txt .= "<tr bgcolor='#eef2f7'>";
+                                $txt .= "  <td>".$val5->id_menu."</td>";
+                                $txt .= "  <td>".$val5->order_menu."</td>";
+                                $txt .= "  <td>$kun ".$val5->nama_menu."</td>";
+                                $txt .= "  <td>".$val5->icon_menu."</td>";
+                                $txt .= "  <td>".$val5->color_menu."</td>";
+                                $txt .= "  <td>".$val5->url_menu."</td>";
+                                $txt .= "  <td>".$val5->level_menu."</td>";
+                                $txt .= "  <td>".$val5->parent_menu."</td>";
+                                $txt .= "  <td>".$val5->type_menu."</td>";
+                                $txt .= "  <td>".$val5->target_menu."</td>";
+                                $txt .= "  <td>".$val5->status_menu."</td>";
+                                $nextlevel = $val5->level_menu + 1;
+                                $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val5->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val5->id_menu."','".$val5->nama_menu."','".$val5->icon_menu."','".$val5->url_menu."','".$val5->level_menu."','".$val5->parent_menu."','".$val5->type_menu."','".$val5->target_menu."','".$val5->color_menu."','".$val5->order_menu."','".$val5->authorized_roles."', '".$val5->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val5->id_menu."','".$val5->nama_menu."','".$val5->icon_menu."','".$val5->url_menu."','".$val5->level_menu."','".$val5->parent_menu."','".$val5->type_menu."','".$val5->target_menu."','".$val5->color_menu."','".$val5->order_menu."','".$val5->authorized_roles."', '".$val5->status_menu."')\">delete</a></td>";
+                                $txt .= "</tr>";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return Core::setResponse("success", $txt);
+    }
+
+    public function history_login()
+    {
+        $query = DB::connection("mysql")->select("SELECT * from boopati_history where datetimelog >= now() - interval  7 day order by datetimelog desc");
+
+        if (count($query) == 0) {
+            return Core::setResponse("not_found", ['result' => "Data Empty"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function save_adm_userTDC(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'usernametdc'   => 'required',
+            'tdc_select'    => 'required',
+            'rolestdc'      => 'required',
+            'username'      => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'username'      => $request->input('usernametdc'),
+                'password'      => "953e015fa874844b7af52f25c08d2255",
+                'hint'          => "Telkomsel",
+                'id_cluster'    => $request->input('tdc_select'),
+                'roles'         => $request->input('rolestdc'),
+                'created_date'  => Carbon::now()->timezone('Asia/Jakarta'),
+                'created_by'    => $request->input('username'),
+            ];
+
+            $query = DB::connection("mysql")->table('users')->insert($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data User telah ditambahkan"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+            }
+
+        }
+    }
+
+    public function update_adm_userTDC(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'usernametdc'   => 'required',
+            'tdc_select'    => 'required',
+            'rolestdc'      => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'username'      => $request->input('usernametdc'),
+                'id_cluster'    => $request->input('tdc_select'),
+                'roles'         => $request->input('rolestdc'),
+            ];
+
+            $query = DB::connection("mysql")->table("users")
+                        ->where("id_users", $id)
+                        ->update($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data User telah diupdate"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+            }
+
+        }
+
+    }
+
+    public function delete_adm_userTDC($id)
+    {
+        $query =  DB::connection("mysql")->table('users')->where('id_users','=',$id)->delete();
+
+        if ($query) {
+            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+        } else {
+            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+        }
+    }
+
+    public function save_adm_user(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'roles'         => 'required',
+            'username'      => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            if ($request->input('roles') == 'su') {
+                $data = [
+                    'username'      => $request->input('username'),
+                    'password'      => "953e015fa874844b7af52f25c08d2255",
+                    'hint'          => "Telkomsel",
+                    'roles'         => $request->input('rolestdc'),
+                    'created_date'  => Carbon::now()->timezone('Asia/Jakarta'),
+                    'created_by'    => $request->input('username'),
+                ];
+            } else {
+                $data = [
+                    'username'      => $request->input('username'),
+                    'password'      => "953e015fa874844b7af52f25c08d2255",
+                    'hint'          => "Telkomsel",
+                    'id_cluster'    => $request->input('tdc_select'),
+                    'roles'         => $request->input('rolestdc'),
+                    'created_date'  => Carbon::now()->timezone('Asia/Jakarta'),
+                    'created_by'    => $request->input('username'),
+                ];
+            }
+
+            $query = DB::connection("mysql")->table('users')->insert($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data User telah ditambahkan"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+            }
+
+        }
+    }
+
+    public function update_adm_user(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'username'  => 'required',
+            'roles'     => 'required',
+            'id_cluster'=> 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'username'      => $request->input('username'),
+                'roles'         => $request->input('roles'),
+                'id_cluster'    => $request->input('id_cluster'),
+            ];
+
+            $query = DB::connection("mysql")->table("users")
+                        ->where("id_users", $id)
+                        ->update($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data User telah diupdate"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+            }
+
+        }
+
+    }
+
+    public function delete_adm_user($id)
+    {
+        $query =  DB::connection("mysql")->table('users')->where('id_users','=',$id)->delete();
+
+        if ($query) {
+            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+        } else {
+            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+        }
+    }
+
+    public function change_password_user(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'password'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $data = [
+                'password'  => md5($request->input('password')),
+                'hint'      => $request->input('password'),
+            ];
+
+            $query = DB::connection("mysql")->table("users")
+                        ->where("id_users", $id)
+                        ->update($data);
+
+            if ($query) {
+                return Core::setResponse("success", ['info' => "Data User telah diupdate"]);
+            } else {
+                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+            }
+
+        }
+    }
+
+    public function list_user(Request $request)
+    {
+        $roles = $request->roles;
+
+        if ($roles == '') {
+            return Core::setResponse("error", ['roles' => "Parameter roles harus diisi!"]);
+        }
+
+        if ($roles == 'cluster') {
+            $query = DB::connection("mysql")->select("SELECT * FROM users a JOIN cluster b ON (a.id_cluster = b.id_cluster) WHERE roles = 'cluster'");
+        } elseif ($roles == 'su' || $roles == 'branch') {
+            $query = DB::connection("mysql")->select("SELECT * FROM users WHERE roles = '$roles'");
+        } else {
+            return Core::setResponse("not_found", ['roles' => "Roles tidak ditemukan"]);
+        }
+
+        if (count($query) == 0) {
+            return Core::setResponse("error", ['result' => "Data Empty!"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function list_user_tdc(Request $request)
+    {
+        $roles      = $request->roles;
+        $id_cluster = $request->id_cluster;
+
+        if ($roles == '') {
+            return Core::setResponse("error", ['roles' => "Parameter roles harus diisi!"]);
+        }
+
+        if($roles == 'su'){
+            $query = DB::connection("mysql")->select("SELECT a.id_users,a.username,a.roles,b.id_tdc ,b.tdc,b.id_cluster,c.cluster_name,c.id_branch,d.branch_name,a.created_by,a.created_date, a.hint
+            from users a,tdc b,cluster c,branch d
+            where a.roles='tdc' and a.id_cluster=b.id_tdc and b.id_cluster=c.id_cluster and c.id_branch=d.id_branch");
+
+        } else {
+            $query = DB::connection("mysql")->select("SELECT * FROM users a LEFT JOIN tdc b ON (a.id_cluster = b.id_tdc) WHERE a.roles = 'tdc' AND b.id_cluster = '$id_cluster'");
+
+        }
+
+        if (count($query) == 0) {
+            return Core::setResponse("error", ['result' => "Data Empty!"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function adm_get_branch(Request $request)
+    {
+        $id_region = $request->id_region;
+
+        if($id_region == ''){
+            $query = DB::connection("mysql")->select("SELECT * FROM branch");
+        } else {
+            $query = DB::connection("mysql")->select("SELECT * FROM branch WHERE id_region = '$id_region'");
+        }
+
+        if (count($query) == 0) {
+            return Core::setResponse("error", ['result' => "Data Empty!"]);
+        }
+
+        $output = array();
+        foreach ($query as $result) {
+            $output['result'][] = array(
+                'id_branch'     => htmlentities($result->id_branch),
+                'branch_name'   => htmlentities($result->branch_name),
+                'id_region'     => htmlentities($result->id_region)
+            );
+        }
+
+
+        return Core::setResponse("success", $output);
+    }
+
+    public function adm_get_cluster(Request $request)
+    {
+        $id_branch = $request->id_branch;
+
+        if($id_branch == ''){
+            $query = DB::connection("mysql")->select("SELECT * FROM cluster");
+        } else {
+            $query = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+        }
+
+        if (count($query) == 0) {
+            return Core::setResponse("error", ['result' => "Data Empty!"]);
+        }
+
+        $output = array();
+        foreach ($query as $result) {
+            $output['result'][] = array(
+                'id_cluster'    => htmlentities($result->id_cluster),
+                'cluster_name'  => htmlentities($result->cluster_name),
+                'id_branch'     => htmlentities($result->id_branch)
+            );
+        }
+
+        return Core::setResponse("success", $output);
+    }
+
+    public function adm_get_tdc_id(Request $request)
+    {
+        $tmp_idtdc = $request->id_tdc;
+
+        if($tmp_idtdc == ''){
+            $query = "";
+
+        } else {
+            $query = DB::connection("mysql")->select("SELECT b.id_tdc,b.tdc,b.id_cluster,c.cluster_name,c.id_branch,d.branch_name,e.*
+            from tdc b,cluster c,branch d,region e
+            where b.id_cluster=c.id_cluster and c.id_branch=d.id_branch and d.id_region=e.id_region and b.id_tdc='$tmp_idtdc'");
+
+        }
+
+        $output = array();
+        foreach ($query as $result) {
+            $idregion   = htmlentities($result->id_region);
+            $idbranch   = htmlentities($result->id_branch);
+            $idcluster  = htmlentities($result->id_cluster);
+            $idtdc      = htmlentities($result->id_tdc);
+            $output['result'][] = $result;
+        }
+
+        //collect region select form base on tdc id
+        $query = DB::connection("mysql")->select("SELECT * from region where id_region='$idregion'");
+
+        $txtregion = '';
+        foreach ($query as $result) {
+            $txtregion .= '<option value="'.htmlentities($result->id_region).'">'.htmlentities($result->regional).'</option>';
+        }
+        //collect branch select form base on tdc id
+        $query = DB::connection("mysql")->select("SELECT * from branch where id_region='$idregion'");
+
+        $txtbranch = '';
+        foreach ($query as $result) {
+            if($result->id_branch==$idbranch){
+                $sel = "selected";
+            }else{
+                $sel = "";
+            }
+            $txtbranch .= '<option value="'.htmlentities($result->id_branch).'" '.$sel.'>'.htmlentities($result->branch_name).'</option>';
+        }
+        //collect cluster select form base on tdc id
+        $query = DB::connection("mysql")->select("SELECT * from cluster where id_branch='$idbranch'");
+
+        $txtcluster = '';
+        foreach ($query as $result) {
+            if($result->id_cluster==$idcluster){
+                $sel = "selected";
+            }else{
+                $sel = "";
+            }
+            $txtcluster .= '<option value="'.htmlentities($result->id_cluster).'" '.$sel.'>'.htmlentities($result->cluster_name).'</option>';
+        }
+        //collect tdc select form base on tdc id
+        $query = DB::connection("mysql")->select("SELECT * from tdc where id_cluster='$idcluster'");
+
+        $txttdc = '';
+        foreach ($query as $result) {
+            if($result->id_tdc==$idtdc){
+                $sel = "selected";
+            }else{
+                $sel = "";
+            }
+            $txttdc .= '<option value="'.htmlentities($result->id_tdc).'" '.$sel.'>'.htmlentities($result->tdc).'</option>';
+        }
+        $output['result']['selectregion']=htmlentities($txtregion);
+        $output['result']['selectbranch']=htmlentities($txtbranch);
+        $output['result']['selectcluster']=htmlentities($txtcluster);
+        $output['result']['selecttdc']=htmlentities($txttdc);
+
+        return Core::setResponse("success", $output);
+    }
+
+    public function adm_get_tdc(Request $request)
+    {
+        $id_cluster = $request->id_cluster;
+
+        if($id_cluster == ''){
+            $query = DB::connection("mysql")->select("SELECT * FROM tdc");
+        } else {
+            $query = DB::connection("mysql")->select("SELECT * FROM tdc WHERE id_cluster = '$id_cluster'");
+        }
+
+        if (count($query) == 0) {
+            return Core::setResponse("error", ['result' => "Data Empty!"]);
+        }
+
+        $output = array();
+        foreach ($query as $result) {
+            $output['result'][] = $result;
+        }
+
+        return Core::setResponse("success", $output);
+    }
+
+    public function save_table_map(Request $request)
+    {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '-1');
+
+        $file           = $request->file('upload_file');
+        $roles          = $request->roles;
+        $table_name     = $request->table_name;
+        $keyword_page   = $request->keyword_page;
+        $flag_page      = $request->flag_page;
+        $header_page    = $request->header_page;
+        $status_table   = $request->status_table;
+        $username       = $request->username;
+
+        $file_name      = "";
+
+        if (!empty($file))
+        {
+            $file_size  = $file->getSize();
+            $max_size	= 500000000; //5mb
+            if ($file_size > $max_size) {
+                return Core::setResponse("error", ['info' => "File max size 5 mb"]);
+            }
+
+            $file_oriname   = $file->getClientOriginalName();
+            $extension      = pathinfo($file_oriname,PATHINFO_EXTENSION);
+            $extension      = strtolower($extension);
+
+            $allowed_extensions = array("png, jpg, jpeg");
+
+            if(!in_array(strtolower($extension), $allowed_extensions)) {
+                return Core::setResponse("error", ['type' => "Format file harus png | jpg | jpeg"]);
+            }
+
+            $file->move(storage_path('img_chamber'), $file_oriname);
+
+            $file_name	= preg_replace("/[^a-zA-Z0-9]+/", "", "img_" . preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', basename(htmlspecialchars($keyword_page))) . "." . $extension);
+			$file_name	= str_replace("/", "", $file_name);
+			$file_name	= str_replace("..", "", $file_name);
+			$file_name	= str_replace("etc", "", $file_name);
+			$file_name	= str_replace("00", "", $file_name);
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $data = [
+                'roles'         => $roles,
+                'table_name'    => $table_name,
+                'keyword_page'  => $keyword_page,
+                'flag_page'     => $flag_page,
+                'header_page'   => $header_page,
+                'image_table'   => $file_name,
+                'status_table'  => $status_table,
+                'created_date'  => Carbon::now()->timezone('Asia/Jakarta'),
+                'created_by'    => $username,
+                ];
+            $query = DB::connection("mysql")->table('boopati_table_mapped_by_region')->insert($data);
+
+            $doquery = $query;
+            $id =  DB::getPdo()->lastInsertId();
+
+            $data2 = [
+                'nama_loader'    => "main/listtarget/$keyword_page",
+                'session_loader' => "roles",
+                'permission'     => "su;users;tdc;cluster",
+                'filepage'       => "./page/main/listmsisdntarget.php",
+                'title'          => "Target Call $header_page",
+                'created_by'     => $username,
+                'created_date'   => Carbon::now()->timezone('Asia/Jakarta'),
+            ];
+            $query = DB::connection("mysql")->table('boopati_loader')->insert($data2);
+
+            $data3 = [
+                'nama_menu'      => "List $header_page",
+                'icon_menu'      => "fa-phone",
+                'url_menu'       => "main/listtarget/$keyword_page",
+                'level_menu'     => "1",
+                'parent_menu'    => "4",
+                'type_menu'      => "link",
+                'target_menu'    => "_self",
+                'order_menu'     => "$id",
+                'color_menu'     => "text-green",
+                'authorized_roles' => "clusters;tdc",
+                'status_menu'    => "active",
+            ];
+            $query = DB::connection("mysql")->table('boopati_menu')->insert($data3);
+
+            $data4 = [
+                'nama_loader'    => "achievement/$keyword_page",
+                'session_loader' => "roles",
+                'permission'     => "su",
+                'filepage'       => "./page/achievement.php",
+                'title'          => "Achievement $header_page",
+                'created_by'     => $username,
+                'created_date'   => Carbon::now()->timezone('Asia/Jakarta'),
+            ];
+            $query = DB::connection("mysql")->table('boopati_loader')->insert($data4);
+
+            $data5 = [
+                'nama_menu'      => "Ach All $header_page",
+                'icon_menu'      => "fa-phone",
+                'url_menu'       => "achievement/$keyword_page",
+                'level_menu'     => "1",
+                'parent_menu'    => "10",
+                'type_menu'      => "link",
+                'target_menu'    => "_self",
+                'order_menu'     => "$id",
+                'color_menu'     => "",
+                'authorized_roles'=> "su",
+                'status_menu'   => "active",
+            ];
+            $query = DB::connection("mysql")->table('boopati_menu')->insert($data5);
+
+            if (count($query) == 0) {
+                return Core::setResponse("success", ['info' => "Data Berhasil Ditambah"]);
+            }
+
+            DB::commit();
+
+        } catch (\Throwable $th) {
+            DB::rollback();
+
+            return Core::setResponse("error", ['info' => "Gagal simpan ke database"]);
+        }
+
+    }
+
+    public function update_table_map(Request $request, $id)
+    {
+        $file           = $request->file('upload_file');
+        $roles          = $request->roles;
+        $table_name     = $request->table_name;
+        $keyword_page   = $request->keyword_page;
+        $flag_page      = $request->flag_page;
+        $header_page    = $request->header_page;
+        $status_table   = $request->status_table;
+
+        $file_name      = "";
+
+        if (!empty($file))
+        {
+            $file_size  = $file->getSize();
+            $max_size	= 500000000; //5mb
+            if ($file_size > $max_size) {
+                return Core::setResponse("error", ['info' => "File max size 5 mb"]);
+            }
+
+            $file_oriname   = $file->getClientOriginalName();
+            $extension      = pathinfo($file_oriname,PATHINFO_EXTENSION);
+            $extension      = strtolower($extension);
+
+            $allowed_extensions = array("png, jpg, jpeg");
+
+            if(!in_array(strtolower($extension), $allowed_extensions)) {
+                return Core::setResponse("error", ['type' => "Format file harus png | jpg | jpeg"]);
+            }
+
+            $file->move(storage_path('img_chamber'), $file_oriname);
+
+            $file_name	= preg_replace("/[^a-zA-Z0-9]+/", "", "img_" . preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', basename(htmlspecialchars($keyword_page))) . "." . $extension);
+			$file_name	= str_replace("/", "", $file_name);
+			$file_name	= str_replace("..", "", $file_name);
+			$file_name	= str_replace("etc", "", $file_name);
+			$file_name	= str_replace("00", "", $file_name);
+        }
+
+        $data = [
+            'roles'         => $roles,
+            'table_name'    => $table_name,
+            'keyword_page'  => $keyword_page,
+            'flag_page'     => $flag_page,
+            'header_page'   => $header_page,
+            'image_table'   => $file_name,
+            'status_table'  => $status_table
+            ];
+
+        $query = DB::connection("mysql")->table("boopati_table_mapped_by_region")
+                        ->where("id_boopati_table_mapped_by_region", $id)
+                        ->update($data);
+
+        if (count($query) == 0) {
+            return Core::setResponse("success", ['result' => "Data Berhasil Ditambah"]);
+        }
+
+    }
+
+    public function delete_table_map($id)
+    {
+        $query =  DB::connection("mysql")->table('boopati_table_mapped_by_region')->where('id_boopati_table_mapped_by_region','=',$id)->delete();
+
+        if ($query) {
+            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+        } else {
+            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+        }
+    }
+
+    public function list_table_map()
+    {
+        $query =  DB::connection("mysql")->table('boopati_table_mapped_by_region')->get();
+
+        if (count($query) != 0) {
+            return Core::setResponse("success", $query);
+        } else {
+            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+        }
+    }
 }
