@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "https://10.59.105.208/api-rabfail/api/v1/",
+            "url": "http://localhost:8080/api/v1/",
             "description": "Host"
         }
     ],
@@ -864,6 +864,2664 @@
                     "Dashboards Performance"
                 ],
                 "summary": "Get list data ne_Name",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/cek_login": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/menu": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "Get list menu templates",
+                "parameters": [
+                    {
+                        "name": "roles",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "link",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/tableRegion": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "keyword_page",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/columnName": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "table_obc_msisdn",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/hitungRetrieve": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id_branch",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id_users",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "table_obc_msisdn",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "aksi",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/ajaxMsisdn": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "table_obc_msisdn",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id_users",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "flag",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status_claim",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "column",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id_branch",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/saveListMsisdn": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "id_users": {
+                                        "type": "string"
+                                    },
+                                    "msisdnkirim": {
+                                        "type": "string"
+                                    },
+                                    "hasil": {
+                                        "type": "string"
+                                    },
+                                    "catatan": {
+                                        "type": "string"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "table_obc_msisdn": {
+                                        "type": "string"
+                                    },
+                                    "brand": {
+                                        "type": "string"
+                                    },
+                                    "jamklik": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/updateListMsisdn": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "id_users": {
+                                        "type": "string"
+                                    },
+                                    "msisdnkirim": {
+                                        "type": "string"
+                                    },
+                                    "hasil": {
+                                        "type": "string"
+                                    },
+                                    "table_obc_msisdn": {
+                                        "type": "string"
+                                    },
+                                    "jamklik": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/export_mapping_msisdn": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "ftype": {
+                                        "type": "string"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "table": {
+                                        "type": "string"
+                                    },
+                                    "id_user": {
+                                        "type": "string"
+                                    },
+                                    "id_branch": {
+                                        "type": "string"
+                                    },
+                                    "part": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_cluster": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id_branch",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_wlupload": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "flag",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_achive_top10": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "keyword_page",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/insert_upload_wl": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "file_csv": {
+                                        "type": "file"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "id_region": {
+                                        "type": "string"
+                                    },
+                                    "tap_user": {
+                                        "type": "string"
+                                    },
+                                    "table_name": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/export_achiev_wl": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "ftype": {
+                                        "type": "string"
+                                    },
+                                    "id_branch": {
+                                        "type": "string"
+                                    },
+                                    "roles": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "mode": {
+                                        "type": "string"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string"
+                                    },
+                                    "end_date": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/tot_info_achiev": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "keyword_page": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/users_branch_cluster": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_achive_top10_wabranch": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "keyword_page",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/export_achiev_wabranch": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "ftype": {
+                                        "type": "string"
+                                    },
+                                    "mode": {
+                                        "type": "string"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string"
+                                    },
+                                    "end_date": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/tot_info_achiev_wabranch": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "keyword_page",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/export_achiev": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "roles",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "mode",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "week",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "year",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "flag",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/obc_per_cluster_achiev": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "keyword_page",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "regional",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/upload_file_wabranch": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "upload_file": {
+                                        "type": "file"
+                                    },
+                                    "optradio": {
+                                        "type": "string"
+                                    },
+                                    "multi_opt": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/stock_wl_recap": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "ftype": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/save_adm_menu": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "namaMenu": {
+                                        "type": "string"
+                                    },
+                                    "iconMenu": {
+                                        "type": "string"
+                                    },
+                                    "urlMenu": {
+                                        "type": "string"
+                                    },
+                                    "levelMenu": {
+                                        "type": "string"
+                                    },
+                                    "parentMenu": {
+                                        "type": "string"
+                                    },
+                                    "typeMenu": {
+                                        "type": "string"
+                                    },
+                                    "targetMenu": {
+                                        "type": "string"
+                                    },
+                                    "orderMenu": {
+                                        "type": "string"
+                                    },
+                                    "colorMenu": {
+                                        "type": "string"
+                                    },
+                                    "authorized": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/update_adm_menu/{id}": {
+            "put": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "namaMenu": {
+                                        "type": "string"
+                                    },
+                                    "iconMenu": {
+                                        "type": "string"
+                                    },
+                                    "urlMenu": {
+                                        "type": "string"
+                                    },
+                                    "levelMenu": {
+                                        "type": "string"
+                                    },
+                                    "parentMenu": {
+                                        "type": "string"
+                                    },
+                                    "typeMenu": {
+                                        "type": "string"
+                                    },
+                                    "targetMenu": {
+                                        "type": "string"
+                                    },
+                                    "orderMenu": {
+                                        "type": "string"
+                                    },
+                                    "colorMenu": {
+                                        "type": "string"
+                                    },
+                                    "status_menu": {
+                                        "type": "string"
+                                    },
+                                    "authorized": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/delete_adm_menu/{id}": {
+            "delete": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/save_adm_loader": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "namaLoader": {
+                                        "type": "string"
+                                    },
+                                    "sessionLoader": {
+                                        "type": "string"
+                                    },
+                                    "permission": {
+                                        "type": "string"
+                                    },
+                                    "pathLoader": {
+                                        "type": "string"
+                                    },
+                                    "titleLoader": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/update_adm_loader/{id}": {
+            "put": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "namaLoader": {
+                                        "type": "string"
+                                    },
+                                    "sessionLoader": {
+                                        "type": "string"
+                                    },
+                                    "permission": {
+                                        "type": "string"
+                                    },
+                                    "pathLoader": {
+                                        "type": "string"
+                                    },
+                                    "titleLoader": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/delete_adm_loader/{id}": {
+            "delete": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/boopati_loader": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/chamber_menu": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/history_login": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/save_adm_userTDC": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "usernametdc": {
+                                        "type": "string"
+                                    },
+                                    "tdc_select": {
+                                        "type": "string"
+                                    },
+                                    "rolestdc": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/update_adm_userTDC/{id}": {
+            "put": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "usernametdc": {
+                                        "type": "string"
+                                    },
+                                    "tdc_select": {
+                                        "type": "string"
+                                    },
+                                    "rolestdc": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/delete_adm_userTDC/{id}": {
+            "delete": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/save_adm_user": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "roles": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/update_adm_user/{id}": {
+            "put": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "roles": {
+                                        "type": "string"
+                                    },
+                                    "id_cluster": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/delete_adm_user/{id}": {
+            "delete": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/change_password_user/{id}": {
+            "put": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_user": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "roles",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_user_tdc": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "roles",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id_cluster",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/adm_get_branch": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id_region",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/adm_get_cluster": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id_branch",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/adm_get_tdc_id": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id_tdc",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/adm_get_tdc": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id_cluster",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/save_table_map": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "upload_file": {
+                                        "type": "file"
+                                    },
+                                    "roles": {
+                                        "type": "string"
+                                    },
+                                    "table_name": {
+                                        "type": "string"
+                                    },
+                                    "keyword_page": {
+                                        "type": "string"
+                                    },
+                                    "flag_page": {
+                                        "type": "string"
+                                    },
+                                    "header_page": {
+                                        "type": "string"
+                                    },
+                                    "status_table": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/update_table_map/{id}": {
+            "put": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "upload_file": {
+                                        "type": "file"
+                                    },
+                                    "roles": {
+                                        "type": "string"
+                                    },
+                                    "table_name": {
+                                        "type": "string"
+                                    },
+                                    "keyword_page": {
+                                        "type": "string"
+                                    },
+                                    "flag_page": {
+                                        "type": "string"
+                                    },
+                                    "header_page": {
+                                        "type": "string"
+                                    },
+                                    "status_table": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/delete_table_map/{id}": {
+            "delete": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_table_map": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_flag": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/count_msisdn": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "table_obc_msisdn",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "branch_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/hitung_retrieve_wb": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "id_users": {
+                                        "type": "string"
+                                    },
+                                    "table_obc_msisdn": {
+                                        "type": "string"
+                                    },
+                                    "branch_name": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/save_claim_wb": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "id_users": {
+                                        "type": "string"
+                                    },
+                                    "msisdnkirim": {
+                                        "type": "string"
+                                    },
+                                    "hasil": {
+                                        "type": "string"
+                                    },
+                                    "catatan": {
+                                        "type": "string"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "table_obc_msisdn": {
+                                        "type": "string"
+                                    },
+                                    "brand": {
+                                        "type": "string"
+                                    },
+                                    "jamklik": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/update_claim_wb": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "id_users": {
+                                        "type": "string"
+                                    },
+                                    "msisdnkirim": {
+                                        "type": "string"
+                                    },
+                                    "hasil": {
+                                        "type": "string"
+                                    },
+                                    "catatan": {
+                                        "type": "string"
+                                    },
+                                    "jamklik": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Success"
