@@ -15,8 +15,7 @@ $router->get('/list_achive_top10', [ 'as' => 'list_achive_top10', 'uses' => 'Cha
 $router->post('/insert_upload_wl', [ 'as' => 'insert_upload_wl', 'uses' => 'ChamberController@insert_upload_wl']);
 $router->post('/export_achiev_wl', [ 'as' => 'export_achiev_wl', 'uses' => 'ChamberController@export_achiev_wl']);
 $router->post('/tot_info_achiev', [ 'as' => 'tot_info_achiev', 'uses' => 'ChamberController@tot_info_achiev']);
-$router->post('/users_branch_cluster', [ 'as' => 'users_branch_cluster', 'uses' => 'ChamberController@users_branch_cluster']);
-$router->get('/list_achive_top10_wabranch', [ 'as' => 'list_achive_top10_wabranch', 'uses' => 'ChamberController@list_achive_top10_wabranch']);
+$router->get('/users_branch_cluster', [ 'as' => 'users_branch_cluster', 'uses' => 'ChamberController@users_branch_cluster']);
 $router->get('/list_achive_top10_wabranch', [ 'as' => 'list_achive_top10_wabranch', 'uses' => 'ChamberController@list_achive_top10_wabranch']);
 $router->post('/export_achiev_wabranch', [ 'as' => 'export_achiev_wabranch', 'uses' => 'ChamberController@export_achiev_wabranch']);
 $router->get('/tot_info_achiev_wabranch', [ 'as' => 'tot_info_achiev_wabranch', 'uses' => 'ChamberController@tot_info_achiev_wabranch']);
@@ -50,3 +49,8 @@ $router->post('/save_table_map', [ 'as' => 'save_table_map', 'uses' => 'ChamberC
 $router->put('/update_table_map/{id}', [ 'as' => 'update_table_map', 'uses' => 'ChamberController@update_table_map']);
 $router->delete('/delete_table_map/{id}', [ 'as' => 'delete_table_map', 'uses' => 'ChamberController@delete_table_map']);
 $router->get('/list_table_map', [ 'as' => 'list_table_map', 'uses' => 'ChamberController@list_table_map']);
+$router->get('/list_flag', [ 'as' => 'list_flag', 'uses' => 'ChamberController@list_flag']);
+$router->get('/count_msisdn', [ 'as' => 'count_msisdn', 'uses' => 'ChamberController@count_msisdn']);
+$router->post('/hitung_retrieve_wb', [ 'as' => 'hitung_retrieve_wb', 'uses' => 'ChamberController@hitung_retrieve_wb']);
+$router->post('/save_claim_wb', [ 'as' => 'save_claim_wb', 'uses' => 'ChamberController@save_claim_wb']);
+$router->post('/update_claim_wb', [ 'as' => 'update_claim_wb', 'uses' => 'ChamberController@update_claim_wb']);

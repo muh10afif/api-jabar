@@ -2897,4 +2897,142 @@ class ChamberController extends Controller
             return Core::setResponse("not_found", ['info' => "Data Empty"]);
         }
     }
+
+    public function list_flag()
+    {
+        $query =  DB::connection("mysql")->select('SELECT DISTINCT flag FROM wl_wabranch1');
+
+        if (count($query) != 0) {
+            return Core::setResponse("success", $query);
+        } else {
+            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+        }
+    }
+
+    public function count_msisdn(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'table_obc_msisdn' => 'required',
+            'branch_name'      => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            $table_obc_msisdn   = $request->table_obc_msisdn;
+            $branch_name        = $request->branch_name;
+
+            $query = DB::connection("mysql")->select("SELECT COUNT(*) AS count_msisdn FROM ".$table_obc_msisdn." WHERE branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL");
+
+            if (count($query) == 0) {
+                return Core::setResponse("not_found", ["result" => "Data Empty"]);
+            } else {
+                return Core::setResponse("success", $query);
+            }
+
+        }
+
+    }
+
+    public function hitung_retrieve_wb(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_users'          => 'required',
+            'table_obc_msisdn'  => 'required',
+            'branch_name'       => 'required',
+            'username'          => 'required',
+        ]);
+
+        if ($validator->fails()) {
+
+            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+
+        } else {
+
+            DB::beginTransaction();
+
+            try {
+
+                $id_users 		    = $request->id_users;
+                $table_obc_msisdn   = $request->table_obc_msisdn;
+                $branch_name        = $request->branch_name;
+                $tanggal  		    = Carbon::now()->format('Y-m-d')->timezone("Asia/Jakarta");
+
+                // insert history
+                $query_history 	= DB::connection("mysql")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data for ".$id_users." OBC','Begin','',now())");
+
+                $kondisi =  "branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL LIMIT 50000";
+
+                // update wl
+                $j      = 0;
+                $q2     = DB::connection("mysql")->select("SELECT * from ".$table_obc_msisdn." where $kondisi");
+                $query2 = $q2;
+
+                foreach($query2 as $query3){
+                    $msisdn         = $query3->msisdn;
+                    $query_update   = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set temp_user = '".$id_users."', temp_date='".$tanggal."' where msisdn='".$msisdn."'");
+                    $j++;
+                }
+
+                $query_history = DB::connection("mysql")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
+
+                DB::commit();
+
+                return Core::setResponse("success", ['info' => "Sukses proses data"]);
+
+            } catch (\Throwable $th) {
+                DB::rollback();
+
+                return Core::setResponse("error", ["info" => "Gagal ambil data"]);
+            }
+        }
+
+    }
+
+    public function save_claim_wb(Request $request)
+    {
+        $id_users       = $request->input('id_users');
+        $msisdnkirim    = $request->input('msisdnkirim');
+        $hasil          = $request->input('hasil');
+        $catatan        = $request->input('catatan');
+        $flag           = $request->input('flag');
+        $table_obc_msisdn   = $request->input('table_obc_msisdn');
+        $brand          = $request->input('brand');
+        $jamklik        = $request->input('jamklik');
+
+        DB::beginTransaction();
+
+        try {
+            $query = DB::connection("mysql")->select("INSERT into boopati_whitelist_claim (id_users,msisdn,status_claim,keterangan,tanggal_claim,datetime_claim, flag, table_name, brand, datetime_open_form) values ('".$id_users."','".$msisdnkirim."','".$hasil."','".$catatan."',now(),now(), '".$flag."', '".$table_obc_msisdn."', '".$brand."', '".$jamklik."')");
+
+            $query2 = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."'");
+
+            DB::commit();
+
+            return Core::setResponse("success", ['info' => "Data sukses diproses"]);
+
+        } catch (\Throwable $th) {
+            DB::rollback();
+
+            return Core::setResponse("error", ['info' => "Gagal diproses"]);
+        }
+
+    }
+
+    public function update_claim_wb(Request $request)
+    {
+        $id_users       = $request->input('id_users');
+        $msisdnkirim    = $request->input('msisdnkirim');
+        $hasil          = $request->input('hasil');
+        $catatan        = $request->input('catatan');
+        $jamklik        = $request->input('jamklik');
+
+        $query = DB::connection("mysql")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
+
+        return Core::setResponse("success", ['info' => "Data sukses diproses"]);
+    }
+
 }
