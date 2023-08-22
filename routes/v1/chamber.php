@@ -11,6 +11,7 @@ $router->post('/updateListMsisdn', [ 'as' => 'updateListMsisdn', 'uses' => 'Cham
 $router->post('/export_mapping_msisdn', [ 'as' => 'export_mapping_msisdn', 'uses' => 'ChamberController@export_mapping_msisdn']);
 $router->get('/list_cluster', [ 'as' => 'list_cluster', 'uses' => 'ChamberController@list_cluster']);
 $router->get('/list_wlupload', [ 'as' => 'list_wlupload', 'uses' => 'ChamberController@list_wlupload']);
+$router->get('/list_wlupload_wb', [ 'as' => 'list_wlupload_wb', 'uses' => 'ChamberController@list_wlupload_wb']);
 $router->get('/list_achive_top10', [ 'as' => 'list_achive_top10', 'uses' => 'ChamberController@list_achive_top10']);
 $router->post('/insert_upload_wl', [ 'as' => 'insert_upload_wl', 'uses' => 'ChamberController@insert_upload_wl']);
 $router->post('/export_achiev_wl', [ 'as' => 'export_achiev_wl', 'uses' => 'ChamberController@export_achiev_wl']);
@@ -20,9 +21,9 @@ $router->get('/list_achive_top10_wabranch', [ 'as' => 'list_achive_top10_wabranc
 $router->post('/export_achiev_wabranch', [ 'as' => 'export_achiev_wabranch', 'uses' => 'ChamberController@export_achiev_wabranch']);
 $router->get('/tot_info_achiev_wabranch', [ 'as' => 'tot_info_achiev_wabranch', 'uses' => 'ChamberController@tot_info_achiev_wabranch']);
 $router->get('/export_achiev', [ 'as' => 'export_achiev', 'uses' => 'ChamberController@export_achiev']);
-$router->get('/obc_per_cluster_achiev', [ 'as' => 'obc_per_cluster_achiev', 'uses' => 'ChamberController@obc_per_cluster_achiev']);
+$router->post('/obc_per_cluster_achiev', [ 'as' => 'obc_per_cluster_achiev', 'uses' => 'ChamberController@obc_per_cluster_achiev']);
 $router->post('/upload_file_wabranch', [ 'as' => 'upload_file_wabranch', 'uses' => 'ChamberController@upload_file_wabranch']);
-$router->post('/stock_wl_recap', [ 'as' => 'stock_wl_recap', 'uses' => 'ChamberController@stock_wl_recap']);
+$router->get('/stock_wl_recap', [ 'as' => 'stock_wl_recap', 'uses' => 'ChamberController@stock_wl_recap']);
 $router->post('/save_adm_menu', [ 'as' => 'save_adm_menu', 'uses' => 'ChamberController@save_adm_menu']);
 $router->put('/update_adm_menu/{id}', [ 'as' => 'update_adm_menu', 'uses' => 'ChamberController@update_adm_menu']);
 $router->delete('/delete_adm_menu/{id}', [ 'as' => 'delete_adm_menu', 'uses' => 'ChamberController@delete_adm_menu']);
@@ -54,3 +55,7 @@ $router->get('/count_msisdn', [ 'as' => 'count_msisdn', 'uses' => 'ChamberContro
 $router->post('/hitung_retrieve_wb', [ 'as' => 'hitung_retrieve_wb', 'uses' => 'ChamberController@hitung_retrieve_wb']);
 $router->post('/save_claim_wb', [ 'as' => 'save_claim_wb', 'uses' => 'ChamberController@save_claim_wb']);
 $router->post('/update_claim_wb', [ 'as' => 'update_claim_wb', 'uses' => 'ChamberController@update_claim_wb']);
+$router->get('/list_region', [ 'as' => 'list_region', 'uses' => 'ChamberController@list_region']);
+$router->get('/list_cluster_all', [ 'as' => 'list_cluster_all', 'uses' => 'ChamberController@list_cluster_all']);
+$router->post('/insert_upload_wl_wb', [ 'as' => 'insert_upload_wl_wb', 'uses' => 'ChamberController@insert_upload_wl_wb']);
+$router->get('/loader_users', [ 'as' => 'loader_users', 'uses' => 'ChamberController@loader_users']);

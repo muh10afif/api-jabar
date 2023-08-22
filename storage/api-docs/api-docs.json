@@ -1,12 +1,12 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "API documentation",
+        "title": "API Jabar documentation",
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "http://localhost:8080/api/v1/",
+            "url": "https://10.59.105.208/api-jabar/api/v1/",
             "description": "Host"
         }
     ],
@@ -1487,6 +1487,52 @@
                 }
             }
         },
+        "/list_wlupload_wb": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "flag",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
         "/list_achive_top10": {
             "get": {
                 "tags": [
@@ -1944,29 +1990,29 @@
             }
         },
         "/obc_per_cluster_achiev": {
-            "get": {
+            "post": {
                 "tags": [
                     "Chamber"
                 ],
                 "summary": "",
-                "parameters": [
-                    {
-                        "name": "keyword_page",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "regional",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "keyword_page": {
+                                        "type": "string"
+                                    },
+                                    "regional": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -2039,7 +2085,7 @@
             }
         },
         "/stock_wl_recap": {
-            "post": {
+            "get": {
                 "tags": [
                     "Chamber"
                 ],
@@ -3522,6 +3568,158 @@
                         }
                     }
                 },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_cluster_all": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/list_region": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/insert_upload_wl_wb": {
+            "post": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "file_csv": {
+                                        "type": "file"
+                                    },
+                                    "flag": {
+                                        "type": "string"
+                                    },
+                                    "id_region": {
+                                        "type": "string"
+                                    },
+                                    "tap_user": {
+                                        "type": "string"
+                                    },
+                                    "table_name": {
+                                        "type": "string"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorize"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/loader_users": {
+            "get": {
+                "tags": [
+                    "Chamber"
+                ],
+                "summary": "",
+                "parameters": [
+                    {
+                        "name": "nama_loader",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success"

@@ -66,6 +66,7 @@ return [
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
         ],
+
         'mysql222a' => [
             'driver' => 'mysql',
             'host' => env('DB7a_HOST'),
@@ -74,6 +75,15 @@ return [
             'password' => env('DB7a_PASSWORD'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
+        ],
+      
+        'mysqlChamber' => [
+            'driver' => 'mysql',
+            'host' => env('DB8_HOST'),
+            'port' => env('DB8_PORT'),
+            'database' => env('DB8_DATABASE'),
+            'username' => env('DB8_USERNAME'),
+            'password' => env('DB8_PASSWORD'),
         ],
     ]
 ];
