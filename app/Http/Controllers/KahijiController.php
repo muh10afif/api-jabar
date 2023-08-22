@@ -442,9 +442,9 @@ class KahijiController extends Controller
         $dt = $request->all();
 
         $mode     = $dt['mode'];
-        $str      = $dt['tanggal_start'];
-        $stp      = $dt['tanggal_stop'];
-        $sid      = $dt['siteid'];
+        //$str      = $dt['tanggal_start'];
+        //$stp      = $dt['tanggal_stop'];
+        //$sid      = $dt['siteid'];
 
         switch ($mode) {
         case 'query_weeks_years':
@@ -649,6 +649,484 @@ class KahijiController extends Controller
                 ) aa
                 where nsa is not null
                 group by rtp,code
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'ajaxeas':
+            $dt = $request->all();
+            $opsi1 =  $dt['opsi1'];
+            $opsi2 =  $dt['opsi2'];
+            $opsi3 =  $dt['opsi3'];
+            $array_opsi1 = array('nsa', 'rtp', 'all');
+            if ($opsi1 <> '' || $opsi2 <> '' || $opsi3 <> '') {
+            $code = str_replace("alarm", "", $opsi3);
+            if ($opsi1 == 'nsa' && $opsi2 <> 'all') {
+                $tambahan = "and nsa='" . $opsi2 . "'";
+            } elseif ($opsi1 == 'rtp' && $opsi2 <> 'all') {
+                $tambahan = "and rtp='" . $opsi2 . "'";
+            } else {
+                $tambahan = '';
+            }
+            $query = \DB::connection("mysql222")->select("select a.*,TIMESTAMPDIFF(MINUTE, mydatetime, now()) as duration_min, (@curRank := @curRank + 1) AS rank from ran_alarm a,(SELECT @curRank := 0) c where (band='EAS' or band='EAS_BOARD') and string_alarm like '%" . $code . "%' " . $tambahan . " order by mydatetime desc");
+            //$query = mysqli_query($link, $text) or die(mysqli_error($link));
+
+            $output_array = array();
+            //while ($result = mysqli_fetch_object($query)) {
+            foreach ($query as $query => $result) {
+                $output_array[] = $result;
+                $output2['data'][] = $result;
+            }
+            $output = array();
+            $output['query'] = $query;
+            $output['output_array'] = $output_array;
+            $output['output_json'] = json_encode($output_array);
+            //echo json_encode($output2);
+            //$output['series'] = $output_iub;
+
+            return Core::setResponse("success",$output2);
+            }
+            break;
+        }
+    }
+
+    public function alarmlocked(Request $request)
+    {
+        $dt = $request->all();
+
+        $mode     = $dt['mode'];
+        //$str      = $dt['tanggal_start'];
+        //$stp      = $dt['tanggal_stop'];
+        //$sid      = $dt['siteid'];
+
+        switch ($mode) {
+        case 'query1':  
+            $output = \DB::connection("mysql222")->select("select distinct(rtp) as rtp,nsa from 16010754_dapot_site.dapot_site
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'ajaxeas':
+            $dt = $request->all();
+            $opsi1 =  $dt['opsi1'];
+            $opsi2 =  $dt['opsi2'];
+            $opsi3 =  $dt['opsi3'];
+            $array_opsi1 = array('nsa', 'rtp', 'all');
+            if ($opsi1 <> '' || $opsi2 <> '' || $opsi3 <> '') {
+            $code = str_replace("alarm", "", $opsi3);
+            if ($opsi1 == 'nsa' && $opsi2 <> 'all') {
+                $tambahan = "and nsa='" . $opsi2 . "'";
+            } elseif ($opsi1 == 'rtp' && $opsi2 <> 'all') {
+                $tambahan = "and rtp='" . $opsi2 . "'";
+            } else {
+                $tambahan = '';
+            }
+            $query = \DB::connection("mysql222")->select("select a.*,TIMESTAMPDIFF(MINUTE, mydatetime, now()) as duration_min, (@curRank := @curRank + 1) AS rank from ran_alarm a,(SELECT @curRank := 0) c where (band='EAS' or band='EAS_BOARD') and string_alarm like '%" . $code . "%' " . $tambahan . " order by mydatetime desc");
+            //$query = mysqli_query($link, $text) or die(mysqli_error($link));
+
+            $output_array = array();
+            //while ($result = mysqli_fetch_object($query)) {
+            foreach ($query as $query => $result) {
+                $output_array[] = $result;
+                $output2['data'][] = $result;
+            }
+            $output = array();
+            $output['query'] = $query;
+            $output['output_array'] = $output_array;
+            $output['output_json'] = json_encode($output_array);
+            //echo json_encode($output2);
+            //$output['series'] = $output_iub;
+
+            return Core::setResponse("success",$output2);
+            }
+            break;
+        }
+    }
+
+    public function dapotranneweekly(Request $request)
+    {
+        
+        $dt = $request->all();
+
+        $mode     = $dt['mode'];
+
+        function db_get_last_update_year_query($table)
+        {
+            $q = \DB::connection("mysql222a")->select("
+                SELECT years AS last_update
+                FROM " . $table . "
+                GROUP BY years
+                ORDER BY years DESC
+                LIMIT 1
+            ");
+            
+            foreach ($q as $q => $r) {
+                if (empty($r)) {
+                    return 1;
+                } else {
+                    return $r->last_update;
+                }
+            }
+        }
+
+        function db_get_last_update_week_query_with_year($table, $year)
+        {
+
+            $q = \DB::connection("mysql222a")->select("
+                SELECT weeks AS last_update
+                FROM " . $table . "
+                WHERE years = $year
+                GROUP BY weeks
+                ORDER BY weeks DESC
+                LIMIT 1
+            ");
+            //$q = mysqli_query($conn, $query);
+            //$r = mysqli_fetch_object($q);
+            foreach ($q as $q => $r) {
+                if (empty($r)) {
+                    return 1;
+                } else {
+                    return $r->last_update;
+                }
+            }
+        }
+
+        $year = db_get_last_update_year_query('dapot_ran_ne');
+        $week = db_get_last_update_week_query_with_year('dapot_ran_ne', $year);
+
+        switch ($mode) {
+        case 'query':  
+            $output = \DB::connection("mysql222a")->select("SELECT *,
+            (
+                SELECT COUNT(*)
+                FROM dapot_ran_resume_ne a1
+                WHERE a1.weeks = a.weeks
+                AND a1.years = a.years
+                AND a1.nsa = a.nsa
+            ) AS count_nsa  
+            FROM dapot_ran_resume_ne a
+            WHERE weeks = '" . $week . "'
+            AND years = '" . $year . "'
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'query22':
+            $output = \DB::connection("mysql222a")->select("SELECT DISTINCT nsa
+            FROM dapot_ran_resume_ne a
+            WHERE weeks = '" . $week . "' AND years = '" . $year . "'
+            ORDER BY nsa asc");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_2':
+            $output = \DB::connection("mysql222a")->select("SELECT *, 
+                (
+                    SELECT COUNT(*) 
+                    FROM ran_cluster_rtp a1
+                    JOIN dapot_ran_ne b1 ON (a1.id_ran_cluster_rtp = b1.id_ran_cluster_rtp)
+                    WHERE a1.id_nsa = a.id_nsa
+                    AND b1.id_ran_dapot_category IN ($res->id_ran_dapot_category, 3)
+                    AND weeks = $week
+                    AND years = $year
+                    AND IF($week < 6, a1.start_week BETWEEN 1 AND 5, a1.start_week BETWEEN 6 AND 6) 
+                ) AS count_rtpo
+            FROM nsa a
+            WHERE active = 1
+            AND IF($week < 6, start_week BETWEEN 1 AND 5, start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_detail':
+            $output = \DB::connection("mysql222a")->select("SELECT *, a.sum_site_wow as wow_site, a.sum_2g_gsm_wow as wow_2g_gsm, a.sum_2g_dcs_wow as wow_2g_dcs, a.sum_3g_f1_wow as wow_3g_f1,  a.sum_3g_f2_wow as wow_3g_f2,  a.sum_3g_f3_wow as wow_3g_f3,  a.sum_3g_f4_wow as wow_3g_f4, a.sum_multisector_f1_wow as wow_multisector_f1, a.sum_multisector_f2_wow as wow_multisector_f2, a.sum_multisector_f3_wow as wow_multisector_f3, a.sum_lte_e_nodeB_wow as wow_lte_e_nodeB, a.sum_nr_e_nodeB_wow as wow_nr_e_nodeB
+            FROM dapot_ran_ne a
+            JOIN ran_cluster_rtp b ON (a.id_ran_cluster_rtp = b.id_ran_cluster_rtp) 
+            JOIN ran_dapot_category c ON (a.id_ran_dapot_category = c.id_ran_dapot_category)
+            WHERE b.id_ran_dapot_category = '" . $res->id_ran_dapot_category . "' 
+            AND weeks = $week
+            AND years = $year
+            AND b.id_nsa = '" . $result->id_nsa . "'
+            AND b.active = 1
+            AND IF($week < 6, b.start_week BETWEEN 1 AND 5, b.start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query2':
+            $output = \DB::connection("mysql222a")->select("select count(name_ran_cluster_rtp) as jml FROM ran_cluster_rtp WHERE id_nsa = '$result->id_nsa' AND id_ran_dapot_category = '$res->id_ran_dapot_category' AND active = 1 AND IF($week < 6, start_week BETWEEN 1 AND 5, start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_a':
+            $output = \DB::connection("mysql222a")->select("SELECT *, 
+                (
+                    SELECT COUNT(*) 
+                    FROM dapot_ran_kota_kabupaten a1
+                    WHERE a1.id_nsa = a.id_nsa
+                    AND IF($week < 6, a1.start_week BETWEEN 1 AND 5, a1.start_week BETWEEN 6 AND 6) 
+                ) AS count_kota_kabupaten
+            FROM nsa a
+            WHERE active = 1
+            AND IF($week < 6, start_week BETWEEN 1 AND 5, start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_detail_a':
+            $output = \DB::connection("mysql222a")->select("SELECT *, a.sum_site_wow as wow_site, a.sum_2g_gsm_wow as wow_2g_gsm, a.sum_2g_dcs_wow as wow_2g_dcs, a.sum_3g_f1_wow as wow_3g_f1,  a.sum_3g_f2_wow as wow_3g_f2,  a.sum_3g_f3_wow as wow_3g_f3,  a.sum_3g_f4_wow as wow_3g_f4, a.sum_multisector_f1_wow as wow_multisector_f1, a.sum_multisector_f2_wow as wow_multisector_f2, a.sum_multisector_f3_wow as wow_multisector_f3, a.sum_lte_e_nodeB_wow as wow_lte_e_nodeB, a.sum_nr_e_nodeB_wow as wow_nr_e_nodeB
+            FROM dapot_ran_ne_kota_kabupaten a
+            JOIN dapot_ran_kota_kabupaten b ON (a.id_dapot_ran_kota_kabupaten = b.id_dapot_ran_kota_kabupaten) 
+            WHERE weeks = $week
+            AND years = $year
+            AND b.id_nsa = '" . $result->id_nsa . "'
+            AND b.active = 1		
+            AND IF($week < 6, b.start_week BETWEEN 1 AND 5, b.start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query2_a':
+            $output = \DB::connection("mysql222a")->select("select count(name_ran_kota_kabupaten) as jml FROM dapot_ran_kota_kabupaten WHERE id_nsa = '$result->id_nsa' AND active = 1 AND IF($week < 6, start_week BETWEEN 1 AND 5, start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_b':
+            $output = \DB::connection("mysql222a")->select("SELECT *, 
+                    (
+                        SELECT COUNT(*) 
+                        FROM dapot_ran_kota_kabupaten a1
+                        WHERE a1.id_nsa = a.id_nsa
+                        AND IF($week < 6, a1.start_week BETWEEN 1 AND 5, a1.start_week BETWEEN 6 AND 6) 
+                    ) AS count_kota_kabupaten
+                FROM nsa a
+                WHERE active = 1
+                AND IF($week < 6, start_week BETWEEN 1 AND 5, start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_detail_b':
+            $output = \DB::connection("mysql222a")->select("SELECT *, a.sum_site_wow as wow_site, a.sum_2g_gsm_wow as wow_2g_gsm, a.sum_2g_dcs_wow as wow_2g_dcs, a.sum_3g_f1_wow as wow_3g_f1,  a.sum_3g_f2_wow as wow_3g_f2,  a.sum_3g_f3_wow as wow_3g_f3,  a.sum_3g_f4_wow as wow_3g_f4, a.sum_multisector_f1_wow as wow_multisector_f1, a.sum_multisector_f2_wow as wow_multisector_f2, a.sum_multisector_f3_wow as wow_multisector_f3, a.sum_lte_e_nodeB_wow as wow_lte_e_nodeB, a.sum_nr_e_nodeB_wow as wow_nr_e_nodeB
+                FROM dapot_ran_ne_kota_kabupaten a
+                JOIN dapot_ran_kota_kabupaten b ON (a.id_dapot_ran_kota_kabupaten = b.id_dapot_ran_kota_kabupaten) 
+                WHERE weeks = $week
+                AND years = $year
+                AND b.id_nsa = '" . $result->id_nsa . "'
+                AND b.active = 1		
+                AND IF($week < 6, b.start_week BETWEEN 1 AND 5, b.start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query2_b':
+            $output = \DB::connection("mysql222a")->select("select count(name_ran_kota_kabupaten) as jml FROM dapot_ran_kota_kabupaten WHERE id_nsa = '$result->id_nsa' AND active = 1 AND IF($week < 6, start_week BETWEEN 1 AND 5, start_week BETWEEN 6 AND 6)");
+
+            return Core::setResponse("success",$output);
+            break;
+        }
+    }
+
+    public function dapotrannemonthly(Request $request)
+    {
+        
+        $dt = $request->all();
+
+        $mode     = $dt['mode'];
+
+        function db_get_last_update_year_by_month_query($table)
+            {
+                $tahun = date('Y');
+                $q = \DB::connection("mysql222a")->select("
+                    SELECT years AS last_update
+                    FROM " . $table . "
+                    GROUP BY years
+                    ORDER BY years DESC
+                    LIMIT 1
+                ");
+                foreach ($q as $q => $r) {
+                    if (empty($r)) {
+                        return 1;
+                    } else {
+                        return $r->last_update;
+                    }
+                }
+            }
+
+            function db_get_last_update_month_query_by_year($table, $year)
+            {
+                $q = \DB::connection("mysql222a")->select("
+                    SELECT MONTH(date_created) AS last_month
+                    FROM " . $table . "
+                    WHERE YEAR(date_created) = $year
+                    GROUP BY MONTH(date_created)
+                    ORDER BY MONTH(date_created) DESC
+                    LIMIT 1
+                ");
+                foreach ($q as $q => $r) {
+                    if (empty($r)) {
+                        return 1;
+                    } else {
+                        return $r->last_month;
+                    }
+                }
+            }
+
+        $year = db_get_last_update_year_by_month_query('dapot_ran_ne_monthly');
+        $month = db_get_last_update_month_query_by_year('dapot_ran_ne_monthly', $year);
+
+        switch ($mode) {
+        case 'query':  
+            $output = \DB::connection("mysql222a")->select("SELECT * ,
+            (
+                SELECT COUNT(*)
+                FROM dapot_ran_resume_ne_monthly a1
+                WHERE a1.months = a.months
+                AND a1.years = a.years
+                AND a1.nsa = a.nsa
+            ) AS count_nsa 
+            FROM dapot_ran_resume_ne_monthly a
+            WHERE months = '" . $month . "'
+            AND years = '" . $year . "'
+            ");
+            //$output['series'] = $output_iub;
+            return Core::setResponse("success",$output);
+            break;
+        case 'query22':
+            $output = \DB::connection("mysql222a")->select("SELECT DISTINCT nsa
+            FROM dapot_ran_resume_ne_monthly a
+            WHERE months = '" . $month . "' AND years = '" . $year . "'
+            ORDER BY nsa asc");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_category':
+            $output = \DB::connection("mysql222a")->select("SELECT * FROM ran_dapot_category WHERE id_ran_dapot_category NOT IN (3)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_a':
+            $output = \DB::connection("mysql222a")->select("SELECT *, 
+                (
+                    SELECT COUNT(*) 
+                    FROM ran_cluster_rtp a1
+                    JOIN dapot_ran_ne_monthly b1 ON (a1.id_ran_cluster_rtp = b1.id_ran_cluster_rtp)
+                    WHERE a1.id_nsa = a.id_nsa
+                    AND b1.id_ran_dapot_category IN ('" . $res->id_ran_dapot_category . "', 3)
+                    AND MONTH(b1.date_created) = '$month'
+                    AND YEAR(b1.date_created) = $year
+                ) AS count_rtpo
+            FROM nsa a
+            WHERE expired_years = '$year' AND (SELECT MAX(expired_years) FROM nsa) OR expired_years BETWEEN '$year' AND (SELECT MAX(expired_years) FROM nsa)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_detail':
+            $output = \DB::connection("mysql222a")->select("SELECT *, a.sum_site_mom as mom_site, a.sum_2g_gsm_mom as mom_2g_gsm, a.sum_2g_dcs_mom as mom_2g_dcs, a.sum_3g_f1_mom as mom_3g_f1,  a.sum_3g_f2_mom as mom_3g_f2,  a.sum_3g_f3_mom as mom_3g_f3,  a.sum_3g_f4_mom as mom_3g_f4, a.sum_multisector_f1_mom as mom_multisector_f1, a.sum_multisector_f2_mom as mom_multisector_f2, a.sum_multisector_f3_mom as mom_multisector_f3, a.sum_lte_e_nodeB_mom as mom_lte_e_nodeB, a.sum_nr_e_nodeB_mom as mom_nr_e_nodeB
+            FROM dapot_ran_ne_monthly a
+            JOIN ran_cluster_rtp b ON (a.id_ran_cluster_rtp = b.id_ran_cluster_rtp) 
+            JOIN ran_dapot_category c ON (a.id_ran_dapot_category = c.id_ran_dapot_category)
+            WHERE a.id_ran_dapot_category = '" . $res->id_ran_dapot_category . "' 
+            AND MONTH(date_created) = $month
+            AND YEAR(date_created) = $year
+            AND b.id_nsa = '" . $result->id_nsa . "'
+            AND (expired_years = '$year' AND (SELECT MAX(expired_years) FROM nsa) OR expired_years BETWEEN '$year' AND (SELECT MAX(expired_years) FROM nsa))");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query2':
+            $output = \DB::connection("mysql222a")->select("select count(name_ran_cluster_rtp) as jml FROM ran_cluster_rtp WHERE id_nsa = '$result->id_nsa' AND id_ran_dapot_category = '$res->id_ran_dapot_category' AND active = 1");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_b':
+            $output = \DB::connection("mysql222a")->select("SELECT *, 
+                (
+                    SELECT COUNT(*) 
+                    FROM dapot_ran_kota_kabupaten a1
+                    WHERE a1.id_nsa = a.id_nsa
+                ) AS count_kota_kabupaten
+            FROM nsa a
+            WHERE expired_years = '$year' AND (SELECT MAX(expired_years) FROM nsa) OR expired_years BETWEEN '$year' AND (SELECT MAX(expired_years) FROM nsa)");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query_detail_b':
+            $output = \DB::connection("mysql222a")->select("SELECT *, a.sum_site_mom as mom_site, a.sum_2g_gsm_mom as mom_2g_gsm, a.sum_2g_dcs_mom as mom_2g_dcs, a.sum_3g_f1_mom as mom_3g_f1,  a.sum_3g_f2_mom as mom_3g_f2,  a.sum_3g_f3_mom as mom_3g_f3,  a.sum_3g_f4_mom as mom_3g_f4, a.sum_multisector_f1_mom as mom_multisector_f1, a.sum_multisector_f2_mom as mom_multisector_f2, a.sum_multisector_f3_mom as mom_multisector_f3, a.sum_lte_e_nodeB_mom as mom_lte_e_nodeB, a.sum_nr_e_nodeB_mom as mom_nr_e_nodeB
+            FROM dapot_ran_ne_kota_kabupaten_monthly a
+            JOIN dapot_ran_kota_kabupaten b ON (a.id_dapot_ran_kota_kabupaten = b.id_dapot_ran_kota_kabupaten) 
+            WHERE months = $month
+            AND years = $year
+            AND b.id_nsa = '" . $result->id_nsa . "'
+            AND (expired_years = '$year' AND (SELECT MAX(expired_years) FROM nsa) OR expired_years BETWEEN '$year' AND (SELECT MAX(expired_years) FROM nsa))");
+
+            return Core::setResponse("success",$output);
+            break;
+        case 'query2_b':
+            $output = \DB::connection("mysql222a")->select("select count(name_ran_kota_kabupaten) as jml FROM dapot_ran_kota_kabupaten WHERE id_nsa = '$result->id_nsa' AND active = 1");
+
+            return Core::setResponse("success",$output);
+            break;
+        }
+    }
+
+    public function avaweeklyresume(Request $request)
+    {
+        
+        $dt = $request->all();
+        $mode     = $dt['mode'];        
+        function db_get_last_update_year_query($table)
+        {
+            $q = \DB::connection("mysql222a")->select("
+                SELECT years AS last_update
+                FROM " . $table . "
+                GROUP BY years
+                ORDER BY years DESC
+                LIMIT 1
+            ");
+            
+            foreach ($q as $q => $r) {
+                if (empty($r)) {
+                    return 1;
+                } else {
+                    return $r->last_update;
+                }
+            }
+        }
+
+        function db_get_last_update_week_query_with_year($table, $year)
+        {
+
+            $q = \DB::connection("mysql222a")->select("
+                SELECT weeks AS last_update
+                FROM " . $table . "
+                WHERE years = $year
+                GROUP BY weeks
+                ORDER BY weeks DESC
+                LIMIT 1
+            ");
+            //$q = mysqli_query($conn, $query);
+            //$r = mysqli_fetch_object($q);
+            foreach ($q as $q => $r) {
+                if (empty($r)) {
+                    return 1;
+                } else {
+                    return $r->last_update;
+                }
+            }
+        }
+
+        $year = db_get_last_update_year_query('dapot_ran_availability_weighting_ns');
+        $week = db_get_last_update_week_query_with_year('dapot_ran_availability_weighting_ns', $year);
+
+
+        switch ($mode) {
+        case 'query':  
+            $output = \DB::connection("mysql222a")->select("SELECT * ,
+            (
+                SELECT COUNT(*)
+                FROM dapot_ran_resume_ne_monthly a1
+                WHERE a1.months = a.months
+                AND a1.years = a.years
+                AND a1.nsa = a.nsa
+            ) AS count_nsa 
+            FROM dapot_ran_resume_ne_monthly a
+            WHERE months = '" . $month . "'
+            AND years = '" . $year . "'
             ");
             //$output['series'] = $output_iub;
             return Core::setResponse("success",$output);
