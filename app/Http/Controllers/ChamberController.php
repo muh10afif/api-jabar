@@ -23,7 +23,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['username' => "username tidak boleh kosong"]);
         }
 
-        $query_db = DB::connection("mysql")->select("SELECT *,
+        $query_db = DB::connection("mysqlChamber")->select("SELECT *,
             (
                 SELECT COUNT(*)
                 FROM boopati_history a1
@@ -44,7 +44,7 @@ class ChamberController extends Controller
         $row = $query_db[0];
 
         if($row->roles == 'tdc'){
-            $qi = DB::connection("mysql")->select("SELECT *
+            $qi = DB::connection("mysqlChamber")->select("SELECT *
                 FROM users a
                 LEFT JOIN tdc b ON (a.id_cluster = b.id_tdc)
                 LEFT JOIN cluster c ON (b.id_cluster = c.id_cluster)
@@ -53,7 +53,7 @@ class ChamberController extends Controller
                 WHERE a.username = '".$username."'
             ");
 
-            $qtdc = DB::connection("mysql")->select("SELECT *
+            $qtdc = DB::connection("mysqlChamber")->select("SELECT *
                 FROM tdc a
                 LEFT JOIN kecamatan b ON (a.id_tdc = b.id_tdc)
                 LEFT JOIN kabupaten c ON (b.id_kabupaten = c.id_kabupaten)
@@ -63,27 +63,27 @@ class ChamberController extends Controller
 
         } else {
             if($row->roles == 'mini_grapari'){
-                $qi = DB::connection("mysql")->select("SELECT *
+                $qi = DB::connection("mysqlChamber")->select("SELECT *
                     FROM users a
                     LEFT JOIN grapari_mini b ON (a.id_cluster = b.id_grapari)
                     WHERE a.username = '".$username."'");
             }
             elseif($row->roles == 'wareg'){
-                $qi = DB::connection("mysql")->select("SELECT *
+                $qi = DB::connection("mysqlChamber")->select("SELECT *
                     FROM users a
                     LEFT JOIN branch c ON (a.id_cluster = c.id_branch)
                     LEFT JOIN region d ON (c.id_region = d.id_region)
                     WHERE a.username = '".$username."'");
             }
             elseif($row->roles == 'branch'){
-                $qi = DB::connection("mysql")->select("SELECT *
+                $qi = DB::connection("mysqlChamber")->select("SELECT *
                     FROM users a
                     LEFT JOIN branch c ON (a.id_cluster = c.id_branch)
                     LEFT JOIN region d ON (c.id_region = d.id_region)
                     WHERE a.username = '".$username."'");
             }
             else {
-                $qi = DB::connection("mysql")->select("SELECT *
+                $qi = DB::connection("mysqlChamber")->select("SELECT *
                     FROM users a
                     LEFT JOIN cluster b ON (a.id_cluster = b.id_cluster)
                     LEFT JOIN branch c ON (b.id_branch = c.id_branch)
@@ -98,7 +98,7 @@ class ChamberController extends Controller
         $hh = $request->server('REMOTE_ADDR');
         $ha = $request->server('HTTP_USER_AGENT');
 
-        // $query_history = DB::connection("mysql")->select("insert into boopati_history(username,activity,status,errorcode,datetimelog,ip,ket) values ('".$username."','Login ".$username."','Sukses','',now(),'$hh','$ha')");
+        // $query_history = DB::connection("mysqlChamber")->select("insert into boopati_history(username,activity,status,errorcode,datetimelog,ip,ket) values ('".$username."','Login ".$username."','Sukses','',now(),'$hh','$ha')");
 
         $output['session'] = $row_region_table;
         $output['session'][0]->data_tdc = $data_tdc;
@@ -127,7 +127,7 @@ class ChamberController extends Controller
 
         $optionroles = "and status_menu = 'active' and (authorized_roles is null or authorized_roles ='' or authorized_roles LIKE '%".$roles."%')";
 
-        $query = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=0 $optionroles order by order_menu");
+        $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=0 $optionroles order by order_menu");
 
         $data0 = $query;
 
@@ -137,7 +137,7 @@ class ChamberController extends Controller
             if($val0->type_menu == "header"){
                 $txt .= '<li class="header">'.$val0->nama_menu.'</li>';
 
-                $query1 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=1 and parent_menu=$val0->id_menu $optionroles order by order_menu");
+                $query1 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=1 and parent_menu=$val0->id_menu $optionroles order by order_menu");
                 $data1 = $query1;
 
                 foreach($data1 as $val1){
@@ -155,7 +155,7 @@ class ChamberController extends Controller
                         $txt .= '  </a>';
                         $txt .= '  <ul class="treeview-menu">';
 
-                        $query2 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=2 and parent_menu=$val1->id_menu $optionroles order by order_menu");
+                        $query2 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=2 and parent_menu=$val1->id_menu $optionroles order by order_menu");
                         $data2 = $query2;
 
                         foreach($data2 as $val2){
@@ -176,7 +176,7 @@ class ChamberController extends Controller
                                 $txt .= '  </a>';
                                 $txt .= '  <ul class="treeview-menu">';
 
-                                $query3 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=3 and parent_menu=$val2->id_menu $optionroles order by order_menu");
+                                $query3 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=3 and parent_menu=$val2->id_menu $optionroles order by order_menu");
                                 $data3 = $query3;
 
                                 foreach($data3 as $val3){
@@ -197,7 +197,7 @@ class ChamberController extends Controller
                                         $txt .= '  </a>';
                                         $txt .= '  <ul class="treeview-menu">';
 
-                                        $query4 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=4 and parent_menu=$val3->id_menu $optionroles order by order_menu");
+                                        $query4 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=4 and parent_menu=$val3->id_menu $optionroles order by order_menu");
                                         $data4 = $query4;
 
                                         foreach($data4 as $val4){
@@ -218,7 +218,7 @@ class ChamberController extends Controller
                                                 $txt .= '  </a>';
                                                 $txt .= '  <ul class="treeview-menu">';
 
-                                                $query5 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=5 and parent_menu=$val4->id_menu $optionroles order by order_menu");
+                                                $query5 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=5 and parent_menu=$val4->id_menu $optionroles order by order_menu");
                                                 $data5 = $query5;
 
                                                 foreach($data5 as $val5){
@@ -273,7 +273,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['keyword_page' => "keyword page tidak boleh kosong"]);
         }
 
-        $row = DB::connection("mysql")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$keyword_page'");
+        $row = DB::connection("mysqlChamber")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$keyword_page'");
 
         if (count($row) == 0) {
             return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
@@ -290,7 +290,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['table_obc_msisdn' => "table_obc_msisdn tidak boleh kosong"]);
         }
 
-        $row = DB::connection("mysql")->select("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table_obc_msisdn'");
+        $row = DB::connection("mysqlChamber")->select("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table_obc_msisdn'");
 
         if (count($row) == 0) {
             return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
@@ -314,7 +314,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['table_obc_msisdn' => "table_obc_msisdn tidak boleh kosong."]);
         }
 
-        $row = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+        $row = DB::connection("mysqlChamber")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
 
         if (count($row) == 0) {
             return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
@@ -328,9 +328,9 @@ class ChamberController extends Controller
 
         $mapping = implode(',', $l_mapping);
 
-        $row_blm_retr = DB::connection("mysql")->select("SELECT COUNT(*) AS count_msisdn FROM $table_obc_msisdn WHERE cluster_lacci IN($mapping) AND temp_user IS NULL AND remark_claim IS NULL");
+        $row_blm_retr = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS count_msisdn FROM $table_obc_msisdn WHERE cluster_lacci IN($mapping) AND temp_user IS NULL AND remark_claim IS NULL");
 
-        $row_sdh_retr = DB::connection("mysql")->select("SELECT COUNT(*) AS count_msisdn FROM $table_obc_msisdn WHERE cluster_lacci IN($mapping) AND temp_user = '$id_users' AND remark_claim IS NULL");
+        $row_sdh_retr = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS count_msisdn FROM $table_obc_msisdn WHERE cluster_lacci IN($mapping) AND temp_user = '$id_users' AND remark_claim IS NULL");
 
         if ($aksi == 'generate_retrive') {
             $tanggal        = date("Y-m-d");
@@ -338,19 +338,19 @@ class ChamberController extends Controller
             $kondisi = "AND cluster_lacci IN($mapping) LIMIT 50000";
 
             // insert history
-            $query_history  = DB::connection("mysql")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data for ".$id_users." OBC','Begin','',now())");
+            $query_history  = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data for ".$id_users." OBC','Begin','',now())");
 
             // update wl
             $j = 0;
-			$query2 = DB::connection("mysql")->select("SELECT * FROM $table_obc_msisdn WHERE temp_user IS NULL $kondisi");
+			$query2 = DB::connection("mysqlChamber")->select("SELECT * FROM $table_obc_msisdn WHERE temp_user IS NULL $kondisi");
 
 			foreach($query2 as $key => $query3){
 				$msisdn         = $query3->msisdn;
-				$query_update   = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set temp_user = '".$id_users."', temp_date='".$tanggal."' where msisdn='".$msisdn."'");
+				$query_update   = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set temp_user = '".$id_users."', temp_date='".$tanggal."' where msisdn='".$msisdn."'");
                 $j++;
             }
 
-            $query_history = DB::connection("mysql")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
+            $query_history = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
 
             return Core::setResponse("success", ['result' => "WL Berhasil di retrive"]);
         }
@@ -379,7 +379,7 @@ class ChamberController extends Controller
         switch ($type) {
 
             case "achievement":
-                $query = DB::connection("mysql")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan FROM boopati_whitelist_claim a WHERE status_claim in (".$status_claim.") and a.flag = '".$flag."' and a.id_users = '".$id_users."'");
+                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan FROM boopati_whitelist_claim a WHERE status_claim in (".$status_claim.") and a.flag = '".$flag."' and a.id_users = '".$id_users."'");
 
                 break;
 
@@ -393,14 +393,14 @@ class ChamberController extends Controller
                     $field = "region, cluster_lacci as cluster, kabupaten, kecamatan, msisdn, brand, temp_date";
                 }
 
-                $query_limit = DB::connection("mysql")->select("SELECT ".$field."
-                    from ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," .htmlspecialchars($params['length'],ENT_QUOTES) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("SELECT ".$field."
+                //     from ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," .htmlspecialchars($params['length'],ENT_QUOTES) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("SELECT ".$field." FROM ".$table_obc_msisdn."
+                $query = DB::connection("mysqlChamber")->select("SELECT ".$field." FROM ".$table_obc_msisdn."
                     where temp_user='".$id_users."' and REMARK_CLAIM is null");
                 break;
 
@@ -408,14 +408,14 @@ class ChamberController extends Controller
 
                 $field = "region, cluster_lacci as cluster, kabupaten, kecamatan, msisdn, brand, temp_date";
 
-                $query_limit = DB::connection("mysql")->select("SELECT ".$field."
-                    from ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " .htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("SELECT ".$field."
+                //     from ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " .htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("SELECT ".$field."
+                $query = DB::connection("mysqlChamber")->select("SELECT ".$field."
                     from ".$table_obc_msisdn."
                     where temp_user='".$id_users."'
                     and REMARK_CLAIM is null
@@ -427,14 +427,14 @@ class ChamberController extends Controller
                 $field = implode(',', $column);
                 // $field = "region_lacci as region, cluster_lacci as cluster, kecamatan, msisdn, segment_id, campaign_channel, keterangan";
 
-                $query_limit = DB::connection("mysql")->select("SELECT ".$field."
-                    from ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " . mysqli_real_escape_string($database->connection, htmlspecialchars($params['start'],ENT_QUOTES)) . " ," . mysqli_real_escape_string($database->connection, htmlspecialchars($params['length'],ENT_QUOTES)) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("SELECT ".$field."
+                //     from ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " . mysqli_real_escape_string($database->connection, htmlspecialchars($params['start'],ENT_QUOTES)) . " ," . mysqli_real_escape_string($database->connection, htmlspecialchars($params['length'],ENT_QUOTES)) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("SELECT ".$field."
+                $query = DB::connection("mysqlChamber")->select("SELECT ".$field."
                     from ".$table_obc_msisdn."
                     where temp_user='".$id_users."'
                     and REMARK_CLAIM is null
@@ -445,7 +445,7 @@ class ChamberController extends Controller
 
                 $month     = date('m');
 
-                $q_mapping = DB::connection("mysql")->select("SELECT DISTINCT(c.id_cluster), u.id_users FROM tdc t
+                $q_mapping = DB::connection("mysqlChamber")->select("SELECT DISTINCT(c.id_cluster), u.id_users FROM tdc t
                     JOIN cluster c ON c.id_cluster = t.id_cluster
                     JOIN users u ON u.id_cluster = c.id_cluster
                     WHERE c.id_branch = '$id_branch' AND u.roles = 'branch_cluster'
@@ -453,12 +453,12 @@ class ChamberController extends Controller
 
 
                 $l_mapping = array();
-                foreach($rl_mapping as $key => $row){
+                foreach($q_mapping as $row){
                     $l_mapping[] = "'$row->id_users'";
                 }
                 $mapping = implode(',', $l_mapping);
 
-                $query = DB::connection("mysql")->select("SELECT msisdn, status_claim, tanggal_claim FROM boopati_whitelist_claim
+                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, status_claim, tanggal_claim FROM boopati_whitelist_claim
                     WHERE flag = '$flag' AND MONTH(tanggal_claim) = '$month' AND id_users IN ($mapping)");
 
                 break;
@@ -467,15 +467,15 @@ class ChamberController extends Controller
 
                 $field = "cluster_lacci, msisdn, service, flag";
 
-                $query_limit = DB::connection("mysql")->select("
-                    select ".$field."
-                    from ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," .htmlspecialchars($params['length'],ENT_QUOTES) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("
+                //     select ".$field."
+                //     from ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," .htmlspecialchars($params['length'],ENT_QUOTES) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("SELECT ".$field."
+                $query = DB::connection("mysqlChamber")->select("SELECT ".$field."
                     from ".$table_obc_msisdn."
                     where temp_user='".$id_users."'
                     and (remark_claim IN ('') OR remark_claim IS NULL)
@@ -484,14 +484,14 @@ class ChamberController extends Controller
 
             case "achievement-gramin":
 
-                $query_limit = DB::connection("mysql")->select("SELECT *
-                    FROM ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("SELECT *
+                //     FROM ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("SELECT *
+                $query = DB::connection("mysqlChamber")->select("SELECT *
                     FROM ".$table_obc_msisdn."
                     where temp_user='".$id_users."'
                     and REMARK_CLAIM is null
@@ -499,14 +499,14 @@ class ChamberController extends Controller
                 break;
 
             case "achievement-hvc-prior":
-                $query_limit = DB::connection("mysql")->select("SELECT *
-                    FROM ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("SELECT *
+                //     FROM ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("SELECT *
+                $query = DB::connection("mysqlChamber")->select("SELECT *
                     FROM ".$table_obc_msisdn."
                     where temp_user='".$id_users."'
                     and REMARK_CLAIM is null
@@ -515,7 +515,7 @@ class ChamberController extends Controller
 
             case "achievement-wacluster":
 
-                $query = DB::connection("mysql")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
+                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
                     FROM boopati_whitelist_claim a
                     WHERE a.flag = '".$flag."' and a.id_users = '".$id_users."'
                 ");
@@ -523,7 +523,7 @@ class ChamberController extends Controller
 
             case "achievement-list-wacluster":
 
-                $query = DB::connection("mysql")->select("SELECT '' AS `no`, NOW() AS `date_update`, b.header_page AS `campaign`, u.username AS `cluster`, a.msisdn, a.status_claim, a.tanggal_claim
+                $query = DB::connection("mysqlChamber")->select("SELECT '' AS `no`, NOW() AS `date_update`, b.header_page AS `campaign`, u.username AS `cluster`, a.msisdn, a.status_claim, a.tanggal_claim
                     FROM boopati_whitelist_claim a
                     LEFT JOIN boopati_table_mapped_by_region b ON b.flag_page = a.flag
                     LEFT JOIN users_tdc u ON u.id_users = a.id_users
@@ -533,7 +533,7 @@ class ChamberController extends Controller
 
             case "achievement-wabranch":
 
-                $query = DB::connection("mysql")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
+                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
                     FROM boopati_whitelist_claim a
                     WHERE a.flag = '".$flag."' and a.id_users = '".$id_users."'
                 ");
@@ -542,7 +542,7 @@ class ChamberController extends Controller
             case "non-achievement-giganet":
                 $field = "cluster_lacci AS cluster, segment_id, msisdn";
 
-                $query = DB::connection("mysql")->select("SELECT $field
+                $query = DB::connection("mysqlChamber")->select("SELECT $field
                     FROM $table_obc_msisdn
                     WHERE temp_user = '$id_users'
                     AND remark_claim IS NULL
@@ -562,15 +562,15 @@ class ChamberController extends Controller
 
                 $field = "msisdn, branch_lacci, cluster_lacci, npsn, nama_sekolah";
 
-                $query_limit = DB::connection("mysql")->select("
-                    select ".$field."
-                    from ".$table_obc_msisdn."
-                    where temp_user='".$id_users."'
-                    and REMARK_CLAIM is null
-                    limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
-                ");
+                // $query_limit = DB::connection("mysqlChamber")->select("
+                //     select ".$field."
+                //     from ".$table_obc_msisdn."
+                //     where temp_user='".$id_users."'
+                //     and REMARK_CLAIM is null
+                //     limit " . htmlspecialchars($params['start'],ENT_QUOTES) . " ," . htmlspecialchars($params['length'],ENT_QUOTES) . "
+                // ");
 
-                $query = DB::connection("mysql")->select("
+                $query = DB::connection("mysqlChamber")->select("
                     select ".$field."
                     from ".$table_obc_msisdn."
                     where temp_user='".$id_users."'
@@ -579,7 +579,7 @@ class ChamberController extends Controller
                 break;
             case "achievement-wambjj":
 
-                $query = DB::connection("mysql")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
+                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
                     FROM boopati_whitelist_claim a
                     WHERE a.flag = '".$flag."' and a.id_users = '".$id_users."' /* and table_name = '".$table_obc_msisdn."'
                 ");
@@ -590,6 +590,10 @@ class ChamberController extends Controller
 
         }
 
+        if (empty($query)) {
+            return Core::setResponse("not_found", ["result" => "Data Empty"]);
+        }
+
         // $sql = mysqli_query($database->connection, htmlspecialchars($query));
 
         $totalRecords  = count($query);
@@ -597,19 +601,20 @@ class ChamberController extends Controller
         $counter = 0;
         $no      = 0;
 
-        while($res = $query){
+        $result = [];
+        foreach($query as $res){
             $no++;
             $result[$counter] = $res;
             $result[$counter]->no = $no;
             $counter++;
         }
 
-        $json_data = array(
-            "draw"            => intval( htmlspecialchars($params['draw']) ),
-            "recordsTotal"    => intval( $totalRecords  ),
-            "recordsFiltered" => intval($totalRecords ),
-            "data"            => $result   // total data array
-            );
+        // $json_data = array(
+        //     "draw"            => intval( htmlspecialchars($params['draw']) ),
+        //     "recordsTotal"    => intval( $totalRecords  ),
+        //     "recordsFiltered" => intval($totalRecords ),
+        //     "data"            => $result   // total data array
+        //     );
 
         $output['data'] = $result;
 
@@ -627,9 +632,9 @@ class ChamberController extends Controller
         $brand          = $request->brand;
         $jamklik        = $request->jamklik;
 
-        $query = DB::connection("mysql")->select("INSERT into boopati_whitelist_claim (id_users,msisdn,status_claim,keterangan,tanggal_claim,datetime_claim, flag, table_name, brand, datetime_open_form) values ('".$id_users."','".$msisdnkirim."','".$hasil."','".$catatan."',now(),now(), '".$flag."', '".$table_obc_msisdn."', '".$brand."', '".$jamklik."')");
+        $query = DB::connection("mysqlChamber")->select("INSERT into boopati_whitelist_claim (id_users,msisdn,status_claim,keterangan,tanggal_claim,datetime_claim, flag, table_name, brand, datetime_open_form) values ('".$id_users."','".$msisdnkirim."','".$hasil."','".$catatan."',now(),now(), '".$flag."', '".$table_obc_msisdn."', '".$brand."', '".$jamklik."')");
 
-        $query2 = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."' AND temp_user = '$id_users'");
+        $query2 = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."' AND temp_user = '$id_users'");
 
         return Core::setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
     }
@@ -642,9 +647,9 @@ class ChamberController extends Controller
         $table_obc_msisdn = $request->table_obc_msisdn;
         $jamklik        = $request->jamklik;
 
-        $query = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."' AND temp_user = '$id_users'");
+        $query = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."' AND temp_user = '$id_users'");
 
-        $query2 = DB::connection("mysql")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
+        $query2 = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
 
         return Core::setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
 
@@ -671,12 +676,12 @@ class ChamberController extends Controller
             $query = '';
 
             if(in_array($flag, $flag_obc_call)){ // obc call
-                $query = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+                $query = DB::connection("mysqlChamber")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
             }elseif(in_array($flag, $flag_wacluster)){ // wacluster
-                $query = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+                $query = DB::connection("mysqlChamber")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
             }
             elseif($flag == 'obc_giganet'){ // obc giganet
-                $query = DB::connection("mysql")->select("SELECT DISTINCT(`wl_for`), username FROM $table
+                $query = DB::connection("mysqlChamber")->select("SELECT DISTINCT(`wl_for`), username FROM $table
                     JOIN users
                     WHERE temp_user = '$id_user'
                     AND id_users = wl_for
@@ -730,7 +735,7 @@ class ChamberController extends Controller
 
             if(in_array($flag, $flag_obc_call)){ // obc call
                 $l_kec    = array();
-                $q_kec = DB::connection("mysql")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
+                $q_kec = DB::connection("mysqlChamber")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
                 $r_kec = $q_kec;
 
                 foreach($r_kec as $key => $v_kec){
@@ -740,11 +745,11 @@ class ChamberController extends Controller
                 $kec = implode(',', $l_kec);
 
                 $field  = "@i:=@i+1 AS `no`, region_lacci AS `region`, cluster_lacci AS `cluster`, kecamatan, msisdn, segment_id, rank_msisdn, campaign_channel, keterangan";
-                $query      = DB::connection("mysql")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE cluster_lacci IN ($kec) AND temp_user = '$id_user' AND remark_claim IS NULL");
+                $query      = DB::connection("mysqlChamber")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE cluster_lacci IN ($kec) AND temp_user = '$id_user' AND remark_claim IS NULL");
             }
             elseif(in_array($flag, $flag_wacluster)){ // wacluster
                 $l_kec = array();
-                $q_kec = DB::connection("mysql")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
+                $q_kec = DB::connection("mysqlChamber")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
                 $r_kec = $q_kec;
 
                 foreach($r_kec as $key => $v_kec){
@@ -754,11 +759,11 @@ class ChamberController extends Controller
                 $kec = implode(',', $l_kec);
 
                 $field  = "@i:=@i+1 AS `no`, region_lacci AS `region`, cluster_lacci AS `cluster`, kecamatan, msisdn, segment_id, rank_msisdn, campaign_channel, keterangan";
-                $query      = DB::connection("mysql")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE cluster_lacci IN ($kec) AND temp_user = '$id_user' AND remark_claim IS NULL");
+                $query      = DB::connection("mysqlChamber")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE cluster_lacci IN ($kec) AND temp_user = '$id_user' AND remark_claim IS NULL");
             }
             else{ // obc giganet
                 $field  = "@i:=@i+1 AS `no`, cluster_lacci AS `cluster`, segment_id, msisdn";
-                $query      = DB::connection("mysql")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE wl_for = '$part' AND temp_user = '$id_user' AND remark_claim IS NULL");
+                $query      = DB::connection("mysqlChamber")->select("SELECT $field FROM $table, (SELECT @i:= 0) AS foo WHERE wl_for = '$part' AND temp_user = '$id_user' AND remark_claim IS NULL");
             }
 
             $result = $query;
@@ -788,7 +793,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['id_branch' => "id_branch tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT u.id_users, u.username, c.id_cluster, c.cluster_name, c.id_branch
+        $query = DB::connection("mysqlChamber")->select("SELECT u.id_users, u.username, c.id_cluster, c.cluster_name, c.id_branch
             FROM users u
             JOIN cluster c ON c.id_cluster = u.id_cluster
             WHERE c.id_branch = '$id_branch' AND u.roles = 'branch_cluster'
@@ -813,12 +818,39 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['flag' => "flag tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT * from boopati_file_import a
+        $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_file_import a
                     JOIN region b ON (a.id_region = b.id_region)
                     JOIN boopati_file_import_summary c on (a.id_file_import=c.id_file_import)
                     WHERE created_by = '$username'
                     AND flag = '$flag'
                     AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN DATE_FORMAT(NOW()  - INTERVAL 1 MONTH, '%Y-%m') AND DATE_FORMAT(NOW(), '%Y-%m') ORDER BY date_upload DESC");
+
+        if (count($query) == 0) {
+            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+        }
+
+        return Core::setResponse("success", $query);
+    }
+
+    public function list_wlupload_wb(Request $request)
+    {
+        $username   = $request->username;
+        $flag       = $request->flag;
+
+        if ($username == ''){
+            return Core::setResponse('error', ['username' => "username tidak boleh kosong"]);
+        }
+        if ($flag == ''){
+            return Core::setResponse('error', ['flag' => "flag tidak boleh kosong"]);
+        }
+
+        $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_file_import a
+                    JOIN region b ON (a.id_region = b.id_region)
+                    JOIN boopati_file_import_summary c on (a.id_file_import=c.id_file_import)
+                    WHERE created_by = '$username'
+                    AND flag = '$flag'
+                    AND MONTH(created_date) = MONTH(NOW())
+                    AND YEAR(created_date) = YEAR(NOW()) ORDER BY date_upload DESC");
 
         if (count($query) == 0) {
             return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
@@ -835,7 +867,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT id_users, username,
+        $query = DB::connection("mysqlChamber")->select("SELECT id_users, username,
         sum(tot_call) as tot_call,
         sum(call_sukses) as call_sukses,
         sum(call_already_activated) as call_sudah
@@ -919,7 +951,7 @@ class ChamberController extends Controller
                 if($file_size <= $max_size){
                     if($file->move(storage_path('file_csv'), $file_oriname)){
 
-                        $query_file_import = DB::connection("mysql")->select("INSERT into boopati_file_import (file_import,flag,id_region,table_name,created_by,created_date,read_status) values(
+                        $query_file_import = DB::connection("mysqlChamber")->select("INSERT into boopati_file_import (file_import,flag,id_region,table_name,created_by,created_date,read_status) values(
                             '".$file_name."',
                             '".$flag."',
                             '".$id_region."',
@@ -974,12 +1006,9 @@ class ChamberController extends Controller
 
                             $result = eval('return (' . $condition . ');');
 
-                            print_r($cari_myads);
-                            exit;
-
                             if($result){
 
-                                $query_insert = DB::connection("mysql")->select("INSERT INTO boopati_whitelist_claim (msisdn, status_claim, tanggal_claim, datetime_claim, flag, table_name, id_users, id_file_import, status_telepon, remark_claim, date_upload)
+                                $query_insert = DB::connection("mysqlChamber")->select("INSERT INTO boopati_whitelist_claim (msisdn, status_claim, tanggal_claim, datetime_claim, flag, table_name, id_users, id_file_import, status_telepon, remark_claim, date_upload)
                                     VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$tap_user', '$id_file_import','$status_telepon', '$tap_user', NOW())");
 
                                 $insert_wl_upload = $query_insert;
@@ -995,7 +1024,7 @@ class ChamberController extends Controller
                             }
                         }
 
-                        $import_summary = DB::connection("mysql")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, not_uploaded, date_upload) VALUES ('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', '$count_not_uploaded', NOW())");
+                        $import_summary = DB::connection("mysqlChamber")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, not_uploaded, date_upload) VALUES ('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', '$count_not_uploaded', NOW())");
 
                         $insert_import_summary = $import_summary;
                         fclose($file);
@@ -1045,11 +1074,11 @@ class ChamberController extends Controller
             $id_branch_cluster	= '';
             if ($roles == 'branch') {
                 $l_cluster  = array();
-                $q_cluster	= DB::connection("mysql")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
+                $q_cluster	= DB::connection("mysqlChamber")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
                 $r_cluster = $q_cluster;
 
-                foreach ($r_cluster as $key => $v_cluster) {
-                    $id_u = $v_cluster['id_users'];
+                foreach ($r_cluster as $v_cluster) {
+                    $id_u = $v_cluster->id_users;
                     $l_cluster[] = "'$id_u'";
                 }
 
@@ -1092,9 +1121,9 @@ class ChamberController extends Controller
             }
 
             if ($roles == 'branch') {
-                $query = DB::connection("mysql")->select("SELECT COUNT(*) AS total FROM boopati_whitelist_claim a $option $option_date $filter");
+                $query = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS total FROM boopati_whitelist_claim a $option $option_date $filter");
             } else {
-                $query = DB::connection("mysql")->select("SELECT COUNT(*) AS total FROM boopati_whitelist_claim a LEFT JOIN users_tdc u ON u.id_users = a.id_users $option $option_date $filter");
+                $query = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS total FROM boopati_whitelist_claim a LEFT JOIN users_tdc u ON u.id_users = a.id_users $option $option_date $filter");
             }
 
             $result = (object)$query[0];
@@ -1113,7 +1142,7 @@ class ChamberController extends Controller
             $id_branch_cluster	= '';
             if ($roles == 'branch') {
                 $l_cluster  = array();
-                $q_cluster	= DB::connection("mysql")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
+                $q_cluster	= DB::connection("mysqlChamber")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
                 $r_cluster = $q_cluster;
 
                 foreach ($r_cluster as $key => $v_cluster) {
@@ -1134,7 +1163,7 @@ class ChamberController extends Controller
             $start_date 		= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['start_date']);
             $end_date 			= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['end_date']);
 
-            $q_tablee = DB::connection("mysql")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$flag'");
+            $q_tablee = DB::connection("mysqlChamber")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$flag'");
             $q_table = (object)$q_tablee['data'][0];
 
             $explode_table_name = explode("(id_region)", $q_table->table_name);
@@ -1178,7 +1207,7 @@ class ChamberController extends Controller
                 $id_region	= $request->id_region;
                 $table 		= $table_name . $id_region;
 
-                $query = DB::connection("mysql")->select("SELECT @i:=@i+1 AS `no`, NOW() AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim, f.created_date as date_upload,
+                $query = DB::connection("mysqlChamber")->select("SELECT @i:=@i+1 AS `no`, NOW() AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim, f.created_date as date_upload,
                     a.datetime_claim, a.datetime_open_form, '$flag' AS `campaign`, a.keterangan, w.flag_combo_sakti AS Flag, w.last_date_activation AS `Last Date Activation`
                 FROM boopati_whitelist_claim a
                 LEFT JOIN $table w ON w.msisdn = a.msisdn
@@ -1188,7 +1217,7 @@ class ChamberController extends Controller
                 $option $option_date $filter
                 LIMIT $limit_start, $limit_end");
             } else {
-                $query = DB::connection("mysql")->select("SELECT @i:=@i+1 AS `no`, CAST(NOW() as DATE) AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim, CAST(f.created_date as DATE) as date_upload,
+                $query = DB::connection("mysqlChamber")->select("SELECT @i:=@i+1 AS `no`, CAST(NOW() as DATE) AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim, CAST(f.created_date as DATE) as date_upload,
                 CAST(a.datetime_claim as DATE) as datetime_claim, CAST(a.datetime_open_form as DATE) as datetime_open_form, '$flag' AS `campaign`, a.keterangan,
                 IF(
                     (a.`table_name` = '$table1'),
@@ -1250,7 +1279,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT sum(tot_call) as tot_call,
+        $query = DB::connection("mysqlChamber")->select("SELECT sum(tot_call) as tot_call,
                   sum(call_sukses) as call_sukses,
                   sum(call_notanswer) as call_notanswer,
                   sum(call_already_activated) as call_sudah,
@@ -1267,7 +1296,7 @@ class ChamberController extends Controller
 
     public function users_branch_cluster()
     {
-        $query = DB::connection("mysql")->select("SELECT id_users, username FROM users_branch_cluster");
+        $query = DB::connection("mysqlChamber")->select("SELECT id_users, username FROM users_branch_cluster");
 
         if (count($query) == 0) {
             return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
@@ -1284,7 +1313,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT id_users, username,
+        $query = DB::connection("mysqlChamber")->select("SELECT id_users, username,
         sum(tot_call) as tot_call,
         sum(call_sukses) as call_sukses,
         sum(call_already_activated) as call_sudah
@@ -1332,7 +1361,7 @@ class ChamberController extends Controller
                     break;
             }
 
-            $query = DB::connection("mysql")->select("SELECT @i:=@i+1 AS `no`, NOW() AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim,
+            $query = DB::connection("mysqlChamber")->select("SELECT @i:=@i+1 AS `no`, NOW() AS `date_update`, u.username, a.msisdn, REPLACE(a.status_claim, '\r\n', '') AS status_claim, a.tanggal_claim,
                 a.datetime_claim, '$flag' AS `campaign`,
                 IF(
                     (a.`table_name` = 'wl_wabranch1'),
@@ -1370,7 +1399,7 @@ class ChamberController extends Controller
                 ) AS `period`
                 FROM boopati_whitelist_claim a
                 LEFT JOIN users_tdc u ON u.id_users = a.id_users,
-                (SELECT @i:= 0) AS foo $option $option_date $filter");
+                (SELECT @i:= 0) AS foo $option $option_date");
 
             $result = $query;
 
@@ -1391,7 +1420,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT sum(tot_call) as tot_call,
+        $query = DB::connection("mysqlChamber")->select("SELECT sum(tot_call) as tot_call,
                         sum(call_sukses) as call_sukses,
                         sum(call_notanswer) as call_notanswer,
                         sum(call_already_activated) as call_sudah,
@@ -1422,7 +1451,7 @@ class ChamberController extends Controller
             if($roles == 'branch'){
                 $branch_tmp = str_replace('branch_', '', $username);
                 $filter = " and branch_name like '%".$branch_tmp."%'";
-                $query = DB::connection("mysql")->select("select * from user_mapping_branch where user = '$username' limit 1");
+                $query = DB::connection("mysqlChamber")->select("select * from user_mapping_branch where user = '$username' limit 1");
                 $row = (object)$query[0];
                 $filter = " and branch_name like '%".$row->branch."%'";
             }
@@ -1471,7 +1500,7 @@ class ChamberController extends Controller
                 break;
             }
 
-            $query = DB::connection("mysql")->select("SELECT now() as date_update,a.username, a.msisdn, a.status_claim, a.tanggal_claim, a.datetime_claim, a.datetime_open_form from list_call_old a $option $option_date $filter
+            $query = DB::connection("mysqlChamber")->select("SELECT now() as date_update,a.username, a.msisdn, a.status_claim, a.tanggal_claim, a.datetime_claim, a.datetime_open_form from list_call_old a $option $option_date $filter
             union select now() as date_update,a.username, a.msisdn, a.status_claim, a.tanggal_claim, a.datetime_claim, a.datetime_open_form from list_call a $option $option_date $filter");
 
             $sql = $query;
@@ -1508,7 +1537,7 @@ class ChamberController extends Controller
             return Core::setResponse('error', ['regional' => "Regional tidak boleh kosong"]);
         }
 
-        $query = DB::connection("mysql")->select("SELECT cluster_name,branch_name, regional,
+        $query = DB::connection("mysqlChamber")->select("SELECT cluster_name,branch_name, regional,
             count(id_tdc) as total_tdc,
             sum(remark_obc) as total_tdc_obc,
             ROUND(sum(remark_obc)/count(id_tdc)*100,2) as percentage,sum(jml_obc) as total_call
@@ -1547,18 +1576,18 @@ class ChamberController extends Controller
         $kondisi    = preg_replace('/[\/<>]/', '', htmlspecialchars($request->optradio));
 
         if ($kondisi == 'wl') {
-            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch1");
-            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch2");
-            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch3");
-            DB::connection("mysql")->select("TRUNCATE TABLE wl_wabranch4");
+            DB::connection("mysqlChamber")->select("TRUNCATE TABLE wl_wabranch1");
+            DB::connection("mysqlChamber")->select("TRUNCATE TABLE wl_wabranch2");
+            DB::connection("mysqlChamber")->select("TRUNCATE TABLE wl_wabranch3");
+            DB::connection("mysqlChamber")->select("TRUNCATE TABLE wl_wabranch4");
 
         } elseif ($kondisi == 'flag') {
             $isi_list = $request->multi_opt;
 
-            DB::connection("mysql")->select("DELETE FROM wl_wabranch1 where flag IN ($isi_list)");
-            DB::connection("mysql")->select("DELETE FROM wl_wabranch2 where flag IN ($isi_list)");
-            DB::connection("mysql")->select("DELETE FROM wl_wabranch3 where flag IN ($isi_list)");
-            DB::connection("mysql")->select("DELETE FROM wl_wabranch4 where flag IN ($isi_list)");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch1 where flag IN ($isi_list)");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch2 where flag IN ($isi_list)");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch3 where flag IN ($isi_list)");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch4 where flag IN ($isi_list)");
 
         } elseif ($kondisi == 'no') {
             if (empty($file))
@@ -1647,10 +1676,10 @@ class ChamberController extends Controller
                 }
             }
 
-            DB::connection("mysql")->select("INSERT into wl_wabranch1 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql1));
-            DB::connection("mysql")->select("INSERT into wl_wabranch2 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql2));
-            DB::connection("mysql")->select("INSERT into wl_wabranch3 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql3));
-            DB::connection("mysql")->select("INSERT into wl_wabranch4 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql4));
+            DB::connection("mysqlChamber")->select("INSERT into wl_wabranch1 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql1));
+            DB::connection("mysqlChamber")->select("INSERT into wl_wabranch2 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql2));
+            DB::connection("mysqlChamber")->select("INSERT into wl_wabranch3 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql3));
+            DB::connection("mysqlChamber")->select("INSERT into wl_wabranch4 (msisdn, region_lacci, branch_lacci, cluster_lacci, service, flag, date_upload) values ".implode(',', $sql4));
 
             unlink(storage_path("/file_xlxs/$file_oriname"));
 
@@ -1759,7 +1788,7 @@ class ChamberController extends Controller
 
         switch($flag_type){
             case "cluster":
-                $q = DB::connection("mysql")->select("SELECT cluster_name, tdc, count(msisdn) as total_msisdn,
+                $q = DB::connection("mysqlChamber")->select("SELECT cluster_name, tdc, count(msisdn) as total_msisdn,
                     count(case when temp_user is null then 1 else null end) as total_notyet_call,
                     count(case when temp_user is not null then 1 else null end) as already_call
                     from (
@@ -1812,7 +1841,7 @@ class ChamberController extends Controller
                 break;
 
             case "branch":
-                $q = DB::connection("mysql")->select("SELECT branch_name as cluster_name, count(msisdn) as total_msisdn,
+                $q = DB::connection("mysqlChamber")->select("SELECT branch_name as cluster_name, count(msisdn) as total_msisdn,
                 count(case when status_telepon IS null then 1 else null end) as total_notyet_call,
                 count(case when temp_user is not null AND status_telepon IS NOT null then 1 else null end) as already_call
                 from (
@@ -1861,7 +1890,7 @@ class ChamberController extends Controller
                 break;
 
             case "giganet":
-                $q = DB::connection("mysql")->select("SELECT cluster_name, count(msisdn) as total_msisdn,
+                $q = DB::connection("mysqlChamber")->select("SELECT cluster_name, count(msisdn) as total_msisdn,
                 count(case when status_telepon IS null then 1 else null end) as total_notyet_call,
                 count(case when temp_user is not null AND status_telepon IS NOT null then 1 else null end) as already_call
                 from (
@@ -1951,7 +1980,7 @@ class ChamberController extends Controller
                 'status_menu'       => 'active'
             ];
 
-            $query = DB::connection("mysql")->table('boopati_menu')->insert($data);
+            $query = DB::connection("mysqlChamber")->table('boopati_menu')->insert($data);
 
             if ($query) {
                 return Core::setResponse("success", ['info' => "Data Menu telah ditambahkan"]);
@@ -1994,7 +2023,7 @@ class ChamberController extends Controller
                 'authorized_roles' => $request->input('authorized')
             ];
 
-            $query = DB::connection("mysql")->table("boopati_menu")
+            $query = DB::connection("mysqlChamber")->table("boopati_menu")
                         ->where("id_menu", $id)
                         ->update($data);
 
@@ -2010,7 +2039,7 @@ class ChamberController extends Controller
 
     public function delete_adm_menu($id)
     {
-        $query =  DB::connection("mysql")->table('boopati_menu')->where('id_menu','=',$id)->delete();
+        $query =  DB::connection("mysqlChamber")->table('boopati_menu')->where('id_menu','=',$id)->delete();
 
         if ($query) {
             return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
@@ -2046,7 +2075,7 @@ class ChamberController extends Controller
                 'created_date'  => Carbon::now()->timezone('Asia/Jakarta')
             ];
 
-            $query = DB::connection("mysql")->table('boopati_loader')->insert($data);
+            $query = DB::connection("mysqlChamber")->table('boopati_loader')->insert($data);
 
             if ($query) {
                 return Core::setResponse("success", ['info' => "Data Loader telah ditambahkan"]);
@@ -2081,7 +2110,7 @@ class ChamberController extends Controller
                 'title'         => $request->input('titleLoader')
             ];
 
-            $query = DB::connection("mysql")->table("boopati_loader")
+            $query = DB::connection("mysqlChamber")->table("boopati_loader")
                         ->where("id_loader", $id)
                         ->update($data);
 
@@ -2097,7 +2126,7 @@ class ChamberController extends Controller
 
     public function delete_adm_loader($id)
     {
-        $query =  DB::connection("mysql")->table('boopati_loader')->where('id_loader','=',$id)->delete();
+        $query =  DB::connection("mysqlChamber")->table('boopati_loader')->where('id_loader','=',$id)->delete();
 
         if ($query) {
             return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
@@ -2108,7 +2137,7 @@ class ChamberController extends Controller
 
     public function boopati_loader()
     {
-        $query = DB::connection("mysql")->table('boopati_loader')->get();
+        $query = DB::connection("mysqlChamber")->table('boopati_loader')->get();
 
         if (count($query) == 0) {
             return Core::setResponse("not_found", ['info' => "Table Empty"]);
@@ -2119,7 +2148,7 @@ class ChamberController extends Controller
 
     public function chamber_menu()
     {
-        $query0 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=0 order by order_menu");
+        $query0 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=0 order by order_menu");
         $data0 = $query0;
 
         $txt = '';
@@ -2146,7 +2175,7 @@ class ChamberController extends Controller
             $nextlevel = $val0->level_menu + 1;
             $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val0->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val0->id_menu."','".$val0->nama_menu."','".$val0->icon_menu."','".$val0->url_menu."','".$val0->level_menu."','".$val0->parent_menu."','".$val0->type_menu."','".$val0->target_menu."','".$val0->color_menu."','".$val0->order_menu."','".$val0->authorized_roles."', '".$val0->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val0->id_menu."','".$val0->nama_menu."','".$val0->icon_menu."','".$val0->url_menu."','".$val0->level_menu."','".$val0->parent_menu."','".$val0->type_menu."','".$val0->target_menu."','".$val0->color_menu."','".$val0->order_menu."','".$val0->authorized_roles."', '".$val0->status_menu."')\">delete</a></td>";
             $txt .= "</tr>";
-            $query1 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=1 and parent_menu=$val0->id_menu order by order_menu");
+            $query1 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=1 and parent_menu=$val0->id_menu order by order_menu");
             $data1 = $query1;
             foreach($data1 as $val1){
 
@@ -2171,7 +2200,7 @@ class ChamberController extends Controller
                 $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val1->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val1->id_menu."','".$val1->nama_menu."','".$val1->icon_menu."','".$val1->url_menu."','".$val1->level_menu."','".$val1->parent_menu."','".$val1->type_menu."','".$val1->target_menu."','".$val1->color_menu."','".$val1->order_menu."','".$val1->authorized_roles."', '".$val1->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val1->id_menu."','".$val1->nama_menu."','".$val1->icon_menu."','".$val1->url_menu."','".$val1->level_menu."','".$val1->parent_menu."','".$val1->type_menu."','".$val1->target_menu."','".$val1->color_menu."','".$val1->order_menu."','".$val1->authorized_roles."', '".$val1->status_menu."')\">delete</a></td>";
                 $txt .= "</tr>";
 
-                $query2 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=2 and parent_menu=$val1->id_menu order by order_menu");
+                $query2 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=2 and parent_menu=$val1->id_menu order by order_menu");
                 $data2 = $query2;
                 foreach($data2 as $val2){
 
@@ -2195,7 +2224,7 @@ class ChamberController extends Controller
                     $nextlevel = $val2->level_menu + 1;
                     $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val2->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val2->id_menu."','".$val2->nama_menu."','".$val2->icon_menu."','".$val2->url_menu."','".$val2->level_menu."','".$val2->parent_menu."','".$val2->type_menu."','".$val2->target_menu."','".$val2->color_menu."','".$val2->order_menu."','".$val2->authorized_roles."', '".$val2->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val2->id_menu."','".$val2->nama_menu."','".$val2->icon_menu."','".$val2->url_menu."','".$val2->level_menu."','".$val2->parent_menu."','".$val2->type_menu."','".$val2->target_menu."','".$val2->color_menu."','".$val2->order_menu."','".$val2->authorized_roles."', '".$val2->status_menu."')\">delete</a></td>";
                     $txt .= "</tr>";
-                    $query3 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=3 and parent_menu=$val2->id_menu order by order_menu");
+                    $query3 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=3 and parent_menu=$val2->id_menu order by order_menu");
                     $data3 = $query3;
                     foreach($data3 as $val3){
 
@@ -2220,7 +2249,7 @@ class ChamberController extends Controller
                         $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val3->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val3->id_menu."','".$val3->nama_menu."','".$val3->icon_menu."','".$val3->url_menu."','".$val3->level_menu."','".$val3->parent_menu."','".$val3->type_menu."','".$val3->target_menu."','".$val3->color_menu."','".$val3->order_menu."','".$val3->authorized_roles."', '".$val3->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val3->id_menu."','".$val3->nama_menu."','".$val3->icon_menu."','".$val3->url_menu."','".$val3->level_menu."','".$val3->parent_menu."','".$val3->type_menu."','".$val3->target_menu."','".$val3->color_menu."','".$val3->order_menu."','".$val3->authorized_roles."', '".$val3->status_menu."')\">delete</a></td>";
                         $txt .= "</tr>";
 
-                        $query4 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=4 and parent_menu=$val3->id_menu order by order_menu");
+                        $query4 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=4 and parent_menu=$val3->id_menu order by order_menu");
                         $data4 = $query4;
                         foreach($data4 as $val4){
 
@@ -2245,7 +2274,7 @@ class ChamberController extends Controller
                             $txt .= "  <td><a class='btn btn-primary btn-sm' onclick=\"addsub('".$val4->id_menu."','".$nextlevel."')\">add</a> | <a  class='btn btn-success btn-sm' onclick=\"editsub('".$val4->id_menu."','".$val4->nama_menu."','".$val4->icon_menu."','".$val4->url_menu."','".$val4->level_menu."','".$val4->parent_menu."','".$val4->type_menu."','".$val4->target_menu."','".$val4->color_menu."','".$val4->order_menu."','".$val4->authorized_roles."', '".$val4->status_menu."')\">edit</a> | <a  class='btn btn-danger btn-sm' onclick=\"deletesub('".$val4->id_menu."','".$val4->nama_menu."','".$val4->icon_menu."','".$val4->url_menu."','".$val4->level_menu."','".$val4->parent_menu."','".$val4->type_menu."','".$val4->target_menu."','".$val4->color_menu."','".$val4->order_menu."','".$val4->authorized_roles."', '".$val4->status_menu."')\">delete</a></td>";
                             $txt .= "</tr>";
 
-                            $query5 = DB::connection("mysql")->select("SELECT * from boopati_menu where level_menu=5 and parent_menu=$val4->id_menu order by order_menu");
+                            $query5 = DB::connection("mysqlChamber")->select("SELECT * from boopati_menu where level_menu=5 and parent_menu=$val4->id_menu order by order_menu");
                             $data5 = $query5;
                             foreach($data5 as $val5){
                                 $kun = '';
@@ -2280,7 +2309,7 @@ class ChamberController extends Controller
 
     public function history_login()
     {
-        $query = DB::connection("mysql")->select("SELECT * from boopati_history where datetimelog >= now() - interval  7 day order by datetimelog desc");
+        $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_history where datetimelog >= now() - interval  7 day order by datetimelog desc");
 
         if (count($query) == 0) {
             return Core::setResponse("not_found", ['result' => "Data Empty"]);
@@ -2314,7 +2343,7 @@ class ChamberController extends Controller
                 'created_by'    => $request->input('username'),
             ];
 
-            $query = DB::connection("mysql")->table('users')->insert($data);
+            $query = DB::connection("mysqlChamber")->table('users')->insert($data);
 
             if ($query) {
                 return Core::setResponse("success", ['info' => "Data User telah ditambahkan"]);
@@ -2345,7 +2374,7 @@ class ChamberController extends Controller
                 'roles'         => $request->input('rolestdc'),
             ];
 
-            $query = DB::connection("mysql")->table("users")
+            $query = DB::connection("mysqlChamber")->table("users")
                         ->where("id_users", $id)
                         ->update($data);
 
@@ -2361,7 +2390,7 @@ class ChamberController extends Controller
 
     public function delete_adm_userTDC($id)
     {
-        $query =  DB::connection("mysql")->table('users')->where('id_users','=',$id)->delete();
+        $query =  DB::connection("mysqlChamber")->table('users')->where('id_users','=',$id)->delete();
 
         if ($query) {
             return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
@@ -2404,7 +2433,7 @@ class ChamberController extends Controller
                 ];
             }
 
-            $query = DB::connection("mysql")->table('users')->insert($data);
+            $query = DB::connection("mysqlChamber")->table('users')->insert($data);
 
             if ($query) {
                 return Core::setResponse("success", ['info' => "Data User telah ditambahkan"]);
@@ -2435,7 +2464,7 @@ class ChamberController extends Controller
                 'id_cluster'    => $request->input('id_cluster'),
             ];
 
-            $query = DB::connection("mysql")->table("users")
+            $query = DB::connection("mysqlChamber")->table("users")
                         ->where("id_users", $id)
                         ->update($data);
 
@@ -2451,7 +2480,7 @@ class ChamberController extends Controller
 
     public function delete_adm_user($id)
     {
-        $query =  DB::connection("mysql")->table('users')->where('id_users','=',$id)->delete();
+        $query =  DB::connection("mysqlChamber")->table('users')->where('id_users','=',$id)->delete();
 
         if ($query) {
             return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
@@ -2477,7 +2506,7 @@ class ChamberController extends Controller
                 'hint'      => $request->input('password'),
             ];
 
-            $query = DB::connection("mysql")->table("users")
+            $query = DB::connection("mysqlChamber")->table("users")
                         ->where("id_users", $id)
                         ->update($data);
 
@@ -2499,9 +2528,9 @@ class ChamberController extends Controller
         }
 
         if ($roles == 'cluster') {
-            $query = DB::connection("mysql")->select("SELECT * FROM users a JOIN cluster b ON (a.id_cluster = b.id_cluster) WHERE roles = 'cluster'");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM users a JOIN cluster b ON (a.id_cluster = b.id_cluster) WHERE roles = 'cluster'");
         } elseif ($roles == 'su' || $roles == 'branch') {
-            $query = DB::connection("mysql")->select("SELECT * FROM users WHERE roles = '$roles'");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM users WHERE roles = '$roles'");
         } else {
             return Core::setResponse("not_found", ['roles' => "Roles tidak ditemukan"]);
         }
@@ -2523,12 +2552,12 @@ class ChamberController extends Controller
         }
 
         if($roles == 'su'){
-            $query = DB::connection("mysql")->select("SELECT a.id_users,a.username,a.roles,b.id_tdc ,b.tdc,b.id_cluster,c.cluster_name,c.id_branch,d.branch_name,a.created_by,a.created_date, a.hint
+            $query = DB::connection("mysqlChamber")->select("SELECT a.id_users,a.username,a.roles,b.id_tdc ,b.tdc,b.id_cluster,c.cluster_name,c.id_branch,d.branch_name,a.created_by,a.created_date, a.hint
             from users a,tdc b,cluster c,branch d
             where a.roles='tdc' and a.id_cluster=b.id_tdc and b.id_cluster=c.id_cluster and c.id_branch=d.id_branch");
 
         } else {
-            $query = DB::connection("mysql")->select("SELECT * FROM users a LEFT JOIN tdc b ON (a.id_cluster = b.id_tdc) WHERE a.roles = 'tdc' AND b.id_cluster = '$id_cluster'");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM users a LEFT JOIN tdc b ON (a.id_cluster = b.id_tdc) WHERE a.roles = 'tdc' AND b.id_cluster = '$id_cluster'");
 
         }
 
@@ -2544,9 +2573,9 @@ class ChamberController extends Controller
         $id_region = $request->id_region;
 
         if($id_region == ''){
-            $query = DB::connection("mysql")->select("SELECT * FROM branch");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM branch");
         } else {
-            $query = DB::connection("mysql")->select("SELECT * FROM branch WHERE id_region = '$id_region'");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM branch WHERE id_region = '$id_region'");
         }
 
         if (count($query) == 0) {
@@ -2571,9 +2600,9 @@ class ChamberController extends Controller
         $id_branch = $request->id_branch;
 
         if($id_branch == ''){
-            $query = DB::connection("mysql")->select("SELECT * FROM cluster");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM cluster");
         } else {
-            $query = DB::connection("mysql")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
         }
 
         if (count($query) == 0) {
@@ -2600,7 +2629,7 @@ class ChamberController extends Controller
             $query = "";
 
         } else {
-            $query = DB::connection("mysql")->select("SELECT b.id_tdc,b.tdc,b.id_cluster,c.cluster_name,c.id_branch,d.branch_name,e.*
+            $query = DB::connection("mysqlChamber")->select("SELECT b.id_tdc,b.tdc,b.id_cluster,c.cluster_name,c.id_branch,d.branch_name,e.*
             from tdc b,cluster c,branch d,region e
             where b.id_cluster=c.id_cluster and c.id_branch=d.id_branch and d.id_region=e.id_region and b.id_tdc='$tmp_idtdc'");
 
@@ -2616,14 +2645,14 @@ class ChamberController extends Controller
         }
 
         //collect region select form base on tdc id
-        $query = DB::connection("mysql")->select("SELECT * from region where id_region='$idregion'");
+        $query = DB::connection("mysqlChamber")->select("SELECT * from region where id_region='$idregion'");
 
         $txtregion = '';
         foreach ($query as $result) {
             $txtregion .= '<option value="'.htmlentities($result->id_region).'">'.htmlentities($result->regional).'</option>';
         }
         //collect branch select form base on tdc id
-        $query = DB::connection("mysql")->select("SELECT * from branch where id_region='$idregion'");
+        $query = DB::connection("mysqlChamber")->select("SELECT * from branch where id_region='$idregion'");
 
         $txtbranch = '';
         foreach ($query as $result) {
@@ -2635,7 +2664,7 @@ class ChamberController extends Controller
             $txtbranch .= '<option value="'.htmlentities($result->id_branch).'" '.$sel.'>'.htmlentities($result->branch_name).'</option>';
         }
         //collect cluster select form base on tdc id
-        $query = DB::connection("mysql")->select("SELECT * from cluster where id_branch='$idbranch'");
+        $query = DB::connection("mysqlChamber")->select("SELECT * from cluster where id_branch='$idbranch'");
 
         $txtcluster = '';
         foreach ($query as $result) {
@@ -2647,7 +2676,7 @@ class ChamberController extends Controller
             $txtcluster .= '<option value="'.htmlentities($result->id_cluster).'" '.$sel.'>'.htmlentities($result->cluster_name).'</option>';
         }
         //collect tdc select form base on tdc id
-        $query = DB::connection("mysql")->select("SELECT * from tdc where id_cluster='$idcluster'");
+        $query = DB::connection("mysqlChamber")->select("SELECT * from tdc where id_cluster='$idcluster'");
 
         $txttdc = '';
         foreach ($query as $result) {
@@ -2671,9 +2700,9 @@ class ChamberController extends Controller
         $id_cluster = $request->id_cluster;
 
         if($id_cluster == ''){
-            $query = DB::connection("mysql")->select("SELECT * FROM tdc");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM tdc");
         } else {
-            $query = DB::connection("mysql")->select("SELECT * FROM tdc WHERE id_cluster = '$id_cluster'");
+            $query = DB::connection("mysqlChamber")->select("SELECT * FROM tdc WHERE id_cluster = '$id_cluster'");
         }
 
         if (count($query) == 0) {
@@ -2746,7 +2775,7 @@ class ChamberController extends Controller
                 'created_date'  => Carbon::now()->timezone('Asia/Jakarta'),
                 'created_by'    => $username,
                 ];
-            $query = DB::connection("mysql")->table('boopati_table_mapped_by_region')->insert($data);
+            $query = DB::connection("mysqlChamber")->table('boopati_table_mapped_by_region')->insert($data);
 
             $doquery = $query;
             $id =  DB::getPdo()->lastInsertId();
@@ -2760,7 +2789,7 @@ class ChamberController extends Controller
                 'created_by'     => $username,
                 'created_date'   => Carbon::now()->timezone('Asia/Jakarta'),
             ];
-            $query = DB::connection("mysql")->table('boopati_loader')->insert($data2);
+            $query = DB::connection("mysqlChamber")->table('boopati_loader')->insert($data2);
 
             $data3 = [
                 'nama_menu'      => "List $header_page",
@@ -2775,7 +2804,7 @@ class ChamberController extends Controller
                 'authorized_roles' => "clusters;tdc",
                 'status_menu'    => "active",
             ];
-            $query = DB::connection("mysql")->table('boopati_menu')->insert($data3);
+            $query = DB::connection("mysqlChamber")->table('boopati_menu')->insert($data3);
 
             $data4 = [
                 'nama_loader'    => "achievement/$keyword_page",
@@ -2786,7 +2815,7 @@ class ChamberController extends Controller
                 'created_by'     => $username,
                 'created_date'   => Carbon::now()->timezone('Asia/Jakarta'),
             ];
-            $query = DB::connection("mysql")->table('boopati_loader')->insert($data4);
+            $query = DB::connection("mysqlChamber")->table('boopati_loader')->insert($data4);
 
             $data5 = [
                 'nama_menu'      => "Ach All $header_page",
@@ -2801,7 +2830,7 @@ class ChamberController extends Controller
                 'authorized_roles'=> "su",
                 'status_menu'   => "active",
             ];
-            $query = DB::connection("mysql")->table('boopati_menu')->insert($data5);
+            $query = DB::connection("mysqlChamber")->table('boopati_menu')->insert($data5);
 
             if (count($query) == 0) {
                 return Core::setResponse("success", ['info' => "Data Berhasil Ditambah"]);
@@ -2866,7 +2895,7 @@ class ChamberController extends Controller
             'status_table'  => $status_table
             ];
 
-        $query = DB::connection("mysql")->table("boopati_table_mapped_by_region")
+        $query = DB::connection("mysqlChamber")->table("boopati_table_mapped_by_region")
                         ->where("id_boopati_table_mapped_by_region", $id)
                         ->update($data);
 
@@ -2878,7 +2907,7 @@ class ChamberController extends Controller
 
     public function delete_table_map($id)
     {
-        $query =  DB::connection("mysql")->table('boopati_table_mapped_by_region')->where('id_boopati_table_mapped_by_region','=',$id)->delete();
+        $query =  DB::connection("mysqlChamber")->table('boopati_table_mapped_by_region')->where('id_boopati_table_mapped_by_region','=',$id)->delete();
 
         if ($query) {
             return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
@@ -2889,7 +2918,7 @@ class ChamberController extends Controller
 
     public function list_table_map()
     {
-        $query =  DB::connection("mysql")->table('boopati_table_mapped_by_region')->get();
+        $query =  DB::connection("mysqlChamber")->table('boopati_table_mapped_by_region')->get();
 
         if (count($query) != 0) {
             return Core::setResponse("success", $query);
@@ -2900,7 +2929,7 @@ class ChamberController extends Controller
 
     public function list_flag()
     {
-        $query =  DB::connection("mysql")->select('SELECT DISTINCT flag FROM wl_wabranch1');
+        $query =  DB::connection("mysqlChamber")->select('SELECT DISTINCT flag FROM wl_wabranch1');
 
         if (count($query) != 0) {
             return Core::setResponse("success", $query);
@@ -2925,7 +2954,7 @@ class ChamberController extends Controller
             $table_obc_msisdn   = $request->table_obc_msisdn;
             $branch_name        = $request->branch_name;
 
-            $query = DB::connection("mysql")->select("SELECT COUNT(*) AS count_msisdn FROM ".$table_obc_msisdn." WHERE branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL");
+            $query = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS count_msisdn FROM ".$table_obc_msisdn." WHERE branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL");
 
             if (count($query) == 0) {
                 return Core::setResponse("not_found", ["result" => "Data Empty"]);
@@ -2962,22 +2991,22 @@ class ChamberController extends Controller
                 $tanggal  		    = Carbon::now()->format('Y-m-d')->timezone("Asia/Jakarta");
 
                 // insert history
-                $query_history 	= DB::connection("mysql")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data for ".$id_users." OBC','Begin','',now())");
+                $query_history 	= DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data for ".$id_users." OBC','Begin','',now())");
 
                 $kondisi =  "branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL LIMIT 50000";
 
                 // update wl
                 $j      = 0;
-                $q2     = DB::connection("mysql")->select("SELECT * from ".$table_obc_msisdn." where $kondisi");
+                $q2     = DB::connection("mysqlChamber")->select("SELECT * from ".$table_obc_msisdn." where $kondisi");
                 $query2 = $q2;
 
                 foreach($query2 as $query3){
                     $msisdn         = $query3->msisdn;
-                    $query_update   = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set temp_user = '".$id_users."', temp_date='".$tanggal."' where msisdn='".$msisdn."'");
+                    $query_update   = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set temp_user = '".$id_users."', temp_date='".$tanggal."' where msisdn='".$msisdn."'");
                     $j++;
                 }
 
-                $query_history = DB::connection("mysql")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
+                $query_history = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
 
                 DB::commit();
 
@@ -3006,9 +3035,9 @@ class ChamberController extends Controller
         DB::beginTransaction();
 
         try {
-            $query = DB::connection("mysql")->select("INSERT into boopati_whitelist_claim (id_users,msisdn,status_claim,keterangan,tanggal_claim,datetime_claim, flag, table_name, brand, datetime_open_form) values ('".$id_users."','".$msisdnkirim."','".$hasil."','".$catatan."',now(),now(), '".$flag."', '".$table_obc_msisdn."', '".$brand."', '".$jamklik."')");
+            $query = DB::connection("mysqlChamber")->select("INSERT into boopati_whitelist_claim (id_users,msisdn,status_claim,keterangan,tanggal_claim,datetime_claim, flag, table_name, brand, datetime_open_form) values ('".$id_users."','".$msisdnkirim."','".$hasil."','".$catatan."',now(),now(), '".$flag."', '".$table_obc_msisdn."', '".$brand."', '".$jamklik."')");
 
-            $query2 = DB::connection("mysql")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."'");
+            $query2 = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."'");
 
             DB::commit();
 
@@ -3030,9 +3059,208 @@ class ChamberController extends Controller
         $catatan        = $request->input('catatan');
         $jamklik        = $request->input('jamklik');
 
-        $query = DB::connection("mysql")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
+        $query = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
 
         return Core::setResponse("success", ['info' => "Data sukses diproses"]);
+    }
+
+    public function list_region()
+    {
+        $query =  DB::connection("mysqlChamber")->select('SELECT * FROM region');
+
+        if (count($query) != 0) {
+            return Core::setResponse("success", $query);
+        } else {
+            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+        }
+    }
+
+    public function list_cluster_all()
+    {
+        $query =  DB::connection("mysqlChamber")->select('SELECT * FROM cluster');
+
+        if (count($query) != 0) {
+            return Core::setResponse("success", $query);
+        } else {
+            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+        }
+    }
+
+    public function insert_upload_wl_wb(Request $request)
+    {
+        $file           = $request->file('file_csv');
+        $flag           = $request->flag;
+        $id_region      = $request->id_region;
+        $tap_user       = $request->tap_user;
+        $table_name     = $request->table_name;
+        $username       = $request->username;
+
+        if ($file != '') {
+
+            $file_oriname   = $file->getClientOriginalName();
+            $file_size      = $file->getSize();
+            $fileMimeType   = $file->getClientMimeType();
+            $filename       = pathinfo($file_oriname, PATHINFO_FILENAME);
+            $extension      = pathinfo($file_oriname, PATHINFO_EXTENSION);
+
+            $tanggal        = date('Y-m-d');
+            $waktu          = strtotime(date('H:i:s'));
+            $file_import 	= str_replace('/','', preg_replace('/[\/<>]/', '', htmlspecialchars($file_oriname)));
+            $flag 			= str_replace('/','', htmlspecialchars($flag));
+            $id_region 		= str_replace('/','', htmlspecialchars($id_region));
+            $tap_user 		= str_replace('/','', htmlspecialchars($tap_user));
+
+            $eror		    = false;
+            $max_upload     = false;
+            $pesan          = '';
+            $folder		    = 'file_upload/';
+
+            $allowed_file = array('application/vnd.ms-excel','text/plain','text/csv');
+            $max_size	= 10 * 1024 * 1024; // 10MB
+
+			$file_size	    = $file_size;
+			$extensi	    = $extension;
+
+			$tanggal        = date('Ymd');
+			$waktu          = date('His');
+			$types          = $fileMimeType;
+
+			$file_name	= str_replace('/','',$table_name."_".$tanggal."_".$waktu.".".$extensi);
+			// $file_loc   = $folder.$file_name;
+
+            $ext = $extension;
+            if($ext == "csv" && in_array($types, array('text/csv', 'application/vnd.ms-excel'))){
+                if($file_size <= $max_size){
+                    if($file->move(storage_path('file_csv'), $file_oriname)){
+
+                        $query_file_import = DB::connection("mysqlChamber")->select("INSERT into boopati_file_import (file_import,flag,id_region,table_name,created_by,created_date,read_status) values(
+                            '".$file_name."',
+                            '".$flag."',
+                            '".$id_region."',
+                            '".$table_name."',
+                            '".$username."',
+                        now(), '1')");
+
+                        $id_file_import = DB::getPdo()->lastInsertId();
+                        $doquery        = $query_file_import;
+
+                        $msg = "Data telah ditambahkan";
+
+                        $file_loc   = storage_path("/file_csv/$file_oriname");
+                        $file       = fopen($file_loc, "r");
+
+                        $count_insert_uploaded  = 0;
+                        $count_not_uploaded     = 0;
+                        $count_insert_claimed   = 0;
+
+                        $delimiter = $this->detectDelimiter($file_loc);
+
+                        $data_import = array();
+
+                        while(!feof($file)){
+                            $data_import[] = explode($delimiter, fgetcsv($file,2000,$delimiter));
+                        }
+
+                        $fileHeader = $data_import[0];
+                        // unset($data_import[0]);
+                        $total_data   = count($data_import);
+                        $total_insert = 0;
+
+                        $tmp = date("Y-m-d", strtotime(convertTgl($fileHeader[0])));
+
+                        // validasi template menghitung dari header
+                        if(count($fileHeader) != 3 or strlen($fileHeader[0]) < 11 or strpos($fileHeader[0],'E+') !== false or $tmp=='1970-01-01' or $tmp < date("Y-m-d", strtotime("-3 weeks")) or $tmp > date("Y-m-d", strtotime("+1 weeks"))){ // validasi template false
+                            unlink($file_loc); // remove file jika validasi gagal
+
+                            return Core::setResponse("error", ['file' => 'Data gagal diupload. Format file / template tidak sesuai', 'alert' => 'danger']);
+
+                        } else {
+
+                            foreach($data_import as $val){
+                                $valDate        = date("Y-m-d", strtotime(convertTgl($val[1])));
+                                $msisdn         = str_replace(['\r', '"'], '', $val[0]);
+                                $date_remark    = htmlspecialchars(date("Y-m-d", strtotime(convertTgl($val[1]))));
+
+                                if($msisdn != '' and strpos($fileHeader[0],'E+') == false and $valDate!='1970-01-01' and $valDate>date("Y-m-d", strtotime("-3 weeks")) and $valDate<date("Y-m-d", strtotime("+1 weeks"))){
+
+                                    $q_claim = DB::connection("mysqlChamber")->select("SELECT * FROM boopati_whitelist_claim
+                                    WHERE msisdn = '".$msisdn."' AND tanggal_claim = '".$date_remark."' AND flag = '".$flag."'");
+
+                                    $count_check_claim = count($q_claim);
+                                    $query_insert = "";
+
+                                    if($count_check_claim == 0){ // blm terclaim
+                                        $status_telepon   = str_replace(['\r', '\n', '"'], '', htmlspecialchars($val[2]));
+                                        $date_remark      = htmlspecialchars(date("Y-m-d", strtotime(convertTgl($val[1]))));
+
+                                        $query_insert = DB::connection("mysqlChamber")->select("UPDATE $table_obc_msisdn set remark_claim='$tap_user', status_telepon='$status_telepon', date_upload = NOW() where msisdn='$msisdn'");
+
+                                        $query_insert2    = DB::connection("mysqlChamber")->select("INSERT INTO boopati_whitelist_claim (msisdn, status_claim, tanggal_claim, datetime_claim, flag, table_name, id_users, id_file_import)
+                                        VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$id_users', '$id_file_import')");
+
+                                        $count_insert_uploaded++;
+
+                                    }
+                                    else { // sudah terclaim
+                                        $count_insert_claimed++;
+                                    }
+                                }
+                            }
+
+                            $fix_return = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim SET status_claim = REPLACE(REPLACE(status_claim, '\r', ''), '\n', '') WHERE flag = 'wabranch'");
+
+                            $import_summary = DB::connection("mysqlChamber")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, date_upload)
+                                VALUES('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', NOW())");
+
+                            fclose($file);
+
+                            if(count($import_summary) == 0){
+
+                                return Core::setResponse("success", ['info' => 'Data telah ditambahkan.', 'alert' => 'success']);
+
+                            } else {
+                                unlink($file_loc);
+
+                                return Core::setResponse("error", ['info' => 'Data gagal ditambahkan.', 'alert' => 'danger']);
+                            }
+
+                        }
+
+                    } else {
+                        return Core::setResponse("error", ['file_upload' => 'File gagal diupload', 'alert' => 'danger']);
+                    }
+
+                } else {
+                    return Core::setResponse("error", ['file_size' => 'Maksimal Upload 10 MB', 'alert' => 'danger']);
+                }
+
+            } else {
+                return Core::setResponse("error", ['format_file' => 'Format file harus .CSV', 'alert' => 'danger']);
+            }
+
+        } else {
+            return Core::setResponse("error", ['file' => 'File Import harus diisi!', 'alert' => 'danger']);
+        }
+
+    }
+
+    public function loader_users(Request $request)
+    {
+        $nama_loader = $request->nama_loader;
+
+        if ($nama_loader == '') {
+            $nama_loader = 'home';
+        }
+
+        $query = DB::connection("mysqlChamber")->table('boopati_loader')
+                    ->where("nama_loader", $nama_loader)
+                    ->get();
+
+        if (count($query) == 0) {
+            return Core::setResponse("not_found", ["info" => "Data Empty"]);
+        } else {
+            return Core::setResponse("success", $query);
+        }
     }
 
 }

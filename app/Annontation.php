@@ -10,17 +10,17 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 /**
  * @OA\Swagger(
  *     basePath="/",
- *     schemes={"http://localhost:8080/api/v1/"},
+ *     schemes={"https://10.59.105.208/api-jabar/api/v1/"},
  *     @OA\Info(
  *         version="1.0.0",
- *         title="API documentation"
+ *         title="API Jabar documentation"
  *     )
  * )
  */
 
  /**
 *  @OA\Server(
-*      url="http://localhost:8080/api/v1/",
+*      url="https://10.59.105.208/api-jabar/api/v1/",
 *      description="Host"
 *  )
 *
@@ -1577,6 +1577,53 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 */
 /**
 * @OA\Get(
+*     path="/list_wlupload_wb",
+*     summary="",
+*     tags={"Chamber"},
+*       @OA\Parameter(
+*           name="username",
+*           in="query",
+*           required=true,
+*           @OA\Schema(
+*                 type="string"
+*           )
+*       ),
+*       @OA\Parameter(
+*           name="flag",
+*           in="query",
+*           required=true,
+*           @OA\Schema(
+*                 type="string"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+/**
+* @OA\Get(
 *     path="/list_achive_top10",
 *     summary="",
 *     tags={"Chamber"},
@@ -2060,26 +2107,26 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 */
 
 /**
-* @OA\Get(
+* @OA\Post(
 *     path="/obc_per_cluster_achiev",
 *     summary="",
 *     tags={"Chamber"},
-*       @OA\Parameter(
-*           name="keyword_page",
-*           in="query",
-*           required=true,
-*           @OA\Schema(
-*                 type="string"
-*           )
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         @OA\Property(
+*           property="keyword_page",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="regional",
+*           type="string",
+*         ),
 *       ),
-*       @OA\Parameter(
-*           name="regional",
-*           in="query",
-*           required=true,
-*           @OA\Schema(
-*                 type="string"
-*           )
-*       ),
+*     ),
+*   ),
 *    @OA\Response(
 *      response=200,
 *       description="Success",
@@ -2160,7 +2207,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 */
 
 /**
-* @OA\Post(
+* @OA\Get(
 *     path="/stock_wl_recap",
 *     summary="",
 *     tags={"Chamber"},
@@ -3745,6 +3792,176 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 *       ),
 *     ),
 *   ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+
+/**
+* @OA\Get(
+*     path="/list_cluster_all",
+*     summary="",
+*     tags={"Chamber"},
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+
+/**
+* @OA\Get(
+*     path="/list_region",
+*     summary="",
+*     tags={"Chamber"},
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/insert_upload_wl_wb",
+*     summary="",
+*     tags={"Chamber"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         @OA\Property(
+*           property="file_csv",
+*           type="file"
+*         ),
+*         @OA\Property(
+*           property="flag",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id_region",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="tap_user",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="table_name",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="username",
+*           type="string",
+*         ),
+*       ),
+*     ),
+*   ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/loader_users",
+*     summary="",
+*     tags={"Chamber"},
+*       @OA\Parameter(
+*           name="nama_loader",
+*           in="query",
+*           required=false,
+*           @OA\Schema(
+*                 type="string"
+*           )
+*       ),
 *    @OA\Response(
 *      response=200,
 *       description="Success",
