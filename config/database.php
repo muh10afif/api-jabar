@@ -84,6 +84,8 @@ return [
             'database' => env('DB8_DATABASE'),
             'username' => env('DB8_USERNAME'),
             'password' => env('DB8_PASSWORD'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
         ],
     ]
 ];
