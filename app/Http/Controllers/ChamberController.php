@@ -2760,7 +2760,7 @@ class ChamberController extends Controller
 			$file_name	= str_replace("00", "", $file_name);
         }
 
-        DB::beginTransaction();
+        DB::connection("mysqlChamber")->beginTransaction();
 
         try {
 
@@ -2836,10 +2836,10 @@ class ChamberController extends Controller
                 return Core::setResponse("success", ['info' => "Data Berhasil Ditambah"]);
             }
 
-            DB::commit();
+            DB::connection("mysqlChamber")->commit();
 
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("mysqlChamber")->rollback();
 
             return Core::setResponse("error", ['info' => "Gagal simpan ke database"]);
         }
@@ -2981,7 +2981,7 @@ class ChamberController extends Controller
 
         } else {
 
-            DB::beginTransaction();
+            DB::connection("mysqlChamber")->beginTransaction();
 
             try {
 
@@ -3008,12 +3008,12 @@ class ChamberController extends Controller
 
                 $query_history = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
 
-                DB::commit();
+                DB::connection("mysqlChamber")->commit();
 
                 return Core::setResponse("success", ['info' => "Sukses proses data"]);
 
             } catch (\Throwable $th) {
-                DB::rollback();
+                DB::connection("mysqlChamber")->rollback();
 
                 return Core::setResponse("error", ["info" => "Gagal ambil data"]);
             }
@@ -3032,19 +3032,19 @@ class ChamberController extends Controller
         $brand          = $request->input('brand');
         $jamklik        = $request->input('jamklik');
 
-        DB::beginTransaction();
+        DB::connection("mysqlChamber")->beginTransaction();
 
         try {
             $query = DB::connection("mysqlChamber")->select("INSERT into boopati_whitelist_claim (id_users,msisdn,status_claim,keterangan,tanggal_claim,datetime_claim, flag, table_name, brand, datetime_open_form) values ('".$id_users."','".$msisdnkirim."','".$hasil."','".$catatan."',now(),now(), '".$flag."', '".$table_obc_msisdn."', '".$brand."', '".$jamklik."')");
 
             $query2 = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."'");
 
-            DB::commit();
+            DB::connection("mysqlChamber")->commit();
 
             return Core::setResponse("success", ['info' => "Data sukses diproses"]);
 
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("mysqlChamber")->rollback();
 
             return Core::setResponse("error", ['info' => "Gagal diproses"]);
         }
