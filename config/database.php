@@ -76,7 +76,7 @@ return [
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
         ],
-      
+
         'mysqlChamber' => [
             'driver' => 'mysql',
             'host' => env('DB8_HOST'),
@@ -84,6 +84,17 @@ return [
             'database' => env('DB8_DATABASE'),
             'username' => env('DB8_USERNAME'),
             'password' => env('DB8_PASSWORD'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+        ],
+
+        'mysqlAnsel' => [
+            'driver' => 'mysql',
+            'host' => env('DB9_HOST'),
+            'port' => env('DB9_PORT'),
+            'database' => env('DB9_DATABASE'),
+            'username' => env('DB9_USERNAME'),
+            'password' => env('DB9_PASSWORD'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
         ],
