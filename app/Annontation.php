@@ -3989,6 +3989,1136 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 * )
 */
 
+/**
+* @OA\Get(
+*     path="/ansel/cek_login",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="username",
+*           in="query",
+*           required=true,
+*           @OA\Schema(
+*                 type="string"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Delete(
+*     path="/ansel/delete_project/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/list_master",
+*     summary="",
+*     tags={"Ansel"},
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/list_configure",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"nama_roles", "id"},
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id",
+*           type="integer",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/list_hadiah",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"nama_roles", "id"},
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id",
+*           type="integer",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/list_peserta",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"nama_roles", "id"},
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id",
+*           type="integer",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/project_exist",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"project", "type"},
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="project",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="type",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id",
+*           type="integer",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/list_project_edit/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/save_update_project/{id}",
+*     summary="Update Project",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=false,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"aksi","user_created","name_project","description","field_a","field_b","field_c","hadiah"},
+*         @OA\Property(
+*           property="aksi",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="user_created",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="name_project",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="description",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="field_a",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="field_b",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="field_c",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="hadiah",
+*           type="array",
+*               @OA\Items()
+*         ),
+*         @OA\Property(
+*           property="file",
+*           type="file",
+*         ),
+*       ),
+*     ),
+*   ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+/**
+* @OA\Post(
+*     path="/ansel/save_update_project",
+*     summary="Save Project",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"aksi","user_created","name_project","description","field_a","field_b","field_c","hadiah","file"},
+*         @OA\Property(
+*           property="aksi",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="user_created",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="name_project",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="description",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="field_a",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="field_b",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="field_c",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="hadiah",
+*           type="array",
+*               @OA\Items()
+*         ),
+*         @OA\Property(
+*           property="file",
+*           type="file",
+*         ),
+*       ),
+*     ),
+*   ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/list_user_dropdown/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+
+/**
+* @OA\Post(
+*     path="/ansel/add_user",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"user_id","username","fullname","password"},
+*         @OA\Property(
+*           property="user_id",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="username",
+*           type="integer",
+*         ),
+*         @OA\Property(
+*           property="fullname",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="password",
+*           type="string",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/list_undian/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="string"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/valid_project",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id_project",
+*           in="query",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*       @OA\Parameter(
+*           name="id_user",
+*           in="query",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/list_hadiah_undi/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/angka_jumlah/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/undi_acak_peserta",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"list","id_hadiah","periode","id_project","nama_roles"},
+*         @OA\Property(
+*           property="list",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id_hadiah",
+*           type="integer",
+*         ),
+*         @OA\Property(
+*           property="periode",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id_project",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/undi_get_pemenang",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"nama_roles","project","kategori"},
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="project",
+*           type="integer",
+*         ),
+*         @OA\Property(
+*           property="kategori",
+*           type="string",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Post(
+*     path="/ansel/undi_get_peserta",
+*     summary="",
+*     tags={"Ansel"},
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         required={"project","nama_roles","id_user"},
+*         @OA\Property(
+*           property="project",
+*           type="integer",
+*         ),
+*         @OA\Property(
+*           property="nama_roles",
+*           type="string",
+*         ),
+*         @OA\Property(
+*           property="id_user",
+*           type="integer",
+*         ),
+*       ),
+*     ),
+*    ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Delete(
+*     path="/ansel/pemenang_delete_all/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Put(
+*     path="/pemenang_delete_satu/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*   @OA\RequestBody(
+*     required=true,
+*     @OA\MediaType(
+*       mediaType="application/x-www-form-urlencoded",
+*       @OA\Schema(
+*         @OA\Property(
+*           property="id_list_pemenang",
+*           type="string"
+*         ),
+*         @OA\Property(
+*           property="id_peserta",
+*           type="string",
+*         ),
+*       ),
+*     ),
+*   ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/field_list_pemenang/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+/**
+* @OA\Get(
+*     path="/ansel/export_pemenang/{id}",
+*     summary="",
+*     tags={"Ansel"},
+*       @OA\Parameter(
+*           name="id",
+*           in="path",
+*           required=true,
+*           @OA\Schema(
+*                 type="integer"
+*           )
+*       ),
+*    @OA\Response(
+*      response=200,
+*       description="Success",
+*   ),
+*   @OA\Response(
+*      response=400,
+*      description="Bad Request"
+*   ),
+*   @OA\Response(
+*      response=401,
+*       description="Unauthorize"
+*   ),
+*   @OA\Response(
+*      response=404,
+*      description="Not Found"
+*   ),
+*   @OA\Response(
+*       response=403,
+*       description="Forbidden"
+*   ),
+*   @OA\Response(
+*       response=500,
+*       description="Server Error"
+*   )
+* )
+*/
+
+
+
 class Annotation extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
