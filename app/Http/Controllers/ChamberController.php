@@ -2833,10 +2833,10 @@ class ChamberController extends Controller
             $query = DB::connection("mysqlChamber")->table('boopati_menu')->insert($data5);
 
             if (count($query) == 0) {
+                DB::connection("mysqlChamber")->commit();
                 return Core::setResponse("success", ['info' => "Data Berhasil Ditambah"]);
             }
 
-            DB::connection("mysqlChamber")->commit();
 
         } catch (\Throwable $th) {
             DB::connection("mysqlChamber")->rollback();
