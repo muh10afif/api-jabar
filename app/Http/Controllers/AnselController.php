@@ -663,7 +663,7 @@ class AnselController extends Controller
         $id_hadiah  = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('id_hadiah')));
         $periode    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('periode')));
         $id_project = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('id_project')));
-        $list       = $request->input('list');
+        // $list       = $request->input('list');
         $nama_roles = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('nama_roles')));
         $id_user    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('id_user')));
 
@@ -682,6 +682,26 @@ class AnselController extends Controller
         DB::connection("mysqlAnsel")->beginTransaction();
 
         try {
+
+            $q = "SELECT * from peserta_".$id_project." where `status` = '0'";
+            $sql = DB::connection("mysqlAnsel")->select($q);
+
+            if (count($sql) == 0) {
+                return Core::setResponse("not_found", "Semua peserta sudah menang!");
+            }
+
+            $list = array();
+            $no = 1;
+            foreach ($sql as $row) {
+                $list["a".$no] = array(
+                    "id_peserta"    => htmlentities($row->id_peserta),
+                    "fielda"        => htmlentities($row->fielda),
+                    "fieldb"        => htmlentities($row->fieldb),
+                    "fieldc"        => htmlentities($row->fieldc),
+                    "status"        => htmlentities($row->status)
+                );
+                $no++;
+            }
 
             shuffle($list);
             $hasil = array_shift($list);
@@ -866,17 +886,17 @@ class AnselController extends Controller
         try {
 
             $que = "SELECT * FROM project WHERE id_project = ? AND user_created = ?";
-            $rsl = DB::connection("mysqlAnsel")->select(htmlspecialchars($que), [$pjk,$id_user]);
+            $rsl = DB::connection("mysqlAnsel")->select($que, [$pjk,$id_user]);
 
             if (count($rsl) == 1) {
 
                 $q = "SELECT * from peserta_".$pjk." where `status` = '0'";
-                $sql = DB::connection("mysqlAnsel")->select(htmlspecialchars($q));
+                $sql = DB::connection("mysqlAnsel")->select($q);
 
                 $data = array();
                 $no = 1;
                 foreach ($sql as $row) {
-                    $data[htmlentities("a".$no)] = array(
+                    $data["a".$no] = array(
                         "id_peserta"    => htmlentities($row->id_peserta),
                         "fielda"        => htmlentities($row->fielda),
                         "fieldb"        => htmlentities($row->fieldb),
@@ -1034,13 +1054,13 @@ class AnselController extends Controller
             $data_field = $query[0];
 
             $output[] = array();
-            $output[0][] = 'List Pemenang "'.$data_field->name_project.'"';
-            $output[1][] = $data_field->no;
-            if(!empty($data_field->field1)) $output[1][] = $data_field->field1;
-            if(!empty($data_field->field2)) $output[1][] = $data_field->field2;
-            if(!empty($data_field->field3)) $output[1][] = $data_field->field3;
-            $output[1][] = $data_field->hadiah;
-            $output[1][] = $data_field->periode;
+            $output[0]['judul'] = 'List Pemenang "'.$data_field->name_project.'"';
+            $output[1]['no'] = strtoupper($data_field->no);
+            if(!empty($data_field->field1)) $output[1]['fielda'] = strtoupper($data_field->field1);
+            if(!empty($data_field->field2)) $output[1]['fieldb'] = strtoupper($data_field->field2);
+            if(!empty($data_field->field3)) $output[1]['fieldc'] = strtoupper($data_field->field3);
+            $output[1]['hadiah'] = strtoupper($data_field->hadiah);
+            $output[1]['periode'] = strtoupper($data_field->periode);
 
             $check_project = DB::connection("mysqlAnsel")->select("SELECT *
                             FROM hadiah
@@ -1050,12 +1070,12 @@ class AnselController extends Controller
                             where hadiah.id_project = '".$id."'");
             $no = 2;
             foreach ($check_project as $value) {
-                $output[$no][] = $no-1;
-                if(!empty($data_field->field1)) $output[$no][] = ("'".$value->fielda);
-                if(!empty($data_field->field2)) $output[$no][] = $value->fieldb;
-                if(!empty($data_field->field3)) $output[$no][] = $value->fieldc;
-                $output[$no][] = $value->name_hadiah;
-                $output[$no][] = $value->periode;
+                $output[$no]['no'] = $no-1;
+                if(!empty($data_field->field1)) $output[$no]['fielda'] = $value->fielda;
+                if(!empty($data_field->field2)) $output[$no]['fieldb'] = $value->fieldb;
+                if(!empty($data_field->field3)) $output[$no]['fieldc'] = $value->fieldc;
+                $output[$no]['hadiah'] = $value->name_hadiah;
+                $output[$no]['periode'] = $value->periode;
                 $no++;
             }
 
