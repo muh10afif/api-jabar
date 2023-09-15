@@ -10,7 +10,7 @@ $router->group(['prefix' => 'ansel', 'as' => 'ansel'], function () use ($router)
     $router->post('/list_peserta', [ 'as' => 'list_peserta', 'uses' => 'AnselController@list_peserta']);
     $router->post('/project_exist', [ 'as' => 'project_exist', 'uses' => 'AnselController@project_exist']);
     $router->get('/list_project_edit/{id}', [ 'as' => 'list_project_edit', 'uses' => 'AnselController@list_project_edit']);
-    $router->post('/save_update_project/{id}', [ 'as' => 'save_update_project', 'uses' => 'AnselController@save_update_project']);
+    $router->put('/update_project/{id}', [ 'as' => 'update_project', 'uses' => 'AnselController@update_project']);
     $router->post('/save_update_project', [ 'as' => 'save_update_project', 'uses' => 'AnselController@save_update_project']);
     $router->get('/list_user_dropdown/{id}', [ 'as' => 'list_user_dropdown', 'uses' => 'AnselController@list_user_dropdown']);
     $router->post('/add_user', [ 'as' => 'add_user', 'uses' => 'AnselController@add_user']);

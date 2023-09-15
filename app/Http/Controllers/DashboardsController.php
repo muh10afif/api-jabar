@@ -9,11 +9,16 @@ use Illuminate\Support\Carbon;
 
 class DashboardsController extends Controller
 {
+    public function __construct()
+    {
+        $this->core = new Core();
+    }
+
     public function scr_mss()
     {
-        $query_scr = \DB::connection('mysql89')->select("(SELECT *,'scr' AS remark FROM scr_mss ORDER BY date_id DESC LIMIT 4) ORDER BY time_id ASC;");
+        $query_scr = \DB::connection('mysql89')->select("(SELECT *,'scr' AS remark FROM scr_mss ORDER BY date_id DESC LIMIT 3) ORDER BY time_id ASC;");
 
-        $query_mss = \DB::connection('mysql89')->select("(SELECT date_id,time_id,mss_name,ROUND (ccr,2) AS ccr, 'ccr' AS remark FROM ccr_mss ORDER BY date_id DESC LIMIT 4) ORDER BY time_id ASC;");
+        $query_mss = \DB::connection('mysql89')->select("(SELECT date_id,time_id,mss_name,ROUND (ccr,2) AS ccr, 'ccr' AS remark FROM ccr_mss ORDER BY date_id DESC LIMIT 3) ORDER BY time_id ASC;");
 
         $data_scr = array();
         foreach ($query_scr as $key => $value) {
@@ -29,10 +34,10 @@ class DashboardsController extends Controller
         $output['value_ccr'] = $data_mss;
 
         if (count($query_scr) == 0 && count($query_mss) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function pdp_sr()
@@ -45,7 +50,7 @@ class DashboardsController extends Controller
         ");
 
         if (count($query_pdp2g) == 0 && count($query_pdp3g) == 0 && count($query_pdp4g) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
         $output = array();
@@ -66,7 +71,7 @@ class DashboardsController extends Controller
         $output['value_pdp3g'] = $data_pdp3g;
         $output['value_pdp4g'] = $data_pdp4g;
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function scr_ccr_graph(Request $request)
@@ -76,7 +81,7 @@ class DashboardsController extends Controller
         $mode = $request->mode;
 
         if ($mode == '') {
-            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
         }
 
         switch($mode){
@@ -93,12 +98,12 @@ class DashboardsController extends Controller
                 $output['title'] = 'CCR Trend';
                 break;
             default:
-                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ditemukan. 2 Pilihan: scr, ccr']);
+                return $this->core->setResponse("not_found", ['mode' => 'Parameter mode tidak ditemukan. 2 Pilihan: scr, ccr']);
 
         }
 
         if (count($query_pdp_sr) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
         $output     = array();
@@ -142,7 +147,7 @@ class DashboardsController extends Controller
         $output['series'] = ($series);
         $output['series'] = json_encode($output_sgsn, JSON_NUMERIC_CHECK);
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function pdp_sr_graph(Request $request)
@@ -150,7 +155,7 @@ class DashboardsController extends Controller
         $mode = $request->mode;
 
         if ($mode == '') {
-            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
         }
 
         switch($mode){
@@ -175,11 +180,11 @@ class DashboardsController extends Controller
                 $output['title'] = 'KPI 2G PDP Context SR';
                 break;
             default:
-                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ditemukan. Pilih: 2G, 3G, 4G']);
+                return $this->core->setResponse("not_found", ['mode' => 'Parameter mode tidak ditemukan. Pilih: 2G, 3G, 4G']);
         }
 
         if (count($query_pdp_sr) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
         $output     = array();
@@ -222,7 +227,7 @@ class DashboardsController extends Controller
         $output['series'] = ($series);
         $output['series'] = json_encode($output_sgsn, JSON_NUMERIC_CHECK);
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function ggsn(Request $request)
@@ -235,10 +240,10 @@ class DashboardsController extends Controller
         $output = array();
 
         if ($mode == '') {
-            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
         }
         if ($area == '') {
-            return Core::setResponse("error", ['area' => 'Parameter area tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['area' => 'Parameter area tidak boleh kosong.']);
         }
 
         if (!empty($area)) {
@@ -253,7 +258,7 @@ class DashboardsController extends Controller
                 $where = "";
                 $areanya = "Area 2";
             } else {
-                return Core::setResponse("not_found", ['area' => 'Parameter area salah. 3 pilihan: jabar, jabo, all']);
+                return $this->core->setResponse("not_found", ['area' => 'Parameter area salah. 3 pilihan: jabar, jabo, all']);
             }
         } else {
             $where = " and (ggsn_name like '%DGO%' or ggsn_name like '%SOE%')";
@@ -574,7 +579,7 @@ class DashboardsController extends Controller
                 $output['yaxisVal'] = 'Persentage (%)';
                 break;
             default:
-                return Core::setResponse("not_found", ['result' => 'Mode tidak ada.']);
+                return $this->core->setResponse("not_found", ['result' => 'Mode tidak ada.']);
         }
 
         $point      = array();
@@ -582,7 +587,7 @@ class DashboardsController extends Controller
         $series     = array();
 
         if (count($query_pdp) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
         foreach ($query_pdp as $key => $result) {
@@ -627,7 +632,7 @@ class DashboardsController extends Controller
         $output['series'] = ($series);
         $output['series'] = json_encode($output_ggsn, JSON_NUMERIC_CHECK);
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
 
     }
 
@@ -638,13 +643,13 @@ class DashboardsController extends Controller
         $area = $request->area;
 
         if ($mode == '') {
-            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
         }
         if ($ggsn == '') {
-            return Core::setResponse("error", ['ggsn' => 'Parameter ggsn tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['ggsn' => 'Parameter ggsn tidak boleh kosong.']);
         }
         if ($area == '') {
-            return Core::setResponse("error", ['area' => 'Parameter area tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['area' => 'Parameter area tidak boleh kosong.']);
         }
 
         $output = array();
@@ -653,7 +658,7 @@ class DashboardsController extends Controller
                     $where = " and (ne_name like '%DGO%' or ne_name like '%SOE%')";
                     $areanya = "Jabar";
                 } else {
-                    return Core::setResponse("not_found", ['area' => 'Parameter area isi dengan jabar.']);
+                    return $this->core->setResponse("not_found", ['area' => 'Parameter area isi dengan jabar.']);
                 }
         }else{
             $where = " and (ne_name like '%DGO%' or ne_name like '%SOE%')";
@@ -739,7 +744,7 @@ class DashboardsController extends Controller
                 $output['yaxisVal'] = "RPM";
                 break;
             default:
-                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ada. 4 pilihan: fantray,modul,speedfanft1,speedfanft2']);
+                return $this->core->setResponse("not_found", ['mode' => 'Parameter mode tidak ada. 4 pilihan: fantray,modul,speedfanft1,speedfanft2']);
         }
 
         $point      = array();
@@ -747,7 +752,7 @@ class DashboardsController extends Controller
         $series     = array();
 
         if (count($query_pdp) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
         foreach ($query_pdp as $key => $result) {
@@ -788,7 +793,7 @@ class DashboardsController extends Controller
         $output['series'] = ($series);
         $output['series'] = json_encode($output_ggsn, JSON_NUMERIC_CHECK);
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function ggsn_dropdown(Request $request)
@@ -797,10 +802,10 @@ class DashboardsController extends Controller
         $mode   = $request->mode;
 
         if ($mode == '') {
-            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong.']);
         }
         if ($areain == '') {
-            return Core::setResponse("error", ['area' => 'Parameter area tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['area' => 'Parameter area tidak boleh kosong.']);
         }
 
         switch ($mode) {
@@ -857,14 +862,14 @@ class DashboardsController extends Controller
                 break;
 
             default:
-                return Core::setResponse("not_found", ['mode' => 'Parameter mode tidak ada.']);
+                return $this->core->setResponse("not_found", ['mode' => 'Parameter mode tidak ada.']);
         }
 
         if (count($query) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
-        return Core::setResponse('success', $query);
+        return $this->core->setResponse('success', $query);
 
     }
 
@@ -873,9 +878,9 @@ class DashboardsController extends Controller
         $query = DB::connection("mysql139")->select("SELECT distinct(ne_name) from ggsn_fantray_temp_mon where date_id >= date_add(curdate(),interval -3 day)");
 
         if (count($query) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
-        return Core::setResponse('success', $query);
+        return $this->core->setResponse('success', $query);
     }
 }

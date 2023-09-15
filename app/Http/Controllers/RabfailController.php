@@ -9,6 +9,11 @@ use Illuminate\Support\Carbon;
 
 class RabfailController extends Controller
 {
+    public function __construct()
+    {
+        $this->core = new Core();
+    }
+
     public function cek_tanggal($data){
         $ar=explode("-", $data);
 
@@ -38,18 +43,18 @@ class RabfailController extends Controller
         $stp      = $dt['stop'];
 
         if ($mode == '') {
-            return Core::setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong. 4 Pilihan: line-chart, top-10, pie-chart, based-on-rtp']);
+            return $this->core->setResponse("error", ['mode' => 'Parameter mode tidak boleh kosong. 4 Pilihan: line-chart, top-10, pie-chart, based-on-rtp']);
         }
         if ($str == '') {
-            return Core::setResponse("error", ['start' => 'Parameter start tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['start' => 'Parameter start tidak boleh kosong.']);
         } elseif (!$this->cek_tanggal($str)) {
-            return Core::setResponse("error", ['start' => 'Format tanggal salah.']);
+            return $this->core->setResponse("error", ['start' => 'Format tanggal salah.']);
         }
 
         if ($stp == '') {
-            return Core::setResponse("error", ['stop' => 'Parameter start tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['stop' => 'Parameter start tidak boleh kosong.']);
         } elseif (!$this->cek_tanggal($stp)) {
-            return Core::setResponse("error", ['stop' => 'Format tanggal salah.']);
+            return $this->core->setResponse("error", ['stop' => 'Format tanggal salah.']);
         }
 
 
@@ -74,9 +79,9 @@ class RabfailController extends Controller
             case "line-chart":
 
                 if (!empty($str) && !empty($stp)) {
-                    $doquery = \DB::connection("mysql")->select("SELECT * from minutes_4g_rabfail where satuan = 'jabar' $condition order by mydate ASC", ["$tanggalstart 00:00:00", "$tanggalstop2  23:59:00"]);
+                    $doquery = DB::connection("mysql")->select("SELECT * from minutes_4g_rabfail where satuan = 'jabar' $condition order by mydate ASC", ["$tanggalstart 00:00:00", "$tanggalstop2  23:59:00"]);
                 } else {
-                    $doquery = \DB::connection("mysql")->select("SELECT * from minutes_4g_rabfail where satuan = 'jabar' $condition order by mydate");
+                    $doquery = DB::connection("mysql")->select("SELECT * from minutes_4g_rabfail where satuan = 'jabar' $condition order by mydate");
                 }
 
                 break;
@@ -84,18 +89,18 @@ class RabfailController extends Controller
 
                 if (!empty($str) && !empty($stp)) {
 
-                    $doquery = \DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan = 'jabar' $condition order by tot_fail desc limit 10", ["$tanggalstart 00:00:00", "$tanggalstop2  23:59:00"]);
+                    $doquery = DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan = 'jabar' $condition order by tot_fail desc limit 10", ["$tanggalstart 00:00:00", "$tanggalstop2  23:59:00"]);
 
                 } else {
 
-                    $doquery = \DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan = 'jabar' $condition order by tot_fail desc limit 10");
+                    $doquery = DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan = 'jabar' $condition order by tot_fail desc limit 10");
 
                 }
 
                 break;
             case "pie-chart":
 
-                $doquery = \DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan = 'jabar' and mydate = ?", ["$tanggalstop"]);
+                $doquery = DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan = 'jabar' and mydate = ?", ["$tanggalstop"]);
 
                 break;
 
@@ -105,18 +110,20 @@ class RabfailController extends Controller
 
                 if ($category != '') {
 
-                    $doquery = \DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan != 'jabar' and mydate = ? order by $category DESC", [$tanggalstop]);
+                    $doquery = DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan != 'jabar' and mydate = ? order by $category DESC", [$tanggalstop]);
 
                 } else {
 
-                    $doquery = \DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan != 'jabar' and mydate = ?", [$tanggalstop]);
+                    $doquery = DB::connection("mysql")->select("select * from minutes_4g_rabfail where satuan != 'jabar' and mydate = ?", [$tanggalstop]);
 
                 }
                 break;
 
             default:
-                return Core::setResponse('not_found', ['mode' => "Parameter mode tersebut tidak ditemukan. 4 Pilihan: line-chart, top-10, pie-chart, based-on-rtp"]);
+                return $this->core->setResponse('not_found', ['mode' => "Parameter mode tersebut tidak ditemukan. 4 Pilihan: line-chart, top-10, pie-chart, based-on-rtp"]);
         }
+
+
 
         $value      = array();
         $counter    = 0;
@@ -125,7 +132,7 @@ class RabfailController extends Controller
         $count = count($doquery);
 
         if ($count == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada."]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada."]);
         }
 
         foreach ($doquery as $doquery => $key) {
@@ -161,7 +168,8 @@ class RabfailController extends Controller
             }
         }
 
-        return Core::setResponse("success", $output);
+
+        return $this->core->setResponse("success", $output);
     }
 
     public function triDay(Request $request)
@@ -172,9 +180,9 @@ class RabfailController extends Controller
         $mode   = "Interval 3 days";
 
         if ($bl == '') {
-            return Core::setResponse("error", ['bulan' => 'Parameter bulan tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['bulan' => 'Parameter bulan tidak boleh kosong.']);
         } elseif (!$this->cek_bulan($bl)) {
-            return Core::setResponse("error", ['bulan' => 'Format bulan salah.']);
+            return $this->core->setResponse("error", ['bulan' => 'Format bulan salah.']);
         }
 
         $month_t    = $bl . "-01";
@@ -238,10 +246,10 @@ class RabfailController extends Controller
         }
 
         if ($series['data'][0] == '') {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
-        return Core::setResponse("success",$output);
+        return $this->core->setResponse("success",$output);
 
     }
 
@@ -250,9 +258,9 @@ class RabfailController extends Controller
         $r_tgl = $request->tanggal;
 
         if ($r_tgl == '') {
-            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
         } elseif (!$this->cek_tanggal($r_tgl)) {
-            return Core::setResponse("error", ['tanggal' => 'Format tanggal salah.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Format tanggal salah.']);
         }
 
         $tgl = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($r_tgl));
@@ -281,7 +289,7 @@ class RabfailController extends Controller
             $option .= "<option value='".$d->RTPO."'>".$d->RTPO."</option>";
         }
 
-        return Core::setResponse("success", $option);
+        return $this->core->setResponse("success", $option);
 
     }
 
@@ -290,9 +298,9 @@ class RabfailController extends Controller
         $r_tgl = $request->tanggal;
 
         if ($r_tgl == '') {
-            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
         } elseif (!$this->cek_tanggal($r_tgl)) {
-            return Core::setResponse("error", ['tanggal' => 'Format tanggal salah.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Format tanggal salah.']);
         }
 
         $tgl = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($r_tgl));
@@ -358,7 +366,7 @@ class RabfailController extends Controller
 
         $arr = array("option_tnl" => $option_tnl, "option_mme" => $option_mme);
 
-        return Core::setResponse("success", $arr);
+        return $this->core->setResponse("success", $arr);
 
     }
 
@@ -370,13 +378,13 @@ class RabfailController extends Controller
         $r_rtp = $request->rtp;
 
         if ($r_tgl == '') {
-            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
         } elseif (!$this->cek_tanggal($r_tgl)) {
-            return Core::setResponse("error", ['tanggal' => 'Format tanggal salah.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Format tanggal salah.']);
         }
 
         if ($r_rtp == '') {
-            return Core::setResponse("error", ['rtp' => 'Parameter rtp tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['rtp' => 'Parameter rtp tidak boleh kosong.']);
         }
 
         $tgl        = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($r_tgl));
@@ -388,10 +396,10 @@ class RabfailController extends Controller
         $result = \DB::connection("mysql")->select("SELECT @n := @n + 1 n,a.mydate, a.siteid, a.sitename, a.cellname, a.rab_fail_est_mme, a.rab_fail_est_rnl, a.rab_fail_est_tnl, b.RTPO FROM monitoring_4g_rabfail_15mnit_$bln AS a INNER JOIN dapot_transport_new AS b ON (a.siteid = b.Site_ID), (SELECT @n := 0) m WHERE b.RTPO = ? AND a.mydate BETWEEN ? AND ?", [$rtp, "$tanggal 00:00:00", "$tanggal 23:55:00"]);
 
         if (count($result) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
-        return Core::setResponse("success", array("result" => $result));
+        return $this->core->setResponse("success", array("result" => $result));
     }
 
     public function detailRTP(Request $request)
@@ -401,13 +409,13 @@ class RabfailController extends Controller
         $r_cat = $request->category;
 
         if ($r_tgl == '') {
-            return Core::setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['tanggal' => 'Parameter tanggal tidak boleh kosong.']);
         }
         if ($r_rtp == '') {
-            return Core::setResponse("error", ['rtp' => 'Parameter rtp tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['rtp' => 'Parameter rtp tidak boleh kosong.']);
         }
         if ($r_cat == '') {
-            return Core::setResponse("error", ['category' => 'Parameter category tidak boleh kosong.']);
+            return $this->core->setResponse("error", ['category' => 'Parameter category tidak boleh kosong.']);
         }
 
         $tanggal    = date('Y-m-d H:i:s', strtotime($r_tgl));
@@ -450,7 +458,7 @@ class RabfailController extends Controller
             ", $isi);
 
         if (count($doquery1) == 0) {
-            return Core::setResponse("not_found", ['result' => 'Data tidak ada.']);
+            return $this->core->setResponse("not_found", ['result' => 'Data tidak ada.']);
         }
 
         foreach($doquery1 as $object)
@@ -476,7 +484,7 @@ class RabfailController extends Controller
 
         $output['new_category'] = $new_category;
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
 }

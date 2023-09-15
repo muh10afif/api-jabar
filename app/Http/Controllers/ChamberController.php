@@ -15,12 +15,17 @@ use Carbon\Carbon;
 
 class ChamberController extends Controller
 {
+    public function __construct()
+    {
+        $this->core = new Core();
+    }
+
     public function cek_login(Request $request)
     {
         $username = $request->username;
 
         if ($username == ''){
-            return Core::setResponse('error', ['username' => "username tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['username' => "username tidak boleh kosong"]);
         }
 
         $query_db = DB::connection("mysqlChamber")->select("SELECT *,
@@ -38,7 +43,7 @@ class ChamberController extends Controller
         $count = count($query_db);
 
         if ($count == 0) {
-            return Core::setResponse('not_found', ['username' => "username tidak ditemukan"]);
+            return $this->core->setResponse('not_found', ['username' => "username tidak ditemukan"]);
         }
 
         $row = $query_db[0];
@@ -112,7 +117,7 @@ class ChamberController extends Controller
             $output['redirect'] = "home";
         }
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
 
     }
 
@@ -122,7 +127,7 @@ class ChamberController extends Controller
         $link   = $request->link;
 
         if ($roles == ''){
-            return Core::setResponse('error', ['roles' => "roles tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['roles' => "roles tidak boleh kosong"]);
         }
 
         $optionroles = "and status_menu = 'active' and (authorized_roles is null or authorized_roles ='' or authorized_roles LIKE '%".$roles."%')";
@@ -262,7 +267,7 @@ class ChamberController extends Controller
             }
         }
 
-        return Core::setResponse("success", $txt);
+        return $this->core->setResponse("success", $txt);
     }
 
     public function tableRegion(Request $request)
@@ -270,16 +275,16 @@ class ChamberController extends Controller
         $keyword_page = $request->keyword_page;
 
         if ($keyword_page == ''){
-            return Core::setResponse('error', ['keyword_page' => "keyword page tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['keyword_page' => "keyword page tidak boleh kosong"]);
         }
 
         $row = DB::connection("mysqlChamber")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$keyword_page'");
 
         if (count($row) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $row);
+        return $this->core->setResponse("success", $row);
     }
 
     public function columnName(Request $request)
@@ -287,16 +292,16 @@ class ChamberController extends Controller
         $table_obc_msisdn = $request->table_obc_msisdn;
 
         if ($table_obc_msisdn == ''){
-            return Core::setResponse('error', ['table_obc_msisdn' => "table_obc_msisdn tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['table_obc_msisdn' => "table_obc_msisdn tidak boleh kosong"]);
         }
 
         $row = DB::connection("mysqlChamber")->select("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table_obc_msisdn'");
 
         if (count($row) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $row);
+        return $this->core->setResponse("success", $row);
     }
 
     public function hitungRetrieve(Request $request)
@@ -308,25 +313,25 @@ class ChamberController extends Controller
         $username           = $request->username;
 
         if ($id_branch == ''){
-            return Core::setResponse('error', ['id_branch' => "id_branch tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['id_branch' => "id_branch tidak boleh kosong"]);
         }
         if ($table_obc_msisdn == ''){
-            return Core::setResponse('error', ['table_obc_msisdn' => "table_obc_msisdn tidak boleh kosong."]);
+            return $this->core->setResponse('error', ['table_obc_msisdn' => "table_obc_msisdn tidak boleh kosong."]);
         }
 
         $row = DB::connection("mysqlChamber")->select("SELECT * FROM cluster WHERE id_branch = '$id_branch'");
 
         if (count($row) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
         $l_mapping = array();
-        foreach($row as $key => $row){
+        foreach($row as $row){
             $cl = $row->cluster_name;
             $l_mapping[] = "'$cl'";
         }
 
-        $mapping = implode(',', $l_mapping);
+        $mapping = implode(",", $l_mapping);
 
         $row_blm_retr = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS count_msisdn FROM $table_obc_msisdn WHERE cluster_lacci IN($mapping) AND temp_user IS NULL AND remark_claim IS NULL");
 
@@ -344,7 +349,7 @@ class ChamberController extends Controller
             $j = 0;
 			$query2 = DB::connection("mysqlChamber")->select("SELECT * FROM $table_obc_msisdn WHERE temp_user IS NULL $kondisi");
 
-			foreach($query2 as $key => $query3){
+			foreach($query2 as $query3){
 				$msisdn         = $query3->msisdn;
 				$query_update   = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set temp_user = '".$id_users."', temp_date='".$tanggal."' where msisdn='".$msisdn."'");
                 $j++;
@@ -352,10 +357,10 @@ class ChamberController extends Controller
 
             $query_history = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
 
-            return Core::setResponse("success", ['result' => "WL Berhasil di retrive"]);
+            return $this->core->setResponse("success", ['result' => "WL Berhasil di retrive"]);
         }
 
-        return Core::setResponse("success", ['belum_retrive' => $row_blm_retr, 'sudah_retrive' => $row_sdh_retr]);
+        return $this->core->setResponse("success", ['belum_retrive' => $row_blm_retr, 'sudah_retrive' => $row_sdh_retr]);
     }
 
     public function ajaxMsisdn(Request $request)
@@ -367,19 +372,26 @@ class ChamberController extends Controller
         $table_obc_msisdn   = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->table_obc_msisdn,ENT_QUOTES));
         $id_users           = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->id_users,ENT_QUOTES));
         $flag               = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->flag,ENT_QUOTES));
-        $status_claim       = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->status_claim,ENT_QUOTES));
+        $status_claim       = $request->status_claim;
         $region             = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->region,ENT_QUOTES));
         $column             = $request->column;
         $id_branch          = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->id_branch,ENT_QUOTES));
         $start_date         = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->start_date,ENT_QUOTES));
         $end_date           = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->end_date,ENT_QUOTES));
 
+        // if ($column == '') {
+        //     return $this->core->setResponse("error", "Pilih Column Dahulu");
+        // }
+
         $output = array();
 
         switch ($type) {
 
             case "achievement":
-                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan FROM boopati_whitelist_claim a WHERE status_claim in (".$status_claim.") and a.flag = '".$flag."' and a.id_users = '".$id_users."'");
+
+                $status_claim1 = implode(",", $status_claim);
+
+                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan FROM boopati_whitelist_claim a WHERE status_claim in (".$status_claim1.") and a.flag = '".$flag."' and a.id_users = '".$id_users."'");
 
                 break;
 
@@ -533,10 +545,20 @@ class ChamberController extends Controller
 
             case "achievement-wabranch":
 
-                $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
-                    FROM boopati_whitelist_claim a
-                    WHERE a.flag = '".$flag."' and a.id_users = '".$id_users."'
-                ");
+                if ($status_claim[0] == 'sukses') {
+                    $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
+                        FROM boopati_whitelist_claim a
+                        WHERE a.flag = '".$flag."' AND a.id_users = '".$id_users."' AND
+                        a.status_claim LIKE 'sent on%' OR a.status_claim LIKE 'not using whatsapp%'
+                    ");
+                } else {
+                    $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
+                        FROM boopati_whitelist_claim a
+                        WHERE a.flag = '".$flag."' AND a.id_users = '".$id_users."' AND
+                        a.status_claim NOT LIKE 'sent on%' AND a.status_claim NOT LIKE 'not using whatsapp%'
+                    ");
+                }
+
                 break;
 
             case "non-achievement-giganet":
@@ -586,12 +608,12 @@ class ChamberController extends Controller
                 break;
 
             default:
-                return Core::setResponse("not_found", ['type' => "Type tidak ditemukan"]);
+                return $this->core->setResponse("not_found", ['type' => "Type tidak ditemukan"]);
 
         }
 
         if (empty($query)) {
-            return Core::setResponse("not_found", ["result" => "Data Empty"]);
+            return $this->core->setResponse("not_found", ["result" => "Data Empty"]);
         }
 
         // $sql = mysqli_query($database->connection, htmlspecialchars($query));
@@ -618,7 +640,7 @@ class ChamberController extends Controller
 
         $output['data'] = $result;
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function saveListMsisdn(Request $request)
@@ -636,7 +658,7 @@ class ChamberController extends Controller
 
         $query2 = DB::connection("mysqlChamber")->select("UPDATE ".$table_obc_msisdn." set remark_claim='".$id_users."', status_telepon='".$hasil."' where msisdn='".$msisdnkirim."' AND temp_user = '$id_users'");
 
-        return Core::setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
+        return $this->core->setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
     }
 
     public function updateListMsisdn(Request $request)
@@ -651,7 +673,7 @@ class ChamberController extends Controller
 
         $query2 = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
 
-        return Core::setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
+        return $this->core->setResponse("success", ['query' => count($query), 'query2' => count($query2)]);
 
     }
 
@@ -696,7 +718,7 @@ class ChamberController extends Controller
                 $mapping_for    = array();
                 $result         = $query;
 
-                foreach($result as $key => $val){
+                foreach($result as $val){
                     if(in_array($flag, $flag_obc_call)){ // obc call
                         $mapping[]      = $val->id_cluster;
                         $mapping_for[]  = $val->cluster_name;
@@ -719,11 +741,11 @@ class ChamberController extends Controller
 
                 $ar = array('mapping' => $mapping, 'mapping_for' => $mapping_for, 'ftype' => $ftype, 'flag' => strtoupper($flag), 'time' => date('YmdHis'), 'success' => true);
 
-                return Core::setResponse("success", $ar);
+                return $this->core->setResponse("success", $ar);
             }
             else{
 
-                return Core::setResponse("error", array("message" => 'Failed to export, flag not in list', 'success' => false));
+                return $this->core->setResponse("error", array("message" => 'Failed to export, flag not in list', 'success' => false));
 
                 // echo json_encode(
                 //     array("message" => 'Failed to export, flag not in list', 'success' => false)
@@ -738,7 +760,7 @@ class ChamberController extends Controller
                 $q_kec = DB::connection("mysqlChamber")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
                 $r_kec = $q_kec;
 
-                foreach($r_kec as $key => $v_kec){
+                foreach($r_kec as $v_kec){
                     $l_kec[] = "'$v_kec->cluster_name'";
                 }
 
@@ -752,7 +774,7 @@ class ChamberController extends Controller
                 $q_kec = DB::connection("mysqlChamber")->select("SELECT cluster_name FROM cluster WHERE id_cluster = '$part'");
                 $r_kec = $q_kec;
 
-                foreach($r_kec as $key => $v_kec){
+                foreach($r_kec as $v_kec){
                     $l_kec[] = "'$v_kec->cluster_name'";
                 }
 
@@ -768,7 +790,7 @@ class ChamberController extends Controller
 
             $result = $query;
 
-            return Core::setResponse("success", array('result' => $result, 'ftype' => $ftype));
+            return $this->core->setResponse("success", array('result' => $result, 'ftype' => $ftype));
 
             // echo json_encode(
             //     array('result' => $result, 'ftype' => $ftype)
@@ -776,7 +798,7 @@ class ChamberController extends Controller
         }
         else{
 
-            return Core::setResponse("error", array("message" => 'Failed to export', 'success' => false));
+            return $this->core->setResponse("error", array("message" => 'Failed to export', 'success' => false));
 
             // echo json_encode(
             //     array("message" => 'Failed to export', 'success' => false)
@@ -790,7 +812,7 @@ class ChamberController extends Controller
         $id_branch = $request->id_branch;
 
         if ($id_branch == ''){
-            return Core::setResponse('error', ['id_branch' => "id_branch tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['id_branch' => "id_branch tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT u.id_users, u.username, c.id_cluster, c.cluster_name, c.id_branch
@@ -800,10 +822,10 @@ class ChamberController extends Controller
             ORDER BY c.id_branch ASC");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function list_wlupload(Request $request)
@@ -812,10 +834,10 @@ class ChamberController extends Controller
         $flag       = $request->flag;
 
         if ($username == ''){
-            return Core::setResponse('error', ['username' => "username tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['username' => "username tidak boleh kosong"]);
         }
         if ($flag == ''){
-            return Core::setResponse('error', ['flag' => "flag tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['flag' => "flag tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_file_import a
@@ -823,13 +845,13 @@ class ChamberController extends Controller
                     JOIN boopati_file_import_summary c on (a.id_file_import=c.id_file_import)
                     WHERE created_by = '$username'
                     AND flag = '$flag'
-                    AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN DATE_FORMAT(NOW()  - INTERVAL 1 MONTH, '%Y-%m') AND DATE_FORMAT(NOW(), '%Y-%m') ORDER BY date_upload DESC");
+                    AND DATE_FORMAT(created_date, '%Y-%m') BETWEEN DATE_FORMAT(NOW()  - INTERVAL 1 MONTH, '%Y-%m') AND DATE_FORMAT(NOW(), '%Y-%m') ORDER BY c.date_upload DESC");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function list_wlupload_wb(Request $request)
@@ -838,10 +860,10 @@ class ChamberController extends Controller
         $flag       = $request->flag;
 
         if ($username == ''){
-            return Core::setResponse('error', ['username' => "username tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['username' => "username tidak boleh kosong"]);
         }
         if ($flag == ''){
-            return Core::setResponse('error', ['flag' => "flag tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['flag' => "flag tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_file_import a
@@ -853,10 +875,10 @@ class ChamberController extends Controller
                     AND YEAR(created_date) = YEAR(NOW()) ORDER BY date_upload DESC");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function list_achive_top10(Request $request)
@@ -864,7 +886,7 @@ class ChamberController extends Controller
         $keyword_page = $request->keyword_page;
 
         if ($keyword_page == ''){
-            return Core::setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT id_users, username,
@@ -878,10 +900,10 @@ class ChamberController extends Controller
         limit 0,10");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
 
     }
 
@@ -959,7 +981,7 @@ class ChamberController extends Controller
                             '".$username."',
                         now(), '1')");
 
-                        $id_file_import = DB::getPdo()->lastInsertId();
+                        $id_file_import = DB::connection("mysqlChamber")->getPdo()->lastInsertId();
                         $doquery        = $query_file_import;
 
                         $msg = "Data telah ditambahkan";
@@ -973,9 +995,14 @@ class ChamberController extends Controller
 
                         $delimiter = $this->detectDelimiter($file_loc);
 
-                        while(!feof($file)){
+                        // while(!feof($file)){
 
-                            $val = fgetcsv($file,2000,$delimiter);
+                        fgets($file);  // read one line for nothing (skip header)
+                        while (($val = fgetcsv($file, 10000, ",")) !== FALSE) {
+
+                            // $val = fgetcsv($file,10000,$delimiter);
+
+                            // $val = explode(',', fgets($file));
 
                             $date_string = explode('-', $val[1]);
                             $date_length = count($date_string);
@@ -1009,7 +1036,7 @@ class ChamberController extends Controller
                             if($result){
 
                                 $query_insert = DB::connection("mysqlChamber")->select("INSERT INTO boopati_whitelist_claim (msisdn, status_claim, tanggal_claim, datetime_claim, flag, table_name, id_users, id_file_import, status_telepon, remark_claim, date_upload)
-                                    VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$tap_user', '$id_file_import','$status_telepon', '$tap_user', NOW())");
+                                    VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$tap_user', $id_file_import,'$status_telepon', '$tap_user', NOW())");
 
                                 $insert_wl_upload = $query_insert;
 
@@ -1019,40 +1046,42 @@ class ChamberController extends Controller
                                     $count_insert_claimed++;
                                 }
 
-                            } else {
-                                $count_not_uploaded = (count($data_import) - $count_insert_uploaded);
                             }
+                            // else {
+                            //     $count_not_uploaded = (count($data_import) - $count_insert_uploaded);
+                            // }
                         }
 
-                        $import_summary = DB::connection("mysqlChamber")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, not_uploaded, date_upload) VALUES ('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', '$count_not_uploaded', NOW())");
+                        $import_summary = DB::connection("mysqlChamber")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, not_uploaded, date_upload) VALUES ($id_file_import, '$count_insert_claimed', '$count_insert_uploaded', '$count_not_uploaded', NOW())");
 
                         $insert_import_summary = $import_summary;
                         fclose($file);
 
                         if(count($insert_import_summary) == 0){
 
-                            return Core::setResponse("success", ['info' => 'Data telah ditambahkan.', 'alert' => 'success']);
+                            unlink($file_loc);
+                            return $this->core->setResponse("success", ['info' => 'Data telah ditambahkan.', 'alert' => 'success']);
 
                         } else {
                             unlink($file_loc);
 
-                            return Core::setResponse("error", ['info' => 'Data gagal ditambahkan.', 'alert' => 'danger']);
+                            return $this->core->setResponse("error", ['info' => 'Data gagal ditambahkan.', 'alert' => 'danger']);
                         }
 
                     } else {
-                        return Core::setResponse("error", ['file_upload' => 'File gagal diupload', 'alert' => 'danger']);
+                        return $this->core->setResponse("error", ['file_upload' => 'File gagal diupload', 'alert' => 'danger']);
                     }
 
                 } else {
-                    return Core::setResponse("error", ['file_size' => 'Maksimal Upload 10 MB', 'alert' => 'danger']);
+                    return $this->core->setResponse("error", ['file_size' => 'Maksimal Upload 10 MB', 'alert' => 'danger']);
                 }
 
             } else {
-                return Core::setResponse("error", ['format_file' => 'Format file harus .CSV', 'alert' => 'danger']);
+                return $this->core->setResponse("error", ['format_file' => 'Format file harus .CSV', 'alert' => 'danger']);
             }
 
         } else {
-            return Core::setResponse("error", ['file' => 'File Import harus diisi!', 'alert' => 'danger']);
+            return $this->core->setResponse("error", ['file' => 'File Import harus diisi!', 'alert' => 'danger']);
         }
 
     }
@@ -1129,7 +1158,7 @@ class ChamberController extends Controller
             $result = (object)$query[0];
             $part 	= ($result->total / 100000); // dibagi per seratus ribu
 
-            return Core::setResponse("success", array("total" => (int)$result->total, 'total_part' => ceil($part), 'ftype' => $ftype, 'time' => date('YmdHis')));
+            return $this->core->setResponse("success", array("total" => (int)$result->total, 'total_part' => ceil($part), 'ftype' => $ftype, 'time' => date('YmdHis')));
 
         } else if (!empty($ftype) && $ftype == 'export-partial') {
 
@@ -1145,8 +1174,8 @@ class ChamberController extends Controller
                 $q_cluster	= DB::connection("mysqlChamber")->select("SELECT * FROM users_branch_cluster WHERE id_branch = '$id_branch'");
                 $r_cluster = $q_cluster;
 
-                foreach ($r_cluster as $key => $v_cluster) {
-                    $id_u = $v_cluster['id_users'];
+                foreach ($r_cluster as $v_cluster) {
+                    $id_u = $v_cluster->id_users;
                     $l_cluster[] = "'$id_u'";
                 }
 
@@ -1164,7 +1193,7 @@ class ChamberController extends Controller
             $end_date 			= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $_POST['end_date']);
 
             $q_tablee = DB::connection("mysqlChamber")->select("SELECT * FROM boopati_table_mapped_by_region WHERE keyword_page = '$flag'");
-            $q_table = (object)$q_tablee['data'][0];
+            $q_table = (object)$q_tablee[0];
 
             $explode_table_name = explode("(id_region)", $q_table->table_name);
             $table_name = $explode_table_name[0];
@@ -1263,11 +1292,11 @@ class ChamberController extends Controller
 
             $result = $query;
 
-            return Core::setResponse("success", array("result" => $result, 'ftype' => $ftype, 'time' => date('YmdHis')));
+            return $this->core->setResponse("success", array("result" => $result, 'ftype' => $ftype, 'time' => date('YmdHis')));
 
         } else {
 
-            return Core::setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
+            return $this->core->setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
         }
     }
 
@@ -1276,7 +1305,7 @@ class ChamberController extends Controller
         $keyword_page = $request->keyword_page;
 
         if ($keyword_page == ''){
-            return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT sum(tot_call) as tot_call,
@@ -1288,10 +1317,10 @@ class ChamberController extends Controller
                   where flag = '" . $keyword_page . "'");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function users_branch_cluster()
@@ -1299,10 +1328,10 @@ class ChamberController extends Controller
         $query = DB::connection("mysqlChamber")->select("SELECT id_users, username FROM users_branch_cluster");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function list_achive_top10_wabranch(Request $request)
@@ -1310,7 +1339,7 @@ class ChamberController extends Controller
         $keyword_page = $request->keyword_page;
 
         if ($keyword_page == ''){
-            return Core::setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['keyword_page' => "keyword_page tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT id_users, username,
@@ -1326,10 +1355,10 @@ class ChamberController extends Controller
         limit 0,10");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function export_achiev_wabranch(Request $request)
@@ -1403,12 +1432,12 @@ class ChamberController extends Controller
 
             $result = $query;
 
-            return Core::setResponse("success", array("result" => $result, 'ftype' => $ftype, 'time' => date('YmdHis')));
+            return $this->core->setResponse("success", array("result" => $result, 'ftype' => $ftype, 'time' => date('YmdHis')));
 
         }
         else{
 
-            return Core::setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
+            return $this->core->setResponse("error", array("message" => 'Failed to export', 'ftype' => $ftype));
         }
     }
 
@@ -1417,7 +1446,7 @@ class ChamberController extends Controller
         $keyword_page = $request->keyword_page;
 
         if ($keyword_page == ''){
-            return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT sum(tot_call) as tot_call,
@@ -1431,10 +1460,10 @@ class ChamberController extends Controller
                         AND YEAR(tanggal_claim) = YEAR(NOW())");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function export_achiev(Request $request)
@@ -1513,9 +1542,9 @@ class ChamberController extends Controller
             fputcsv($file, array('No', 'Date Update', 'Username', 'msisdn', 'Status Claim', 'tanggal_claim', 'Datetime Submit Claim', 'Datetime Open Form'));
 
             // output each row of the data
-            foreach ($sql as $key => $result) {
+            foreach ($sql as $result) {
                 $no++;
-                $data = array($no, $result['date_update'], $result['username'], $result['msisdn'], $result['status_claim'], $result['tanggal_claim'], $result['datetime_claim'], $result['datetime_open_form']);
+                $data = array($no, $result->date_update, $result->username, $result->msisdn, $result->status_claim, $result->tanggal_claim, $result->datetime_claim, $result->datetime_open_form);
                 fputcsv($file, $data);
             }
 
@@ -1531,10 +1560,10 @@ class ChamberController extends Controller
         $regional       = $request->regional;
 
         if ($keyword_page == ''){
-            return Core::setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['keyword_page' => "Keyword page tidak boleh kosong"]);
         }
         if ($regional == ''){
-            return Core::setResponse('error', ['regional' => "Regional tidak boleh kosong"]);
+            return $this->core->setResponse('error', ['regional' => "Regional tidak boleh kosong"]);
         }
 
         $query = DB::connection("mysqlChamber")->select("SELECT cluster_name,branch_name, regional,
@@ -1561,10 +1590,10 @@ class ChamberController extends Controller
         ");
 
         if (count($query) == 0) {
-            return Core::setResponse('not_found', ['result' => "Data tidak ada"]);
+            return $this->core->setResponse('not_found', ['result' => "Data tidak ada"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function upload_file_wabranch(Request $request)
@@ -1573,7 +1602,7 @@ class ChamberController extends Controller
         ini_set('max_execution_time', '-1');
 
         $file       = $request->file('upload_file');
-        $kondisi    = preg_replace('/[\/<>]/', '', htmlspecialchars($request->optradio));
+        $kondisi    = preg_replace('/[\/<>]/', '', htmlspecialchars($request->input('optradio')));
 
         if ($kondisi == 'wl') {
             DB::connection("mysqlChamber")->select("TRUNCATE TABLE wl_wabranch1");
@@ -1582,21 +1611,23 @@ class ChamberController extends Controller
             DB::connection("mysqlChamber")->select("TRUNCATE TABLE wl_wabranch4");
 
         } elseif ($kondisi == 'flag') {
-            $isi_list = $request->multi_opt;
+            $isi = $request->input('multi_opt');
 
-            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch1 where flag IN ($isi_list)");
-            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch2 where flag IN ($isi_list)");
-            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch3 where flag IN ($isi_list)");
-            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch4 where flag IN ($isi_list)");
+            $isi_list = implode(",", $isi);
+
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch1 where flag IN ('$isi_list')");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch2 where flag IN ('$isi_list')");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch3 where flag IN ('$isi_list')");
+            DB::connection("mysqlChamber")->select("DELETE FROM wl_wabranch4 where flag IN ('$isi_list')");
 
         } elseif ($kondisi == 'no') {
             if (empty($file))
             {
-                return Core::setResponse("error", ['file' => "File kosong, harap diinput"]);
+                return $this->core->setResponse("error", ['file' => "File kosong, harap diinput"]);
             }
 
         } else {
-            return Core::setResponse("error", ['optradio' => "optradio salah input. Pilihan: wl, flag, no"]);
+            return $this->core->setResponse("error", ['optradio' => "optradio salah input. Pilihan: wl, flag, no"]);
         }
 
         if (!empty($file))
@@ -1608,7 +1639,7 @@ class ChamberController extends Controller
             $allowed_extensions = array("xlsx");
 
             if(!in_array(strtolower($extension), $allowed_extensions)) {
-                return Core::setResponse("success", ['type' => "Format file harus .xlxs"]);
+                return $this->core->setResponse("success", ['type' => "Format file harus .xlxs"]);
             }
 
             $file->move(storage_path('file_xlxs'), $file_oriname);
@@ -1624,7 +1655,7 @@ class ChamberController extends Controller
 
             if (count($worksheetNames) > '11') {
                 unlink(storage_path("/file_xlxs/$file_oriname"));
-                return Core::setResponse("error", ['cluster' => "Cluster kurang dari 11"]);
+                return $this->core->setResponse("error", ['cluster' => "Cluster kurang dari 11"]);
             }
 
             $spreadSheetAry = [];
@@ -1683,24 +1714,41 @@ class ChamberController extends Controller
 
             unlink(storage_path("/file_xlxs/$file_oriname"));
 
-            if ($kondisi == 'wl') {
-                $ar = ['info' => "Semua region WL WABRANCH berhasil dihapus dan data file upload berhasil disimpan"];
-            } elseif ($kondisi == 'flag') {
-                $ar = ['info' => "Flag $isi_list berhasil dihapus dan data file upload berhasil disimpan"];
-            } else {
-                $ar = ['info' => "Data berhasil disimpan"];
+            $option = "";
+
+            $flag =  DB::connection("mysqlChamber")->select('SELECT DISTINCT flag FROM wl_wabranch1');
+
+            foreach ($flag as $value) {
+                $option .= "<option value='".$value->flag."'>".$value->flag."</option>";
             }
 
-            return Core::setResponse("success", $ar);
+            if ($kondisi == 'wl') {
+                $ar = ['info' => "Semua region WL WABRANCH berhasil dihapus dan data file upload berhasil disimpan",  'option' => $option];
+            } elseif ($kondisi == 'flag') {
+                $ar = ['info' => "Flag $isi_list berhasil dihapus dan data file upload berhasil disimpan", 'option' => $option];
+            } else {
+                $ar = ['info' => "Data berhasil disimpan",  'option' => $option];
+            }
+
+            return $this->core->setResponse("success", $ar);
 
         } else {
-            if ($kondisi == 'wl') {
-                $ar = ['info' => "Semua region WL WABRANCH berhasil dihapus"];
-            } elseif ($kondisi == 'flag') {
-                $ar = ['info' => "Flag $isi_list berhasil dihapus"];
+
+            $option = "";
+
+            $flag =  DB::connection("mysqlChamber")->select('SELECT DISTINCT flag FROM wl_wabranch1');
+
+            foreach ($flag as $value) {
+                $option .= "<option value='".$value->flag."'>".$value->flag."</option>";
             }
 
-            return Core::setResponse("success", $ar);
+            if ($kondisi == 'wl') {
+                $ar = ['info' => "Semua region WL WABRANCH berhasil dihapus", 'option' => $option];
+            } elseif ($kondisi == 'flag') {
+                $ar = ['info' => "Flag $isi_list berhasil dihapus", 'option' => $option];
+            }
+
+            return $this->core->setResponse("success", $ar);
         }
 
     }
@@ -1715,7 +1763,7 @@ class ChamberController extends Controller
         $ftype = htmlentities($request->ftype);
 
         if ($ftype == '') {
-            return Core::setResponse("error", ['ftype' => "Parameter ftype harus terisi"]);
+            return $this->core->setResponse("error", ['ftype' => "Parameter ftype harus terisi"]);
         }
 
         $tmp = explode('_',$ftype);
@@ -1737,7 +1785,7 @@ class ChamberController extends Controller
                 $region = '4';
             break;
             default:
-                return Core::setResponse("not_found", ["region" => "Region tidak ada"]);
+                return $this->core->setResponse("not_found", ["region" => "Region tidak ada"]);
         }
 
         switch($flag)
@@ -1782,7 +1830,7 @@ class ChamberController extends Controller
                 $flag_type = 'branch';
             break;
             default:
-                return Core::setResponse("not_found", ["flag" => "Flag tidak ada"]);
+                return $this->core->setResponse("not_found", ["flag" => "Flag tidak ada"]);
 
         }
 
@@ -1800,9 +1848,10 @@ class ChamberController extends Controller
 
                     $sql = $q;
                     $output = array();
+                    $output["table"] = "";
                     //$output["sql"] = $q;
                     $index = 0;
-                    foreach ($sql as $key => $row)
+                    foreach ($sql as $row)
                     {
                         $output["data"][$index] = htmlentities($row);
                         $output["datanya"][$index]= htmlentities($row);
@@ -1852,10 +1901,11 @@ class ChamberController extends Controller
 
                 $sql = $q;
                 $output = array();
+                $output["table"] = "";
                 //$output["sql"] = $q;
                 $index = 0;
                 // while($row =mysqli_fetch_object($sql))
-                foreach ($sql as $key => $row)
+                foreach ($sql as $row)
                 {
                     $output["data"][$index] = htmlentities($row);
                     $output["datanya"][$index]=htmlentities($row);
@@ -1901,10 +1951,11 @@ class ChamberController extends Controller
 
                 $sql = $q;
                 $output = array();
+                $output["table"] = "";
                 //$output["sql"] = $q;
                 $index = 0;
                 // while($row =mysqli_fetch_object($sql))
-                foreach ($sql as $key => $row)
+                foreach ($sql as $row)
                 {
                     $output["data"][$index] = htmlentities($row);
                     $output["datanya"][$index]=htmlentities($row);
@@ -1939,13 +1990,13 @@ class ChamberController extends Controller
                 break;
 
             default:
-                return Core::setResponse("not_found", ["Flag type tidak ada"]);
+                return $this->core->setResponse("not_found", ["Flag type tidak ada"]);
 
         }
 
         $output["type"] =  preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlentities(htmlspecialchars($request->ftype)));
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function save_adm_menu(Request $request)
@@ -1962,7 +2013,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -1983,9 +2034,9 @@ class ChamberController extends Controller
             $query = DB::connection("mysqlChamber")->table('boopati_menu')->insert($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data Menu telah ditambahkan"]);
+                return $this->core->setResponse("success", ['info' => "Data Menu telah ditambahkan"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal ditambahkan"]);
             }
 
         }
@@ -2005,7 +2056,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2028,9 +2079,9 @@ class ChamberController extends Controller
                         ->update($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data Menu telah diupdate"]);
+                return $this->core->setResponse("success", ['info' => "Data Menu telah diupdate"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal diupdate"]);
             }
 
         }
@@ -2042,9 +2093,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->table('boopati_menu')->where('id_menu','=',$id)->delete();
 
         if ($query) {
-            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+            return $this->core->setResponse("success", ['info' => "Data berhasil dihapus"]);
         } else {
-            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+            return $this->core->setResponse("error", ['info' => "Data gagal dihapus"]);
         }
     }
 
@@ -2061,7 +2112,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2078,9 +2129,9 @@ class ChamberController extends Controller
             $query = DB::connection("mysqlChamber")->table('boopati_loader')->insert($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data Loader telah ditambahkan"]);
+                return $this->core->setResponse("success", ['info' => "Data Loader telah ditambahkan"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal ditambahkan"]);
             }
 
         }
@@ -2098,7 +2149,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2115,9 +2166,9 @@ class ChamberController extends Controller
                         ->update($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data Loader telah diupdate"]);
+                return $this->core->setResponse("success", ['info' => "Data Loader telah diupdate"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal diupdate"]);
             }
 
         }
@@ -2129,9 +2180,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->table('boopati_loader')->where('id_loader','=',$id)->delete();
 
         if ($query) {
-            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+            return $this->core->setResponse("success", ['info' => "Data berhasil dihapus"]);
         } else {
-            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+            return $this->core->setResponse("error", ['info' => "Data gagal dihapus"]);
         }
     }
 
@@ -2140,9 +2191,9 @@ class ChamberController extends Controller
         $query = DB::connection("mysqlChamber")->table('boopati_loader')->get();
 
         if (count($query) == 0) {
-            return Core::setResponse("not_found", ['info' => "Table Empty"]);
+            return $this->core->setResponse("not_found", ['info' => "Table Empty"]);
         } else {
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         }
     }
 
@@ -2304,7 +2355,7 @@ class ChamberController extends Controller
             }
         }
 
-        return Core::setResponse("success", $txt);
+        return $this->core->setResponse("success", $txt);
     }
 
     public function history_login()
@@ -2312,10 +2363,10 @@ class ChamberController extends Controller
         $query = DB::connection("mysqlChamber")->select("SELECT * from boopati_history where datetimelog >= now() - interval  7 day order by datetimelog desc");
 
         if (count($query) == 0) {
-            return Core::setResponse("not_found", ['result' => "Data Empty"]);
+            return $this->core->setResponse("not_found", ['result' => "Data Empty"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function save_adm_userTDC(Request $request)
@@ -2329,7 +2380,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2346,9 +2397,9 @@ class ChamberController extends Controller
             $query = DB::connection("mysqlChamber")->table('users')->insert($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data User telah ditambahkan"]);
+                return $this->core->setResponse("success", ['info' => "Data User telah ditambahkan"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal ditambahkan"]);
             }
 
         }
@@ -2364,7 +2415,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2379,9 +2430,9 @@ class ChamberController extends Controller
                         ->update($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data User telah diupdate"]);
+                return $this->core->setResponse("success", ['info' => "Data User telah diupdate"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal diupdate"]);
             }
 
         }
@@ -2393,9 +2444,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->table('users')->where('id_users','=',$id)->delete();
 
         if ($query) {
-            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+            return $this->core->setResponse("success", ['info' => "Data berhasil dihapus"]);
         } else {
-            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+            return $this->core->setResponse("error", ['info' => "Data gagal dihapus"]);
         }
     }
 
@@ -2408,7 +2459,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2436,9 +2487,9 @@ class ChamberController extends Controller
             $query = DB::connection("mysqlChamber")->table('users')->insert($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data User telah ditambahkan"]);
+                return $this->core->setResponse("success", ['info' => "Data User telah ditambahkan"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal ditambahkan"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal ditambahkan"]);
             }
 
         }
@@ -2454,7 +2505,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2469,9 +2520,9 @@ class ChamberController extends Controller
                         ->update($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data User telah diupdate"]);
+                return $this->core->setResponse("success", ['info' => "Data User telah diupdate"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal diupdate"]);
             }
 
         }
@@ -2483,9 +2534,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->table('users')->where('id_users','=',$id)->delete();
 
         if ($query) {
-            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+            return $this->core->setResponse("success", ['info' => "Data berhasil dihapus"]);
         } else {
-            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+            return $this->core->setResponse("error", ['info' => "Data gagal dihapus"]);
         }
     }
 
@@ -2497,7 +2548,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2511,9 +2562,9 @@ class ChamberController extends Controller
                         ->update($data);
 
             if ($query) {
-                return Core::setResponse("success", ['info' => "Data User telah diupdate"]);
+                return $this->core->setResponse("success", ['info' => "Data User telah diupdate"]);
             } else {
-                return Core::setResponse("error", ['info' => "Data gagal diupdate"]);
+                return $this->core->setResponse("error", ['info' => "Data gagal diupdate"]);
             }
 
         }
@@ -2524,7 +2575,7 @@ class ChamberController extends Controller
         $roles = $request->roles;
 
         if ($roles == '') {
-            return Core::setResponse("error", ['roles' => "Parameter roles harus diisi!"]);
+            return $this->core->setResponse("error", ['roles' => "Parameter roles harus diisi!"]);
         }
 
         if ($roles == 'cluster') {
@@ -2532,14 +2583,14 @@ class ChamberController extends Controller
         } elseif ($roles == 'su' || $roles == 'branch') {
             $query = DB::connection("mysqlChamber")->select("SELECT * FROM users WHERE roles = '$roles'");
         } else {
-            return Core::setResponse("not_found", ['roles' => "Roles tidak ditemukan"]);
+            return $this->core->setResponse("not_found", ['roles' => "Roles tidak ditemukan"]);
         }
 
         if (count($query) == 0) {
-            return Core::setResponse("error", ['result' => "Data Empty!"]);
+            return $this->core->setResponse("error", ['result' => "Data Empty!"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function list_user_tdc(Request $request)
@@ -2548,7 +2599,7 @@ class ChamberController extends Controller
         $id_cluster = $request->id_cluster;
 
         if ($roles == '') {
-            return Core::setResponse("error", ['roles' => "Parameter roles harus diisi!"]);
+            return $this->core->setResponse("error", ['roles' => "Parameter roles harus diisi!"]);
         }
 
         if($roles == 'su'){
@@ -2562,10 +2613,10 @@ class ChamberController extends Controller
         }
 
         if (count($query) == 0) {
-            return Core::setResponse("error", ['result' => "Data Empty!"]);
+            return $this->core->setResponse("error", ['result' => "Data Empty!"]);
         }
 
-        return Core::setResponse("success", $query);
+        return $this->core->setResponse("success", $query);
     }
 
     public function adm_get_branch(Request $request)
@@ -2579,7 +2630,7 @@ class ChamberController extends Controller
         }
 
         if (count($query) == 0) {
-            return Core::setResponse("error", ['result' => "Data Empty!"]);
+            return $this->core->setResponse("error", ['result' => "Data Empty!"]);
         }
 
         $output = array();
@@ -2592,7 +2643,7 @@ class ChamberController extends Controller
         }
 
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function adm_get_cluster(Request $request)
@@ -2606,7 +2657,7 @@ class ChamberController extends Controller
         }
 
         if (count($query) == 0) {
-            return Core::setResponse("error", ['result' => "Data Empty!"]);
+            return $this->core->setResponse("error", ['result' => "Data Empty!"]);
         }
 
         $output = array();
@@ -2618,7 +2669,7 @@ class ChamberController extends Controller
             );
         }
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function adm_get_tdc_id(Request $request)
@@ -2692,7 +2743,7 @@ class ChamberController extends Controller
         $output['result']['selectcluster']=htmlentities($txtcluster);
         $output['result']['selecttdc']=htmlentities($txttdc);
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function adm_get_tdc(Request $request)
@@ -2706,7 +2757,7 @@ class ChamberController extends Controller
         }
 
         if (count($query) == 0) {
-            return Core::setResponse("error", ['result' => "Data Empty!"]);
+            return $this->core->setResponse("error", ['result' => "Data Empty!"]);
         }
 
         $output = array();
@@ -2714,7 +2765,7 @@ class ChamberController extends Controller
             $output['result'][] = $result;
         }
 
-        return Core::setResponse("success", $output);
+        return $this->core->setResponse("success", $output);
     }
 
     public function save_table_map(Request $request)
@@ -2738,7 +2789,7 @@ class ChamberController extends Controller
             $file_size  = $file->getSize();
             $max_size	= 500000000; //5mb
             if ($file_size > $max_size) {
-                return Core::setResponse("error", ['info' => "File max size 5 mb"]);
+                return $this->core->setResponse("error", ['info' => "File max size 5 mb"]);
             }
 
             $file_oriname   = $file->getClientOriginalName();
@@ -2748,7 +2799,7 @@ class ChamberController extends Controller
             $allowed_extensions = array("png, jpg, jpeg");
 
             if(!in_array(strtolower($extension), $allowed_extensions)) {
-                return Core::setResponse("error", ['type' => "Format file harus png | jpg | jpeg"]);
+                return $this->core->setResponse("error", ['type' => "Format file harus png | jpg | jpeg"]);
             }
 
             $file->move(storage_path('img_chamber'), $file_oriname);
@@ -2834,14 +2885,14 @@ class ChamberController extends Controller
 
             if (count($query) == 0) {
                 DB::connection("mysqlChamber")->commit();
-                return Core::setResponse("success", ['info' => "Data Berhasil Ditambah"]);
+                return $this->core->setResponse("success", ['info' => "Data Berhasil Ditambah"]);
             }
 
 
         } catch (\Throwable $th) {
             DB::connection("mysqlChamber")->rollback();
 
-            return Core::setResponse("error", ['info' => "Gagal simpan ke database"]);
+            return $this->core->setResponse("error", ['info' => "Gagal simpan ke database"]);
         }
 
     }
@@ -2863,7 +2914,7 @@ class ChamberController extends Controller
             $file_size  = $file->getSize();
             $max_size	= 500000000; //5mb
             if ($file_size > $max_size) {
-                return Core::setResponse("error", ['info' => "File max size 5 mb"]);
+                return $this->core->setResponse("error", ['info' => "File max size 5 mb"]);
             }
 
             $file_oriname   = $file->getClientOriginalName();
@@ -2873,7 +2924,7 @@ class ChamberController extends Controller
             $allowed_extensions = array("png, jpg, jpeg");
 
             if(!in_array(strtolower($extension), $allowed_extensions)) {
-                return Core::setResponse("error", ['type' => "Format file harus png | jpg | jpeg"]);
+                return $this->core->setResponse("error", ['type' => "Format file harus png | jpg | jpeg"]);
             }
 
             $file->move(storage_path('img_chamber'), $file_oriname);
@@ -2900,7 +2951,7 @@ class ChamberController extends Controller
                         ->update($data);
 
         if (count($query) == 0) {
-            return Core::setResponse("success", ['result' => "Data Berhasil Ditambah"]);
+            return $this->core->setResponse("success", ['result' => "Data Berhasil Ditambah"]);
         }
 
     }
@@ -2910,9 +2961,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->table('boopati_table_mapped_by_region')->where('id_boopati_table_mapped_by_region','=',$id)->delete();
 
         if ($query) {
-            return Core::setResponse("success", ['info' => "Data berhasil dihapus"]);
+            return $this->core->setResponse("success", ['info' => "Data berhasil dihapus"]);
         } else {
-            return Core::setResponse("error", ['info' => "Data gagal dihapus"]);
+            return $this->core->setResponse("error", ['info' => "Data gagal dihapus"]);
         }
     }
 
@@ -2921,9 +2972,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->table('boopati_table_mapped_by_region')->get();
 
         if (count($query) != 0) {
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         } else {
-            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+            return $this->core->setResponse("not_found", ['info' => "Data Empty"]);
         }
     }
 
@@ -2932,9 +2983,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->select('SELECT DISTINCT flag FROM wl_wabranch1');
 
         if (count($query) != 0) {
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         } else {
-            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+            return $this->core->setResponse("not_found", ['info' => "Data Empty"]);
         }
     }
 
@@ -2947,7 +2998,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2957,9 +3008,9 @@ class ChamberController extends Controller
             $query = DB::connection("mysqlChamber")->select("SELECT COUNT(*) AS count_msisdn FROM ".$table_obc_msisdn." WHERE branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL");
 
             if (count($query) == 0) {
-                return Core::setResponse("not_found", ["result" => "Data Empty"]);
+                return $this->core->setResponse("not_found", ["result" => "Data Empty"]);
             } else {
-                return Core::setResponse("success", $query);
+                return $this->core->setResponse("success", $query);
             }
 
         }
@@ -2977,7 +3028,7 @@ class ChamberController extends Controller
 
         if ($validator->fails()) {
 
-            return Core::setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
+            return $this->core->setResponse("error", ["info" => "Semua Kolom Wajib Diisi!"]);
 
         } else {
 
@@ -2985,13 +3036,18 @@ class ChamberController extends Controller
 
             try {
 
-                $id_users 		    = $request->id_users;
-                $table_obc_msisdn   = $request->table_obc_msisdn;
-                $branch_name        = $request->branch_name;
-                $tanggal  		    = Carbon::now()->format('Y-m-d')->timezone("Asia/Jakarta");
+                $id_users 		    = $request->input('id_users');
+                $username 		    = $request->input('username');
+                $table_obc_msisdn   = $request->input('table_obc_msisdn');
+                $branch_name        = $request->input('branch_name');
+                $tanggal  		    = Carbon::now()->timezone("Asia/Jakarta")->format('Y-m-d');
+                $datetime  		    = Carbon::now()->timezone("Asia/Jakarta");
 
                 // insert history
-                $query_history 	= DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data for ".$id_users." OBC','Begin','',now())");
+                $query_history 	= DB::connection("mysqlChamber")->select("INSERT INTO boopati_history(username,activity,status,errorcode,datetimelog) VALUES (?,?,?,?,?)", [$username,
+                "Retrieve Data for $id_users OBC",'Begin',' ',$datetime]);
+
+                // print_r($query_history); exit;
 
                 $kondisi =  "branch_lacci = '".$branch_name."' AND temp_user IS NULL AND remark_claim IS NULL LIMIT 50000";
 
@@ -3006,16 +3062,16 @@ class ChamberController extends Controller
                     $j++;
                 }
 
-                $query_history = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values ('".$username."','Retrieve Data with ".$j." attempt OBC','Sukses','',now())");
+                $query_history = DB::connection("mysqlChamber")->select("INSERT into boopati_history(username,activity,status,errorcode,datetimelog) values (?,?,?,?,?)", [$username,"Retrieve Data with $j attempt OBC",'Sukses',' ', $datetime]);
 
                 DB::connection("mysqlChamber")->commit();
 
-                return Core::setResponse("success", ['info' => "Sukses proses data"]);
+                return $this->core->setResponse("success", "Sukses proses data");
 
             } catch (\Throwable $th) {
                 DB::connection("mysqlChamber")->rollback();
 
-                return Core::setResponse("error", ["info" => "Gagal ambil data"]);
+                return $this->core->setResponse("error", "Gagal ambil data");
             }
         }
 
@@ -3041,12 +3097,12 @@ class ChamberController extends Controller
 
             DB::connection("mysqlChamber")->commit();
 
-            return Core::setResponse("success", ['info' => "Data sukses diproses"]);
+            return $this->core->setResponse("success", ['info' => "Data sukses diproses"]);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlChamber")->rollback();
 
-            return Core::setResponse("error", ['info' => "Gagal diproses"]);
+            return $this->core->setResponse("error", ['info' => "Gagal diproses"]);
         }
 
     }
@@ -3061,7 +3117,7 @@ class ChamberController extends Controller
 
         $query = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim set status_claim='".$hasil."',keterangan = '".$catatan."',tanggal_claim = now(), datetime_claim=now(), datetime_open_form = '".$jamklik."' where msisdn='".$msisdnkirim."' and id_users='".$id_users."'");
 
-        return Core::setResponse("success", ['info' => "Data sukses diproses"]);
+        return $this->core->setResponse("success", ['info' => "Data sukses diproses"]);
     }
 
     public function list_region()
@@ -3069,9 +3125,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->select('SELECT * FROM region');
 
         if (count($query) != 0) {
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         } else {
-            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+            return $this->core->setResponse("not_found", ['info' => "Data Empty"]);
         }
     }
 
@@ -3080,9 +3136,9 @@ class ChamberController extends Controller
         $query =  DB::connection("mysqlChamber")->select('SELECT * FROM cluster');
 
         if (count($query) != 0) {
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         } else {
-            return Core::setResponse("not_found", ['info' => "Data Empty"]);
+            return $this->core->setResponse("not_found", ['info' => "Data Empty"]);
         }
     }
 
@@ -3141,7 +3197,7 @@ class ChamberController extends Controller
                             '".$username."',
                         now(), '1')");
 
-                        $id_file_import = DB::getPdo()->lastInsertId();
+                        $id_file_import = DB::connection("mysqlChamber")->getPdo()->lastInsertId();
                         $doquery        = $query_file_import;
 
                         $msg = "Data telah ditambahkan";
@@ -3157,31 +3213,39 @@ class ChamberController extends Controller
 
                         $data_import = array();
 
-                        while(!feof($file)){
-                            $data_import[] = explode($delimiter, fgetcsv($file,2000,$delimiter));
-                        }
+                        // while(!feof($file)){
+                        // fgets($file);  // read one line for nothing (skip header)
+                        // while (($val = fgetcsv($file, 10000, $delimiter)) !== FALSE) {
+                        //     // $data_import[] = explode($delimiter, fgetcsv($file,2000,$delimiter));
+                        //     $data_import[] = explode($delimiter, fgetcsv($file, 10000, $delimiter));
+                        // }
 
-                        $fileHeader = $data_import[0];
-                        // unset($data_import[0]);
-                        $total_data   = count($data_import);
-                        $total_insert = 0;
+                        // $fileHeader = $data_import[0];
+                        // // unset($data_import[0]);
+                        // $total_data   = count($data_import);
+                        // $total_insert = 0;
 
-                        $tmp = date("Y-m-d", strtotime(convertTgl($fileHeader[0])));
 
-                        // validasi template menghitung dari header
-                        if(count($fileHeader) != 3 or strlen($fileHeader[0]) < 11 or strpos($fileHeader[0],'E+') !== false or $tmp=='1970-01-01' or $tmp < date("Y-m-d", strtotime("-3 weeks")) or $tmp > date("Y-m-d", strtotime("+1 weeks"))){ // validasi template false
-                            unlink($file_loc); // remove file jika validasi gagal
 
-                            return Core::setResponse("error", ['file' => 'Data gagal diupload. Format file / template tidak sesuai', 'alert' => 'danger']);
+                        // foreach($data_import as $val){
+                        fgets($file);  // read one line for nothing (skip header)
+                        while (($val = fgetcsv($file, 10000, $delimiter)) !== FALSE) {
 
-                        } else {
+                            $tmp = date("Y-m-d", strtotime($val[1]));
 
-                            foreach($data_import as $val){
-                                $valDate        = date("Y-m-d", strtotime(convertTgl($val[1])));
+                            // validasi template menghitung dari header
+                            if(count($val) != 3 or strlen($val[0]) < 11 or strpos($val[0],'E+') !== false or $tmp=='1970-01-01' or $tmp < date("Y-m-d", strtotime("-3 weeks")) or $tmp > date("Y-m-d", strtotime("+1 weeks"))){ // validasi template false
+                                unlink($file_loc); // remove file jika validasi gagal
+
+                                return $this->core->setResponse("error", ['file' => 'Data gagal diupload. Format file / template tidak sesuai', 'alert' => 'danger']);
+
+                            } else {
+
+                                $valDate        = date("Y-m-d", strtotime($val[1]));
                                 $msisdn         = str_replace(['\r', '"'], '', $val[0]);
-                                $date_remark    = htmlspecialchars(date("Y-m-d", strtotime(convertTgl($val[1]))));
+                                $date_remark    = htmlspecialchars(date("Y-m-d", strtotime($val[1])));
 
-                                if($msisdn != '' and strpos($fileHeader[0],'E+') == false and $valDate!='1970-01-01' and $valDate>date("Y-m-d", strtotime("-3 weeks")) and $valDate<date("Y-m-d", strtotime("+1 weeks"))){
+                                if($msisdn != '' and strpos($val[0],'E+') == false and $valDate!='1970-01-01' and $valDate>date("Y-m-d", strtotime("-3 weeks")) and $valDate<date("Y-m-d", strtotime("+1 weeks"))){
 
                                     $q_claim = DB::connection("mysqlChamber")->select("SELECT * FROM boopati_whitelist_claim
                                     WHERE msisdn = '".$msisdn."' AND tanggal_claim = '".$date_remark."' AND flag = '".$flag."'");
@@ -3191,12 +3255,12 @@ class ChamberController extends Controller
 
                                     if($count_check_claim == 0){ // blm terclaim
                                         $status_telepon   = str_replace(['\r', '\n', '"'], '', htmlspecialchars($val[2]));
-                                        $date_remark      = htmlspecialchars(date("Y-m-d", strtotime(convertTgl($val[1]))));
+                                        $date_remark      = htmlspecialchars(date("Y-m-d", strtotime($val[1])));
 
-                                        $query_insert = DB::connection("mysqlChamber")->select("UPDATE $table_obc_msisdn set remark_claim='$tap_user', status_telepon='$status_telepon', date_upload = NOW() where msisdn='$msisdn'");
+                                        $query_insert = DB::connection("mysqlChamber")->select("UPDATE $table_name set remark_claim='$tap_user', status_telepon='$status_telepon', date_upload = NOW() where msisdn='$msisdn'");
 
                                         $query_insert2    = DB::connection("mysqlChamber")->select("INSERT INTO boopati_whitelist_claim (msisdn, status_claim, tanggal_claim, datetime_claim, flag, table_name, id_users, id_file_import)
-                                        VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$id_users', '$id_file_import')");
+                                        VALUES('$msisdn', '$status_telepon', '$date_remark', '$date_remark', '$flag', '$table_name', '$tap_user', '$id_file_import')");
 
                                         $count_insert_uploaded++;
 
@@ -3207,39 +3271,38 @@ class ChamberController extends Controller
                                 }
                             }
 
-                            $fix_return = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim SET status_claim = REPLACE(REPLACE(status_claim, '\r', ''), '\n', '') WHERE flag = 'wabranch'");
+                        }
+                        $fix_return = DB::connection("mysqlChamber")->select("UPDATE boopati_whitelist_claim SET status_claim = REPLACE(REPLACE(status_claim, '\r', ''), '\n', '') WHERE flag = 'wabranch'");
 
-                            $import_summary = DB::connection("mysqlChamber")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, date_upload)
-                                VALUES('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', NOW())");
+                        $import_summary = DB::connection("mysqlChamber")->select("INSERT INTO boopati_file_import_summary (id_file_import, claimed, uploaded, date_upload)
+                            VALUES('$id_file_import', '$count_insert_claimed', '$count_insert_uploaded', NOW())");
 
-                            fclose($file);
+                        fclose($file);
 
-                            if(count($import_summary) == 0){
+                        if(count($import_summary) == 0){
 
-                                return Core::setResponse("success", ['info' => 'Data telah ditambahkan.', 'alert' => 'success']);
+                            return $this->core->setResponse("success", ['info' => 'Data telah ditambahkan.', 'alert' => 'success']);
 
-                            } else {
-                                unlink($file_loc);
+                        } else {
+                            unlink($file_loc);
 
-                                return Core::setResponse("error", ['info' => 'Data gagal ditambahkan.', 'alert' => 'danger']);
-                            }
-
+                            return $this->core->setResponse("error", ['info' => 'Data gagal ditambahkan.', 'alert' => 'danger']);
                         }
 
                     } else {
-                        return Core::setResponse("error", ['file_upload' => 'File gagal diupload', 'alert' => 'danger']);
+                        return $this->core->setResponse("error", ['file_upload' => 'File gagal diupload', 'alert' => 'danger']);
                     }
 
                 } else {
-                    return Core::setResponse("error", ['file_size' => 'Maksimal Upload 10 MB', 'alert' => 'danger']);
+                    return $this->core->setResponse("error", ['file_size' => 'Maksimal Upload 10 MB', 'alert' => 'danger']);
                 }
 
             } else {
-                return Core::setResponse("error", ['format_file' => 'Format file harus .CSV', 'alert' => 'danger']);
+                return $this->core->setResponse("error", ['format_file' => 'Format file harus .CSV', 'alert' => 'danger']);
             }
 
         } else {
-            return Core::setResponse("error", ['file' => 'File Import harus diisi!', 'alert' => 'danger']);
+            return $this->core->setResponse("error", ['file' => 'File Import harus diisi!', 'alert' => 'danger']);
         }
 
     }
@@ -3257,9 +3320,9 @@ class ChamberController extends Controller
                     ->get();
 
         if (count($query) == 0) {
-            return Core::setResponse("not_found", ["info" => "Data Empty"]);
+            return $this->core->setResponse("not_found", ["info" => "Data Empty"]);
         } else {
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         }
     }
 

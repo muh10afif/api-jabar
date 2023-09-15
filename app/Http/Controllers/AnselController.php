@@ -14,20 +14,25 @@ use Carbon\Carbon;
 
 class AnselController extends Controller
 {
+    public function __construct()
+    {
+        $this->core = new Core();
+    }
+
     public function cek_login(Request $request)
     {
         $username = $request->username;
 
         if ($username == '') {
-            return Core::setResponse("error", "Username harus terisi");
+            return $this->core->setResponse("error", "Username harus terisi");
         }
 
         $query = DB::connection("mysqlAnsel")->select("select * from tbl_user u inner join tbl_roles r on u.id_roles = r.id_roles where username = '".$username."' and block = '0'");
 
         if(empty($query)){
-            return Core::setResponse("not_found", "Data Empty");
+            return $this->core->setResponse("not_found", "Data Empty");
         }else{
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         }
     }
 
@@ -46,11 +51,11 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", "Data berhasil dihapus");
+            return $this->core->setResponse("success", "Data berhasil dihapus");
         } catch (\Throwable $th) {
 
             DB::connection("mysqlAnsel")->rollback();
-            return Core::setResponse("error", "Data gagal dihapus");
+            return $this->core->setResponse("error", "Data gagal dihapus");
         }
 
     }
@@ -63,9 +68,9 @@ class AnselController extends Controller
         ORDER BY c.id_project DESC");
 
         if(empty($query)){
-            return Core::setResponse("not_found", "Data Empty");
+            return $this->core->setResponse("not_found", "Data Empty");
         }else{
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
         }
     }
 
@@ -80,11 +85,11 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         if($nama_roles != 'administrator'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         $id = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($id));
@@ -98,11 +103,11 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", $data);
+            return $this->core->setResponse("success", $data);
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
     }
@@ -118,11 +123,11 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         if($nama_roles != 'administrator'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         $id = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($id));
@@ -136,11 +141,11 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", $data);
+            return $this->core->setResponse("success", $data);
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
     }
@@ -156,11 +161,11 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         if($nama_roles != 'administrator'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         $id = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($id));
@@ -179,12 +184,12 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", ['configure' => $configure, 'data_peserta' => $data_peserta]);
+            return $this->core->setResponse("success", ['configure' => $configure, 'data_peserta' => $data_peserta]);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
     }
@@ -202,11 +207,11 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         if($nama_roles != 'administrator'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         $project    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($project));
@@ -225,12 +230,12 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", ['project_exists' => (count($query) > 0 ? 1 : 0)]);
+            return $this->core->setResponse("success", ['project_exists' => (count($query) > 0 ? 1 : 0)]);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
     }
@@ -240,7 +245,7 @@ class AnselController extends Controller
         $id_project = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($id));
 
         if ($id_project == '') {
-            return Core::setResponse("error", "Id project harus diisi");
+            return $this->core->setResponse("error", "Id project harus diisi");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -253,12 +258,12 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", ['project' => $project, 'configure' => $configure, 'hadiah' => $hadiah, 'peserta' => $peserta]);
+            return $this->core->setResponse("success", ['project' => $project, 'configure' => $configure, 'hadiah' => $hadiah, 'peserta' => $peserta]);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "Data gagal diproses");
+            return $this->core->setResponse("error", "Data gagal diproses");
         }
 
     }
@@ -274,8 +279,8 @@ class AnselController extends Controller
         $data_import = array();
         $data_hasil = array();
 
-        $data_hasil['berhasil'] = NULL;
-        $data_hasil['gagal'] = NULL;
+        $data_hasil['berhasil'] = "";
+        $data_hasil['gagal'] = "";
         $dept = NULL;
 
         while(! feof($file))
@@ -300,27 +305,28 @@ class AnselController extends Controller
         $i = 1;
         foreach(array_filter($data_import) as $index_import => $value_import){
 
-            if($value_import[0]!=''){
-                for($i = 0; $i <= $value_import[2]; $i++){
-                    $fielda = $value_import[0];
-                    $fieldb = $value_import[1];
-                    $fieldc = $value_import[2];
-                    $insert = DB::connection("mysqlAnsel")->select("INSERT into peserta_".$project."(fielda,fieldb,fieldc, status) values ('".$fielda."','".$fieldb."','".$fieldc."','0') ");
+            $fielda = $value_import[0];
+            $fieldb = $value_import[1];
+            $fieldc = $value_import[2];
+            $insert = DB::connection("mysqlAnsel")->select("INSERT into peserta_".$project."(fielda,fieldb,fieldc, status) values ('$fielda','$fieldb','$fieldc','0') ");
 
-                    if(count($insert) == 0){
-                        $data_hasil['berhasil'][] = $value_import;
-                    }else{
-                        $data_hasil['gagal'][] = "error";
-                    }
-                }
-
+            if(count($insert) == 0){
+                $data_hasil['berhasil'] = "Berhasil";
+            }else{
+                $data_hasil['gagal'] = "error";
             }
+            // if($value_import[0]!=''){
+            //     for($i = 0; $i <= count($value_import[2]); $i++){
+            //     }
+
+            // }
 
             $i++;
         }
         fclose($file);
 
         unlink($file_loc);
+
         return $data_hasil;
     }
 
@@ -343,8 +349,11 @@ class AnselController extends Controller
         return array_search(max($delimiters), $delimiters);
     }
 
-    public function save_update_project(Request $request, $id = null)
+    public function save_update_project(Request $request)
     {
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit','2048M');
+
         $input = $request->input();
 
         $user       = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('user_created')));
@@ -359,45 +368,31 @@ class AnselController extends Controller
         $aksi       = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('aksi')));
 
         $validator = Validator::make($request->all(), [
-            'aksi'          => 'required',
-            // 'user_created'  => 'required',
-            // 'name_project'  => 'required',
-            // 'description'   => 'required',
-            // 'field_a'       => 'required',
-            // 'field_b'       => 'required',
-            // 'field_c'       => 'required',
-            // 'hadiah'        => 'required',
+            'user_created'  => 'required',
+            'name_project'  => 'required',
+            'description'   => 'required',
+            'field_a'       => 'required',
+            'field_b'       => 'required',
+            'field_c'       => 'required',
+            'hadiah'        => 'required',
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
 
         try {
-            if($aksi == 'add'){
-                $project_query 	= DB::connection("mysqlAnsel")->select("INSERT into project(name_project, `description`, user_created, date_created) values(?, ?, ?, '".date('Y-m-d H:i:s')."')", [$project, $description, $user]);
 
-                $project_id 	= DB::connection("mysqlAnsel")->getPdo()->lastInsertId();
-            } else {
-                $project_id = $id;
+            DB::connection("mysqlAnsel")->select("INSERT into project(name_project, description, user_created, date_created) values(?, ?, ?, '".Carbon::now()->timezone('Asia/Jakarta')."')", [$project, $description, $user]);
 
-		        $project_query 	= DB::connection("mysqlAnsel")->select("UPDATE project set name_project = ?, `description` = ?, user_created = ? where id_project = ?", [$project,$description,$user,$project_id]);
-            }
+            $project_id 	= DB::connection("mysqlAnsel")->getPdo()->lastInsertId();
 
-            if($aksi == 'add'){
-                $configure_query = DB::connection("mysqlAnsel")->select("INSERT into configure(id_project, field1, field2, field3) values(?, ?, ?, ?)", [$project_id,$field_a,$field_b,$field_c]);
-            } else {
-                $configure_query = DB::connection("mysqlAnsel")->select("update configure set field1 = ?, field2 = ?, field3 = ? where id_project = ?", [$field_a,$field_b,$field_c,$project_id]);
-            }
+            DB::connection("mysqlAnsel")->select("INSERT into configure(id_project, field1, field2, field3) values(?, ?, ?, ?)", [$project_id,$field_a,$field_b,$field_c]);
 
-            if($aksi == 'change'){
-                DB::connection("mysqlAnsel")->select("DELETE from hadiah where id_project = ?", [$project_id]);
-            }
-
-            foreach($hadiah as $data){
-                $hadiah_query = DB::connection("mysqlAnsel")->select("INSERT into hadiah(id_project, name_hadiah) values(?, ?)", [$project_id,"$data"]);
+            foreach($hadiah as $data){;
+                DB::connection("mysqlAnsel")->select("INSERT into hadiah(id_project, name_hadiah) values(?, ?)", [$project_id,"$data"]);
             }
 
             if($file != ''){
@@ -426,27 +421,236 @@ class AnselController extends Controller
                 // if(move_uploaded_file($file, storage_path("/file_csv/$file_name"))){
 
                     $file_loc   = storage_path("/file_csv/$file_name");
+
                     $delimiter  = $this->detectDelimiter($file_loc);
-                    $hasil      = $this->import_csv($delimiter, $file_name, htmlspecialchars($project_id));
+
+                    // $hasil      = $this->import_csv($delimiter, $file_name, htmlspecialchars($project_id));
+
+                    $file_loc       = storage_path("/file_csv/$file_name");
+                    // $new_name_file  = htmlspecialchars(str_replace("/", "", $file_name));
+                    //$new_name_file = htmlspecialchars(str_replace("\", "", $new_name_file));
+
+                    $file = fopen($file_loc,"r");
+
+                    $data_import = array();
+                    $data_hasil = array();
+
+                    $data_hasil['berhasil'] = "";
+                    $data_hasil['gagal'] = "";
+                    $dept = NULL;
+
+                    while(! feof($file))
+                    {
+                    $data_import[] = fgetcsv($file,1000,$delimiter);
+                    }
+                    if(!empty($data_import)){
+                        unset($data_import[0]);
+                    }
+
+                    DB::connection("mysqlAnsel")->select("DROP TABLE IF EXISTS peserta_".$project_id."");
+                    DB::connection("mysqlAnsel")->select("
+                        CREATE TABLE peserta_".$project_id." (
+                            id_peserta INT PRIMARY KEY AUTO_INCREMENT,
+                            fielda VARCHAR(255),
+                            fieldb VARCHAR(255),
+                            fieldc VARCHAR(255),
+                            status INT
+                        )
+                    ");
+
+                    $i = 1;
+                    foreach(array_filter($data_import) as $index_import => $value_import){
+
+                        $fielda = $value_import[0];
+                        $fieldb = $value_import[1];
+                        $fieldc = $value_import[2];
+                        $insert = DB::connection("mysqlAnsel")->select("INSERT into peserta_".$project_id."(fielda,fieldb,fieldc, status) values ('$fielda','$fieldb','$fieldc','0') ");
+
+                        if(count($insert) == 0){
+                            $data_hasil['berhasil'] = "Berhasil";
+                        }else{
+                            $data_hasil['gagal'] = "error";
+                        }
+                        // if($value_import[0]!=''){
+                        //     for($i = 0; $i <= count($value_import[2]); $i++){
+                        //     }
+
+                        // }
+
+                        $i++;
+                    }
+                    fclose($file);
+
+                    unlink($file_loc);
+
+
                 }
 
             }
 
-            DB::connection("mysqlAnsel")->commit();
+            DB::commit();
 
-            if ($aksi == 'add') {
-                $st = "ditambahkan";
-            } else {
-                $st = "diubah";
-            }
-
-            return Core::setResponse("success", "Sukses $st");
+            return $this->core->setResponse("success", "Sukses Ditambahkan");
 
         } catch (\Throwable $th) {
 
-            DB::connection("mysqlAnsel")->rollback();
+            DB::rollback();
 
-            return Core::setResponse("error", "Gagal diproses $th");
+            return $this->core->setResponse("error", "Gagal diproses $th");
+
+        }
+
+    }
+
+    public function update_project(Request $request, $id)
+    {
+        ini_set('max_execution_time', '0');
+        ini_set('memory_limit','2048M');
+
+        $input = $request->input();
+
+        $user       = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('user_created')));
+        $project    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('name_project')));
+        $description= preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('description')));
+        $field_a    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('field_a')));
+        $field_b    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('field_b')));
+        $field_c    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('field_c')));
+        $hadiah     = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', $request->input('hadiah'));
+        $file       = $request->file('file');
+        // $file       = $input['file'];
+        $aksi       = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('aksi')));
+
+        $validator = Validator::make($request->all(), [
+            'user_created'  => 'required',
+            'name_project'  => 'required',
+            'description'   => 'required',
+            'field_a'       => 'required',
+            'field_b'       => 'required',
+            'field_c'       => 'required',
+            'hadiah'        => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->core->setResponse("error", $validator->errors());
+        }
+
+        DB::connection("mysqlAnsel")->beginTransaction();
+
+        try {
+
+            $project_id = $id;
+
+            DB::connection("mysqlAnsel")->update("UPDATE project set name_project = ?, description = ?, user_created = ? where id_project = ?", [$project,$description,$user,$project_id]);
+
+            DB::connection("mysqlAnsel")->update("UPDATE configure set field1 = ?, field2 = ?, field3 = ? where id_project = ?", [$field_a,$field_b,$field_c,$project_id]);
+
+            DB::connection("mysqlAnsel")->delete("DELETE from hadiah where id_project = ?", [$project_id]);
+
+            foreach($hadiah as $data){;
+                DB::connection("mysqlAnsel")->select("INSERT into hadiah(id_project, name_hadiah) values(?, ?)", [$project_id,"$data"]);
+            }
+
+            if($file == ''){
+
+                DB::connection("mysqlAnsel")->commit();
+
+                // return $this->core->setResponse("success", "Sukses Diubah");
+            } else {
+
+                $file_oriname   = $file->getClientOriginalName();
+                $file_size      = $file->getSize();
+                $fileMimeType   = $file->getClientMimeType();
+                // $file_oriname   = $file['name'];
+                // $file_size      = $file['size'];
+                $filename       = pathinfo($file_oriname, PATHINFO_FILENAME);
+                $extensi        = pathinfo($file_oriname, PATHINFO_EXTENSION);
+
+                //file peserta
+                $tanggal= date('Y-m-d');
+                $waktu  = strtotime(date('H:i:s'));
+                // $file   = htmlspecialchars(str_replace("/", "", $file_oriname));
+
+                $eror		= false;
+                $file_type	= array('csv');
+                $max_size	= 500000000; // 5MB
+
+                //ubah nama file
+                $file_name	= "import-".$tanggal."-".$waktu.".".$extensi;
+
+                if($file->move(storage_path('file_csv'), $file_name)){
+                // if(move_uploaded_file($file, storage_path("/file_csv/$file_name"))){
+
+                    $file_loc   = storage_path("/file_csv/$file_name");
+
+                    $delimiter  = $this->detectDelimiter($file_loc);
+
+                    // $hasil      = $this->import_csv($delimiter, $file_name, htmlspecialchars($project_id));
+
+                    $file_loc       = storage_path("/file_csv/$file_name");
+                    // $new_name_file  = htmlspecialchars(str_replace("/", "", $file_name));
+                    //$new_name_file = htmlspecialchars(str_replace("\", "", $new_name_file));
+
+                    $file = fopen($file_loc,"r");
+
+                    $data_import = array();
+                    $data_hasil = array();
+
+                    $data_hasil['berhasil'] = "";
+                    $data_hasil['gagal'] = "";
+                    $dept = NULL;
+
+                    while(! feof($file))
+                    {
+                    $data_import[] = fgetcsv($file,1000,$delimiter);
+                    }
+                    if(!empty($data_import)){
+                        unset($data_import[0]);
+                    }
+
+                    DB::connection("mysqlAnsel")->select("DROP TABLE IF EXISTS peserta_".$project_id."");
+                    DB::connection("mysqlAnsel")->select("
+                        CREATE TABLE peserta_".$project_id." (
+                            id_peserta INT PRIMARY KEY AUTO_INCREMENT,
+                            fielda VARCHAR(255),
+                            fieldb VARCHAR(255),
+                            fieldc VARCHAR(255),
+                            status INT
+                        )
+                    ");
+
+                    $i = 1;
+                    foreach(array_filter($data_import) as $index_import => $value_import){
+
+                        $fielda = $value_import[0];
+                        $fieldb = $value_import[1];
+                        $fieldc = $value_import[2];
+                        $insert = DB::connection("mysqlAnsel")->select("INSERT into peserta_".$project_id."(fielda,fieldb,fieldc, status) values ('$fielda','$fieldb','$fieldc','0') ");
+
+                        if(count($insert) == 0){
+                            $data_hasil['berhasil'] = "Berhasil";
+                        }else{
+                            $data_hasil['gagal'] = "error";
+                        }
+
+                        $i++;
+                    }
+                    fclose($file);
+
+                    unlink($file_loc);
+
+                }
+
+                DB::commit();
+
+            }
+
+            return $this->core->setResponse("success", "Sukses Diubah");
+
+        } catch (\Throwable $th) {
+
+            DB::rollback();
+
+            return $this->core->setResponse("error", "Gagal diproses $th");
 
         }
 
@@ -459,7 +663,7 @@ class AnselController extends Controller
     public function list_user_dropdown($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus numeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus numeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -470,15 +674,15 @@ class AnselController extends Controller
             DB::connection("mysqlAnsel")->commit();
 
             if (count($query) == 0) {
-                return Core::setResponse("not_found", "Data Empty");
+                return $this->core->setResponse("not_found", "Data Empty");
             }
 
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
     }
@@ -492,7 +696,7 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -511,21 +715,21 @@ class AnselController extends Controller
                 $user = DB::connection('mysqlAnsel')->select("SELECT id_user, username from tbl_user where id_user != '1' AND id_user != ?", [$user_id]);
 
                 DB::connection("mysqlAnsel")->commit();
-                return Core::setResponse("success", array('success' => 1, 'user' => $user));
+                return $this->core->setResponse("success", array('success' => 1, 'user' => $user));
             }
 
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
     public function list_undian($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus umeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus umeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -537,15 +741,15 @@ class AnselController extends Controller
             DB::connection("mysqlAnsel")->commit();
 
             if (count($query) == 0) {
-                return Core::setResponse("not_found", "Data Empty");
+                return $this->core->setResponse("not_found", "Data Empty");
             }
 
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
@@ -557,7 +761,7 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -572,22 +776,22 @@ class AnselController extends Controller
             DB::connection("mysqlAnsel")->commit();
 
             if (count($query) == 0) {
-                return Core::setResponse("not_found", "Data Empty");
+                return $this->core->setResponse("not_found", "Data Empty");
             }
 
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
     public function list_hadiah_undi($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus umeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus umeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -599,22 +803,22 @@ class AnselController extends Controller
             DB::connection("mysqlAnsel")->commit();
 
             if (count($query) == 0) {
-                return Core::setResponse("not_found", "Data Empty");
+                return $this->core->setResponse("not_found", "Data Empty");
             }
 
-            return Core::setResponse("success", $query);
+            return $this->core->setResponse("success", $query);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
     public function angka_jumlah($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus umeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus umeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -637,12 +841,12 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", ['pemenang' => count($q_pemenang), 'peserta' => $q_peserta, 'field' => $q_field]);
+            return $this->core->setResponse("success", ['pemenang' => count($q_pemenang), 'peserta' => $q_peserta, 'field' => $q_field]);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
@@ -657,7 +861,7 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         $id_hadiah  = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('id_hadiah')));
@@ -668,7 +872,7 @@ class AnselController extends Controller
         $id_user    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', "", htmlspecialchars($request->input('id_user')));
 
         if($nama_roles != 'user'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         // $id_peserta = 4;
@@ -687,7 +891,7 @@ class AnselController extends Controller
             $sql = DB::connection("mysqlAnsel")->select($q);
 
             if (count($sql) == 0) {
-                return Core::setResponse("not_found", "Semua peserta sudah menang!");
+                return $this->core->setResponse("not_found", "Semua peserta sudah menang!");
             }
 
             $list = array();
@@ -725,21 +929,21 @@ class AnselController extends Controller
 
                     DB::connection("mysqlAnsel")->commit();
 
-                    return Core::setResponse("success", $data);
+                    return $this->core->setResponse("success", $data);
                 }else{
 
                     DB::connection("mysqlAnsel")->rollback();
-                    return Core::setResponse("not_found", "Data Empty");
+                    return $this->core->setResponse("not_found", "Data Empty");
                 }
 
             }else{
-                return Core::setResponse("not_found", "Data Empty");
+                return $this->core->setResponse("not_found", "Data Empty");
             }
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses! $th");
+            return $this->core->setResponse("error", "gagal diproses! $th");
         }
     }
 
@@ -753,7 +957,7 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         $pjk        = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('project')));
@@ -761,7 +965,7 @@ class AnselController extends Controller
         $kategori   = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('kategori')));
 
         if($nama_roles != 'user'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -846,18 +1050,18 @@ class AnselController extends Controller
                     $output['data']=$data;
                     break;
                 default:
-                    return Core::setResponse("not_found", "Kategori tidak ditemukan");
+                    return $this->core->setResponse("not_found", "Kategori tidak ditemukan");
                     break;
             }
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", $output);
+            return $this->core->setResponse("success", $output);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses! $th");
+            return $this->core->setResponse("error", "gagal diproses! $th");
         }
     }
 
@@ -870,7 +1074,7 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         $pjk        = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('project')));
@@ -878,7 +1082,7 @@ class AnselController extends Controller
         $id_user    = preg_replace('~[\\\\/:*?!@#$%^&;:()"<>|]~', '', htmlspecialchars($request->input('id_user')));
 
         if($nama_roles != 'user'){
-            return Core::setResponse("error", "access Denied");
+            return $this->core->setResponse("error", "access Denied");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -908,24 +1112,24 @@ class AnselController extends Controller
 
                 DB::connection("mysqlAnsel")->commit();
 
-                return Core::setResponse("success", $data);
+                return $this->core->setResponse("success", $data);
 
             } else{
-                return Core::setResponse("not_found", "Project Not Found");
+                return $this->core->setResponse("not_found", "Project Not Found");
             }
 
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
     public function pemenang_delete_all($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus umeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus umeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -939,15 +1143,15 @@ class AnselController extends Controller
 
                 DB::connection("mysqlAnsel")->commit();
 
-                return Core::setResponse("success", "Berhasil dihapus");
+                return $this->core->setResponse("success", "Berhasil dihapus");
             }else{
-                return Core::setResponse("error", "gagal dihapus!");
+                return $this->core->setResponse("error", "gagal dihapus!");
             }
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
@@ -959,7 +1163,7 @@ class AnselController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return Core::setResponse("error", $validator->errors());
+            return $this->core->setResponse("error", $validator->errors());
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -981,28 +1185,28 @@ class AnselController extends Controller
                     DB::connection("mysqlAnsel")->select("UPDATE peserta_".$id." SET status = '0' where id_peserta = ?", [$id_peserta]);
 
                     DB::connection("mysqlAnsel")->commit();
-                    return Core::setResponse("success", "Berhasil dihapus");
+                    return $this->core->setResponse("success", "Berhasil dihapus");
                 } else {
                     DB::connection("mysqlAnsel")->rollback();
-                    return Core::setResponse("error", "gagal dihapus!");
+                    return $this->core->setResponse("error", "gagal dihapus!");
                 }
 
             } else {
-                return Core::setResponse("error", "denied!");
+                return $this->core->setResponse("error", "denied!");
             }
 
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
     }
 
     public function field_list_pemenang($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus numeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus numeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -1030,12 +1234,12 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", ['field' => [$field1, $field2, $field3], 'pemenang' => $data, 'peserta' => $ps]);
+            return $this->core->setResponse("success", ['field' => [$field1, $field2, $field3], 'pemenang' => $data, 'peserta' => $ps]);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
     }
@@ -1043,7 +1247,7 @@ class AnselController extends Controller
     public function export_pemenang($id)
     {
         if (!$this->isNumeric($id)) {
-            return Core::setResponse("error", "Parameter ID harus terisi atau harus numeric");
+            return $this->core->setResponse("error", "Parameter ID harus terisi atau harus numeric");
         }
 
         DB::connection("mysqlAnsel")->beginTransaction();
@@ -1081,12 +1285,12 @@ class AnselController extends Controller
 
             DB::connection("mysqlAnsel")->commit();
 
-            return Core::setResponse("success", $output);
+            return $this->core->setResponse("success", $output);
 
         } catch (\Throwable $th) {
             DB::connection("mysqlAnsel")->rollback();
 
-            return Core::setResponse("error", "gagal diproses!");
+            return $this->core->setResponse("error", "gagal diproses!");
         }
 
 
