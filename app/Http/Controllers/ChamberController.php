@@ -549,13 +549,13 @@ class ChamberController extends Controller
                     $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
                         FROM boopati_whitelist_claim a
                         WHERE a.flag = '".$flag."' AND a.id_users = '".$id_users."' AND
-                        a.status_claim LIKE 'sent on%' OR a.status_claim LIKE 'not using whatsapp%'
+                        a.status_claim LIKE 'sent on%' OR a.status_claim LIKE 'terkirim%'
                     ");
                 } else {
                     $query = DB::connection("mysqlChamber")->select("SELECT msisdn, brand, status_claim, tanggal_claim, datetime_claim, keterangan
                         FROM boopati_whitelist_claim a
                         WHERE a.flag = '".$flag."' AND a.id_users = '".$id_users."' AND
-                        a.status_claim NOT LIKE 'sent on%' AND a.status_claim NOT LIKE 'not using whatsapp%'
+                        a.status_claim NOT LIKE 'sent on%' AND a.status_claim NOT LIKE 'terkirim%'
                     ");
                 }
 
